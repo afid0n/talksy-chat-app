@@ -1,10 +1,12 @@
-function App() {
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import ROUTES from "./routes";
+const router = createBrowserRouter(ROUTES);
 
+
+function App() {
   return (
-    <>
-    <h1 className="text-red-400">hey</h1>
-    </>
-  )
+      <RouterProvider router={router} />
+  );
 }
 
-export default App
+export default App;
