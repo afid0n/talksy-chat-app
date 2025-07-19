@@ -1,1 +1,1 @@
-console.log("hey Emil brach test emilqasimov");
+console.log("hey Emil brach test");
