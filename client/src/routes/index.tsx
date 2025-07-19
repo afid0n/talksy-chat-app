@@ -9,6 +9,7 @@ import Chat from "../pages/client/Chat";
 import Feed from "../pages/client/Feed";
 import Home from "../pages/client/Home";
 import Profile from "../pages/client/Profile";
+import NotFound from "../pages/Common/NotFound";
 
 const ROUTES = [
     {
@@ -34,7 +35,7 @@ const ROUTES = [
             {
                 path: "email-verified",
                 element: <VerifyEmail />,
-            },
+            }
         ]
     },
     {
@@ -56,8 +57,12 @@ const ROUTES = [
             {
                 path: "reset-password/:token",
                 element: <ResetPassword />,
-            },
+            }
         ]
+    },
+    {
+        path: "*",
+        element: <NotFound />,
     }
 ]
 
