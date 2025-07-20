@@ -8,7 +8,6 @@ const PrivacySettings = () => {
     return (
         <div className="bg-white p-6 rounded-xl shadow-sm space-y-6">
             <h3 className="text-lg font-semibold text-gray-800">Privacy Settings</h3>
-
             {/* Profile Visibility */}
             <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-xl p-4 transition">
                 <div className="flex items-start gap-3">
