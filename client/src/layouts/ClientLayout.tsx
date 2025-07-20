@@ -1,15 +1,16 @@
 import { Outlet } from "react-router-dom"
 import Sidebar from "../components/Sidebar"
-import Footer from "../components/Footer"
 
 const ClientLayout = () => {
   return (
-    <>
-    <Sidebar/>
-    <Outlet/>
-    <Footer/>
-    </>
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-1 p-5">
+        <Outlet />
+      </div>
+    </div>
   )
 }
+
 
 export default ClientLayout
