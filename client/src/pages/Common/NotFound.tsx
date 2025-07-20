@@ -21,7 +21,7 @@ export default function NotFound() {
           className="text-[100px] font-extrabold text-yellow-400 drop-shadow-md"
           initial={{ y: -50 }}
           animate={{
-            y: [ -50, 0, -10, 0 ],
+            y: [-50, 0, -10, 0],
           }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
@@ -34,7 +34,7 @@ export default function NotFound() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.6 }}
         >
-          Whoops! This page vanished into the sunshine 🌞  
+          Whoops! This page vanished into the sunshine 🌞
         </motion.p>
 
         <motion.button
