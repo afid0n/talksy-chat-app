@@ -11,7 +11,6 @@ const navItems = [
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-
   return (
     <aside className="flex flex-col bg-yellow-50 shadow-[2px_0_4px_rgba(254,240,138,0.4)] top-0 left-0 h-screen w-64 z-50">
       <h1 className="h-16 flex items-center justify-center  text-lg font-bold">
