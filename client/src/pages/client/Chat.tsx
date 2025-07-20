@@ -1,8 +1,13 @@
+import ChatPage from "@/components/ChatPage";
+import Messages from "@/components/Messages";
 
-const Chat = () => {
+const App = () => {
   return (
-    <div>Chat</div>
-  )
-}
+    <div className="flex min-h-screen w-full h-full">
+      <Messages />
+      <ChatPage />
+    </div>
+  );
+};
 
-export default Chat
+export default App;
