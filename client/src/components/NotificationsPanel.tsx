@@ -1,0 +1,71 @@
+import { useState } from "react";
+import { Bell } from "lucide-react";
+
+const NotificationToggle = ({
+  title,
+  description,
+  checked,
+  onChange,
+}: {
+  title: string;
+  description: string;
+  checked: boolean;
+  onChange: () => void;
+}) => (
+  <div className="flex items-center justify-between px-4 py-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition">
+    <div className="flex items-start gap-3">
+      <Bell className="mt-1 text-gray-500" />
+      <div>
+        <p className="text-sm font-medium text-gray-800">{title}</p>
+        <p className="text-xs text-gray-500">{description}</p>
+      </div>
+    </div>
+    <label className="inline-flex items-center cursor-pointer">
+      <input type="checkbox" checked={checked} onChange={onChange} className="sr-only peer" />
+      <div
+        className={`w-11 h-6 rounded-full peer transition-colors duration-300 ${
+          checked ? "bg-green-500" : "bg-gray-300"
+        }`}
+      >
+        <div
+          className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+            checked ? "translate-x-5" : "translate-x-1"
+          }`}
+        />
+      </div>
+    </label>
+  </div>
+);
+
+const NotificationsPanel = () => {
+  const [messageNotif, setMessageNotif] = useState(true);
+  const [connectionNotif, setConnectionNotif] = useState(true);
+  const [appUpdatesNotif, setAppUpdatesNotif] = useState(false);
+
+  return (
+    <div className="space-y-6 bg-white p-6 rounded-xl shadow-sm">
+      <h3 className="text-lg font-semibold text-gray-800">Notifications</h3>
+
+      <NotificationToggle
+        title="Message Notifications"
+        description="Get notified when you receive new messages"
+        checked={messageNotif}
+        onChange={() => setMessageNotif(!messageNotif)}
+      />
+      <NotificationToggle
+        title="Connection Requests"
+        description="Get notified when someone wants to connect"
+        checked={connectionNotif}
+        onChange={() => setConnectionNotif(!connectionNotif)}
+      />
+      <NotificationToggle
+        title="App Updates"
+        description="Get notified about new features and updates"
+        checked={appUpdatesNotif}
+        onChange={() => setAppUpdatesNotif(!appUpdatesNotif)}
+      />
+    </div>
+  );
+};
+
+export default NotificationsPanel;

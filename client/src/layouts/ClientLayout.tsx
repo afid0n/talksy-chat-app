@@ -1,5 +1,5 @@
-import { Outlet } from "react-router-dom"
-import Sidebar from "../components/Sidebar"
+import { Outlet } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 
 const ClientLayout = () => {
   return (
@@ -7,8 +7,7 @@ const ClientLayout = () => {
       <Sidebar/>
       <Outlet />
     </div>
-  )
-}
+  );
+};
 
-
-export default ClientLayout
+export default ClientLayout;
