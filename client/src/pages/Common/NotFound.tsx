@@ -38,12 +38,12 @@ export default function NotFound() {
         </motion.p>
 
         <motion.button
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           className="bg-yellow-300 text-gray-800 font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-xl hover:bg-yellow-400 transition-all duration-300"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
-          ⬅️ Go Home
+          ⬅️ Go Back
         </motion.button>
       </motion.div>
     </div>
