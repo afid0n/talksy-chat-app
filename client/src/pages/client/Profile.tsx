@@ -20,7 +20,6 @@ const Profile = () => {
   return (
     <div className="mx-56">
       <div className="bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row items-center justify-between gap-6 w-full mb-6">
-        {/* Avatar */}
         <div className="relative flex-shrink-0">
           <div className="w-20 h-20 bg-green-600 text-white font-bold text-2xl flex items-center justify-center rounded-full">
             AJ
