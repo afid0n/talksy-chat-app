@@ -57,6 +57,10 @@ const ROUTES = [
             {
                 path: "reset-password/:token",
                 element: <ResetPassword />,
+            },
+               {
+                path: "email-verified",
+                element: <VerifyEmail />,
             }
         ]
     },
