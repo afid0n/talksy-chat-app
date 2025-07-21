@@ -1,13 +1,36 @@
-import { Outlet } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
+import React, { useState, useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
+import Sidebar from '@/components/Sidebar';
 
-const ClientLayout = () => {
+const AppLayout = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   return (
-    <div className="flex">
-      <Sidebar/>
-      <Outlet />
+    <div className=" ">
+      <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
+      <main
+        className={`transition-all duration-300 ${
+          isOpen ? 'md:ml-64 ml-16' : 'ml-16'
+        } `}
+      >
+        <Outlet />
+      </main>
     </div>
   );
 };
 
-export default ClientLayout;
+export default AppLayout;
