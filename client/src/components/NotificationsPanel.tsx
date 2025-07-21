@@ -12,19 +12,19 @@ const NotificationToggle = ({
   checked: boolean;
   onChange: () => void;
 }) => (
-  <div className="flex items-center justify-between px-4 py-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition">
+  <div className="flex items-center justify-between px-4 py-4 rounded-xl bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 transition">
     <div className="flex items-start gap-3">
-      <Bell className="mt-1 text-gray-500" />
+      <Bell className="mt-1 text-gray-500 dark:text-gray-300" />
       <div>
-        <p className="text-sm font-medium text-gray-800">{title}</p>
-        <p className="text-xs text-gray-500">{description}</p>
+        <p className="text-sm font-medium text-gray-800 dark:text-white">{title}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{description}</p>
       </div>
     </div>
     <label className="inline-flex items-center cursor-pointer">
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only peer" />
       <div
         className={`w-11 h-6 rounded-full peer transition-colors duration-300 ${
-          checked ? "bg-green-500" : "bg-gray-300"
+          checked ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
         }`}
       >
         <div
@@ -43,8 +43,8 @@ const NotificationsPanel = () => {
   const [appUpdatesNotif, setAppUpdatesNotif] = useState(false);
 
   return (
-    <div className="space-y-6 bg-white p-6 rounded-xl shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-800">Notifications</h3>
+    <div className="space-y-6 bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-sm">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Notifications</h3>
 
       <NotificationToggle
         title="Message Notifications"

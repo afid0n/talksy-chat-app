@@ -6,19 +6,20 @@ const PrivacySettings = () => {
     const [messagePrivacy, setMessagePrivacy] = useState("Everyone");
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow-sm space-y-6">
-            <h3 className="text-lg font-semibold text-gray-800">Privacy Settings</h3>
+        <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-sm space-y-6">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Privacy Settings</h3>
+
             {/* Profile Visibility */}
-            <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-xl p-4 transition">
+            <div className="flex items-center justify-between bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-xl p-4 transition">
                 <div className="flex items-start gap-3">
-                    <Eye className="mt-1 text-gray-500" />
+                    <Eye className="mt-1 text-gray-500 dark:text-gray-300" />
                     <div>
-                        <p className="text-sm font-medium text-gray-800">Profile Visibility</p>
-                        <p className="text-xs text-gray-500">Control who can see your profile</p>
+                        <p className="text-sm font-medium text-gray-800 dark:text-white">Profile Visibility</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Control who can see your profile</p>
                     </div>
                 </div>
                 <select
-                    className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={profileVisibility}
                     onChange={(e) => setProfileVisibility(e.target.value)}
                 >
@@ -29,16 +30,16 @@ const PrivacySettings = () => {
             </div>
 
             {/* Message Privacy */}
-            <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-xl p-4 transition">
+            <div className="flex items-center justify-between bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-xl p-4 transition">
                 <div className="flex items-start gap-3">
-                    <MessageSquare className="mt-1 text-gray-500" />
+                    <MessageSquare className="mt-1 text-gray-500 dark:text-gray-300" />
                     <div>
-                        <p className="text-sm font-medium text-gray-800">Message Privacy</p>
-                        <p className="text-xs text-gray-500">Control who can send you messages</p>
+                        <p className="text-sm font-medium text-gray-800 dark:text-white">Message Privacy</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Control who can send you messages</p>
                     </div>
                 </div>
                 <select
-                    className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={messagePrivacy}
                     onChange={(e) => setMessagePrivacy(e.target.value)}
                 >
