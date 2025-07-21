@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ForgotPasswordCom from "@/components/ForgotPassword";
 import CheckEmail from "@/components/CheckEmail";
 
