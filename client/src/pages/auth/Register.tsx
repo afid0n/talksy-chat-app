@@ -4,7 +4,7 @@ import RegisterForm from "@/components/RegisterForm";
 export default function Register() {
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen  dark:bg-black text-black dark:text-white transition-colors">
+    <div className="flex flex-col items-center justify-center min-h-screen  text-black dark:text-white transition-colors">
       <div className="mb-6 text-center">
         <h1 className="text-4xl font-bold">
           <span className="text-black dark:text-white">Talk</span>

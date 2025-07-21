@@ -1,3 +1,4 @@
+import { useState } from "react";
 
 const conversations = [
   { id: 1, name: "Alex Chen", message: "Hey! How’s the project going?", time: "2 min", unread: 3, initials: "AC" },
@@ -8,37 +9,51 @@ const conversations = [
 ];
 
 const Messages = () => {
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  const handleClick = (id: number) => {
+    setSelectedId(id);
+    console.log("Selected conversation:", id);
+    // Later you can use navigate(`/chat/${id}`) or set currentChat(id)
+  };
+
   return (
-    <div className=" border-r p-4 overflow-y-auto bg-white">
-      <h2 className="text-xl font-semibold mb-4">Messages</h2>
+    <div className="border-r p-4 overflow-y-auto bg-white/70 dark:bg-zinc-700/70 dark:border-gray-700 min-h-screen">
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Messages</h2>
+
       <input
         type="text"
         placeholder="Search conversations..."
-        className="w-full p-2 mb-4 border rounded"
+        className="w-full p-2 mb-4 border rounded dark:bg-zinc-800 dark:border-gray-600 dark:text-white"
       />
+
       <ul>
         {conversations.map((c) => (
           <li
             key={c.id}
-            className={`flex items-center justify-between p-3 mb-2 rounded-lg hover:bg-gray-100 cursor-pointer ${
-              c.unread ? "bg-green-50" : ""
+            onClick={() => handleClick(c.id)}
+            className={`flex items-center justify-between p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+              selectedId === c.id ? "bg-yellow-100 dark:bg-yellow-800" : "hover:bg-gray-100 dark:hover:bg-zinc-800"
             }`}
           >
             <div className="flex items-center gap-3">
-              <div className="bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">
+              <div className="bg-yellow-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">
                 {c.initials}
               </div>
-              <div>
-                <h4 className="font-medium">
-                  {c.name} {c.group && <span className="ml-1">👥</span>}
+
+              <div className="w-40">
+                <h4 className="font-medium text-gray-800 dark:text-white flex items-center">
+                  {c.name}
+                  {c.group && <span className="ml-1 text-sm">👥</span>}
                 </h4>
-                <p className="text-sm text-gray-600 truncate w-40">{c.message}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{c.message}</p>
               </div>
             </div>
-            <div className="text-right text-xs text-gray-500">
+
+            <div className="text-right text-xs text-gray-500 dark:text-gray-400">
               <p>{c.time}</p>
               {c.unread > 0 && (
-                <span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-xs">
+                <span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-xs inline-block mt-1">
                   {c.unread}
                 </span>
               )}

@@ -7,7 +7,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen dark:bg-black text-black dark:text-white transition-colors">
+    <div className="flex flex-col items-center justify-center min-h-screen text-black dark:text-white transition-colors">
       <div className="mb-6 text-center">
         <h1 className="text-4xl font-bold">
           <span className="text-black dark:text-white">Talk</span>
