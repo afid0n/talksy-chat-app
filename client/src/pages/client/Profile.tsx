@@ -18,8 +18,8 @@ const Profile = () => {
   const [language, setLanguage] = useState("en");
   const { setTheme } = useTheme()
   return (
-    <div className="mx-56">
-      <div className="bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row items-center justify-between gap-6 w-full mb-6">
+    <div className="px-2 sm:px-4 md:px-8 lg:px-20 py-8 sm:py-12 md:py-14">
+      <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-6 w-full mb-6">
         <div className="relative flex-shrink-0">
           <div className="w-20 h-20 bg-green-600 text-white font-bold text-2xl flex items-center justify-center rounded-full">
             AJ
@@ -48,27 +48,27 @@ const Profile = () => {
             Alex Johnson
           </h2>
           <p className="text-gray-600">@alexj_2024</p>
-          <p className="text-gray-700 mt-2 max-w-md">
+          <p className="text-gray-700 mt-2 max-w-md mx-auto md:mx-0">
             Digital enthusiast, coffee lover, and ChatWave explorer! Always
             excited to connect with new people and share interesting
             conversations.
           </p>
 
-          <div className="flex items-center gap-4 mt-4 justify-center md:justify-start text-sm text-gray-600">
+          <div className="flex  xs:flex-row items-center gap-2 xs:gap-4 mt-4 justify-center md:justify-start text-sm text-gray-600">
             <span className="flex items-center gap-1">📍 San Francisco, CA</span>
             <span className="flex items-center gap-1">📅 Joined January 2024</span>
           </div>
         </div>
 
         {/* Edit Button */}
-        <div className="self-start md:self-center">
-          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-semibold">
+        <div className="self-start md:self-center w-full md:w-auto flex justify-center md:justify-end">
+          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-semibold w-full md:w-auto">
             ✏️ Edit Profile
           </button>
         </div>
       </div>
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="w-full bg-white p-1 rounded-xl shadow-sm flex justify-between h-15">
+        <TabsList className="w-full bg-white p-1 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between h-auto gap-2 sm:gap-0">
           <TabsTrigger
             value="overview"
             className="w-full flex items-center justify-center gap-2 py-2 rounded-lg data-[state=active]:bg-green-500 data-[state=active]:text-white text-gray-700 hover:bg-gray-100 transition"
@@ -102,9 +102,9 @@ const Profile = () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="overview">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
             {/* Total Messages */}
-            <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-4">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 flex items-center gap-4">
               <div className="bg-green-100 p-3 rounded-full">
                 <MessageCircle className="text-green-600" />
               </div>
@@ -115,7 +115,7 @@ const Profile = () => {
             </div>
 
             {/* Connections */}
-            <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-4">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 flex items-center gap-4">
               <div className="bg-blue-100 p-3 rounded-full">
                 <Users className="text-blue-600" />
               </div>
@@ -126,7 +126,7 @@ const Profile = () => {
             </div>
 
             {/* Favorites */}
-            <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-4">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 flex items-center gap-4">
               <div className="bg-purple-100 p-3 rounded-full">
                 <Heart className="text-purple-600" />
               </div>
@@ -136,32 +136,32 @@ const Profile = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm mt-8">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm mt-8">
             {/* Başlıq */}
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
 
             {/* Kartlar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4">
               {/* New Chat */}
-              <div className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 transition rounded-lg p-4">
+              <div className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 transition rounded-lg p-3 sm:p-4">
                 <MessageCircle className="text-green-600 mb-2" />
                 <p className="text-sm font-medium text-gray-700">New Chat</p>
               </div>
 
               {/* Find Friends */}
-              <div className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 transition rounded-lg p-4">
+              <div className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 transition rounded-lg p-3 sm:p-4">
                 <Users className="text-blue-600 mb-2" />
                 <p className="text-sm font-medium text-gray-700">Find Friends</p>
               </div>
 
               {/* Preferences */}
-              <div className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 transition rounded-lg p-4">
+              <div className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 transition rounded-lg p-3 sm:p-4">
                 <Settings className="text-purple-600 mb-2" />
                 <p className="text-sm font-medium text-gray-700">Preferences</p>
               </div>
 
               {/* Privacy */}
-              <div className="flex flex-col items-center justify-center bg-orange-50 hover:bg-orange-100 transition rounded-lg p-4">
+              <div className="flex flex-col items-center justify-center bg-orange-50 hover:bg-orange-100 transition rounded-lg p-3 sm:p-4">
                 <Shield className="text-orange-600 mb-2" />
                 <p className="text-sm font-medium text-gray-700">Privacy</p>
               </div>
@@ -169,11 +169,11 @@ const Profile = () => {
           </div>
         </TabsContent>
         <TabsContent className="flex flex-col gap-5" value="settings">
-          <div className=" bg-white p-6 rounded-xl shadow-sm">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
             {/* Language & Region */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Language & Region</h3>
-              <div className="flex justify-between items-center gap-3">
+              <div className="flex flex-col xs:flex-row justify-between items-center gap-3">
                 {[
                   { code: "en", label: "English", region: "US" },
                   { code: "az", label: "Azərbaycan", region: "AZ" },
@@ -183,7 +183,7 @@ const Profile = () => {
                   <button
                     key={lang.code}
                     onClick={() => setLanguage(lang.code)}
-                    className={`flex items-center justify-center gap-2 border px-12 py-5 rounded-lg transition ${language === lang.code
+                    className={`flex items-center justify-center gap-2 border px-8 sm:px-12 py-3 sm:py-5 rounded-lg transition ${language === lang.code
                       ? "bg-green-50 text-green-700 border-green-500"
                       : "text-gray-700 hover:bg-gray-50"
                       }`}
@@ -196,9 +196,9 @@ const Profile = () => {
             </div>
           </div>
           {/* Appearance */}
-          <div className="bg-white p-6 rounded-xl shadow-sm">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Appearance</h3>
-            <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+            <div className="flex flex-col sm:flex-row items-center justify-between bg-gray-50 p-4 rounded-lg gap-3">
               <div className="flex items-center gap-3">
                 <Sun className="text-gray-500" />
                 <div>
@@ -244,19 +244,16 @@ const Profile = () => {
           <div className="w-full">
             <ChangePassword />
           </div>
-          <div className="bg-white border border-red-200 rounded-xl p-6 mt-6 space-y-4 shadow-sm">
+          <div className="bg-white border border-red-200 rounded-xl p-4 sm:p-6 mt-6 space-y-4 shadow-sm">
             <h3 className="text-lg font-semibold text-red-600">Danger Zone</h3>
 
-            <div className="flex items-center justify-between w-full">
+            <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3">
               <button
                 className="flex items-center justify-center w-full gap-2 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 font-medium py-2 px-4 rounded-md transition"
               >
                 <LogOut size={18} />
                 Sign Out
               </button>
-            </div>
-
-            <div className="flex items-center justify-between w-full">
               <button
                 className="flex items-center justify-center w-full gap-2 text-red-700 bg-red-100 hover:bg-red-200 border border-red-300 font-semibold py-2 px-4 rounded-md transition"
               >
@@ -267,9 +264,8 @@ const Profile = () => {
           </div>
         </TabsContent>
       </Tabs>
-      {/* Stats */}
     </div>
   )
 }
 
-export default Profile;
+export default Profile

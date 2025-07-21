@@ -85,7 +85,7 @@ const people = {
 
 const Cards = () => {
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="w-full ">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {Object.entries(people).map(([id, person]) => (
           <div key={id} className="bg-white shadow-md rounded-2xl p-4 flex flex-col justify-between transition-all hover:shadow-lg">
