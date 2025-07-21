@@ -1,26 +1,36 @@
 import { FaGoogle } from 'react-icons/fa';
 import { useState } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 export default function RegisterForm() {
   const [username, setUsername] = useState('');
   const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [securityCheck, setSecurityCheck] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const handleCaptchaChange = (value: string | null) => {
+    if (value) {
+      setCaptchaVerified(true);
+    } else {
+      setCaptchaVerified(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormSubmitted(true);
 
-    if (securityCheck) {
-      // здесь можно сделать POST запрос
+    if (captchaVerified) {
+      // Burada POST sorğusu göndərə bilərsən
       console.log('Form submitted!', { username, fullname, email, password });
+      alert("Uğurla qeydiyyatdan keçdiniz!");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
       <div className="mb-6 text-center">
         <h1 className="text-4xl font-bold text-gray-800">
           <span className="text-black">Chat </span>
@@ -91,21 +101,14 @@ export default function RegisterForm() {
           />
         </div>
 
-        {/* ✅ Security Verification */}
+        {/* ✅ Google reCAPTCHA */}
         <div className="mb-2">
           <p className="text-sm font-medium text-gray-700 mb-1">Security Verification</p>
-          <label className="flex items-center text-sm text-gray-700">
-            <input
-              type="checkbox"
-              className="mr-2"
-              checked={securityCheck}
-              onChange={(e) => setSecurityCheck(e.target.checked)}
-            />
-            I'm not a robot
-          </label>
-
-          {/* ⚠️ Warning message */}
-          {formSubmitted && !securityCheck && (
+          <ReCAPTCHA
+            sitekey="6Ld0A4orAAAAAIguOQtslv-xTFOyrSDMgkRmLeax"  // ⚠️ BURANI DƏYİŞİN!
+            onChange={handleCaptchaChange}
+          />
+          {formSubmitted && !captchaVerified && (
             <p className="text-red-500 text-xs mt-2">
               Please complete the reCAPTCHA verification above
             </p>
@@ -124,11 +127,11 @@ export default function RegisterForm() {
           <button
             type="submit"
             className="w-1/2 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-all"
+            disabled={!captchaVerified}
           >
             Create Account
           </button>
         </div>
-
       </form>
     </div>
   );
