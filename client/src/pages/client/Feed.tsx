@@ -1,7 +1,9 @@
-
+import Cards from "@/components/Cards"
 const Feed = () => {
   return (
-    <div>Feed</div>
+    <>
+      <Cards />
+    </>
   )
 }
 

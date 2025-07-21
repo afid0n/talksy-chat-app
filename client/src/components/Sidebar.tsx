@@ -52,7 +52,6 @@ const Sidebar: React.FC = () => {
           </h1>
         )}
       </div>
-
       {/* Nav */}
       <div className="flex flex-col justify-between flex-1 ">
         <nav className="mt-4 flex flex-col space-y-1 px-2">
