@@ -227,9 +227,6 @@ const Profile = () => {
                   <DropdownMenuItem onClick={() => handleThemeChange("dark")}>
                     Dark
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleThemeChange("system")}>
-                    System
-                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
