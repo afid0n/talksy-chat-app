@@ -1,4 +1,4 @@
-const User = require('../models/userModel');
+const UserModel = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
 
 const getUserById = async (id) => {
@@ -11,10 +11,28 @@ const getUserByEmail = async (email) => {
   return user ? formatMongoData(user) : null;
 };
 
-const createUser = async (userData) => {
-  const user = await User.create(userData);
-  return formatMongoData(user);
+const register = async (payload) => {
+  try {
+    const { email, username } = payload;
+    const existedUser = await UserModel.findOne({
+      $or: [{ email }, { username }],
+    });
+    if (existedUser) {
+      return {
+        success: false,
+        message: "username or email already taken!",
+      };
+    } else {
+      return {
+        data: await UserModel.create(payload),
+        success: true,
+      };
+    }
+  } catch (error) {
+    return error.message || "internal server error!";
+  }
 };
+
 
 const updateUser = async (id, updateData) => {
   const user = await User.findByIdAndUpdate(id, updateData, { new: true });
@@ -34,7 +52,7 @@ const getAllUsers = async () => {
 module.exports = {
   getUserById,
   getUserByEmail,
-  createUser,
+  register,
   updateUser,
   deleteUser,
   getAllUsers,

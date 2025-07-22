@@ -1,4 +1,7 @@
 const userService = require('../services/userService');
+const { sendVerificationEmail } = require('../services/emailService'); 
+const bcrypt = require("bcrypt"); 
+
 
 const getUserById = async (req, res, next) => {
   try {
@@ -29,12 +32,32 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
-const createUser = async (req, res, next) => {
+const registerUser = async (req, res, next) => {
   try {
-    const user = await userService.createUser(req.body);
-    res.status(201).json(user);
-  } catch (err) {
-    next(err);
+    //password hash
+    const { password } = req.body;
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const response = await register({
+      ...req.body,
+      password: hashedPassword,
+    });
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+
+    //send email service ...
+    const token = "test";
+    const verificationLink = `${process.env.SERVER_URL}/auth/verify-email?token=${token}`;
+    sendVerificationEmail(req.body.email, req.body.fullName, verificationLink);
+
+    res.status(201).json({
+      message: "user registered successfully | verify your email",
+      data: response,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -62,7 +85,7 @@ module.exports = {
   getUserById,
   getUserByEmail,
   getAllUsers,
-  createUser,
+  registerUser,
   updateUser,
   deleteUser,
 };

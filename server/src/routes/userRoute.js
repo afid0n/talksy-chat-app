@@ -11,8 +11,8 @@ router.get('/:id', userController.getUserById);
 // Get user by email
 router.get('/email/:email', userController.getUserByEmail);
 
-// Create user
-router.post('/', userController.createUser);
+// Register user
+router.post('/', userController.registerUser);
 
 // Update user
 router.put('/:id', userController.updateUser);
