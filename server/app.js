@@ -5,8 +5,8 @@ const path = require("path");
 
 // Import routes
 const userRoute = require("./src/routes/userRoute");
-const chatRoute = require("./src/routes/chatRoute");
-const messageRoute = require("./src/routes/messageRoute");
+const chatRoutes = require("./src/routes/chatRoute");
+const messageRoutes = require("./src/routes/messageRoute");
 
 const app = express();
 app.use(cors());
@@ -20,8 +20,8 @@ app.get("/", (_, res) => {
 
 // Use routes
 app.use("/api/users", userRoute);
-app.use("/api/chats", chatRoute);
-app.use("/api/messages", messageRoute);
+app.use('/api/chats', chatRoutes);
+app.use('/api/messages', messageRoutes);
 
 app.use(errorHandler);
 

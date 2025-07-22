@@ -1,6 +1,6 @@
 
-const { PORT, DB_URL, DB_PASSWORD } = require("./config");
 const mongoose = require("mongoose");
+const { DB_PASSWORD, PORT, DB_URL } = require("./config");
 
 const connectToDB = (app) => {
   mongoose
