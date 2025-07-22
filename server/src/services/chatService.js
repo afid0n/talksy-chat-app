@@ -32,10 +32,23 @@ const deleteChat = async (id) => {
   return chat ? formatMongoData(chat) : null;
 };
 
+const getAllChats = async (currentUserId) => {
+  return await Chat.find({ participants: currentUserId })
+    .populate('participants', '-password')
+    .populate('latestMessage')
+    .populate({
+      path: 'latestMessage',
+      populate: { path: 'sender', select: 'name email' }
+    })
+    .sort({ updatedAt: -1 });
+    
+};
+
 module.exports = {
   getChatById,
   getChatsForUser,
   createChat,
   updateChat,
   deleteChat,
+  getAllChats
 };

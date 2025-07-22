@@ -13,7 +13,9 @@ const getMessageById = async (req, res, next) => {
 const getMessagesForChat = async (req, res, next) => {
   try {
     const messages = await messageService.getMessagesForChat(req.params.chatId);
-    res.json(messages);
+    res.json({
+      message: messages ? 'Messages retrieved successfully' : 'No messages found for this chat',
+    });
   } catch (err) {
     next(err);
   }
@@ -48,10 +50,19 @@ const deleteMessage = async (req, res, next) => {
   }
 };
 
+const getMessages = async (req, res, next) => {
+  try {
+    const messages = await messageService.getMessages();
+    res.json(messages);
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   getMessageById,
   getMessagesForChat,
   createMessage,
   updateMessage,
   deleteMessage,
+  getMessages
 };

@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const messageController = require('../controllers/messageController');
 
-// Get all messages for a chat
-router.get('/chat/:chatId', messageController.getMessagesForChat);
+router.get('/', messageController.getMessages);
 
 // Get message by ID
 router.get('/:id', messageController.getMessageById);
