@@ -1,6 +1,11 @@
 const UserModel = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
-const { verifyToken } = require("../utils/jwt");
+const { verifyToken, generateToken } = require("../utils/jwt");
+const bcrypt = require("bcrypt");
+const moment = require("moment");
+
+const MAX_ATTEMPTS = 3;
+const LOCK_TIME = 10 * 60 * 1000; //10 minutes
 
 
 const getUserById = async (id) => {
@@ -58,6 +63,77 @@ const verifyEmailToken = async (token) => {
   }
 };
 
+
+const login = async (credentials) => {
+  const { email, password } = credentials;
+
+  const user = await UserModel.findOne({ email });
+
+  if (!user) {
+    throw new Error("Invalid credentials!");
+  }
+
+  //is verified
+  if (!user.emailVerified) {
+    throw new Error("email should be verified first!");
+  }
+
+  // Check if banned
+  if (user.isBanned) {
+    if (!user.banUntil || new Date(user.banUntil) > new Date()) {
+      throw new Error("You are banned from logging in.");
+    } else {
+      // Ban has expired, remove it
+      user.isBanned = false;
+      user.banUntil = null;
+      await user.save();
+    }
+  }
+
+  // Check if locked
+  if (user.lockUntil && user.lockUntil > new Date()) {
+    const unlockTime = new Date(user.lockUntil).toLocaleString();
+    throw new Error(`Account is locked. Try again after ${unlockTime}.`);
+  }
+
+  // Validate password
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
+    user.loginAttempts = (user.loginAttempts || 0) + 1;
+
+    if (user.loginAttempts >= MAX_ATTEMPTS) {
+      user.lockUntil = new Date(Date.now() + LOCK_TIME);
+      await user.save();
+      throw new Error(
+        "Too many login attempts. Account locked for 10 minutes."
+      );
+    }
+
+    await user.save();
+    throw new Error("Invalid credentials!");
+  }
+
+  // Success: reset loginAttempts, lockUntil, update lastLogin
+  user.loginAttempts = 0;
+  user.lockUntil = null;
+  user.lastLogin = new Date();
+
+  await user.save();
+  //implement refresh token
+  const token = generateToken({
+    email: user.email,
+    id: user._id,
+    role: user.role,
+    fullName: user.fullName,
+  });
+
+  return {
+    message: "login successful",
+    token: token,
+  };
+};
+
 const updateUser = async (id, updateData) => {
   const user = await User.findByIdAndUpdate(id, updateData, { new: true });
   return user ? formatMongoData(user) : null;
@@ -78,6 +154,7 @@ module.exports = {
   getUserByEmail,
   register,
   verifyEmailToken,
+  login,
   updateUser,
   deleteUser,
   getAllUsers,
