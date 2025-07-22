@@ -5,13 +5,9 @@ export default function NotFound() {
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen w-full flex items-center justify-center px-4  dark:bg-black transition-colors">
+    <div className="h-screen w-full flex items-center justify-center px-4 dark:bg-black transition-colors">
       <motion.div
-<<<<<<< HEAD
         className="bg-white dark:bg-zinc-900 rounded-3xl shadow-xl p-10 max-w-xl w-full text-center border-2 border-yellow-300 dark:border-yellow-500"
-=======
-        className="bg-white dark:bg-zinc-800 rounded-3xl shadow-xl p-10 max-w-xl w-full text-center border-2 border-yellow-300"
->>>>>>> main
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1.05, opacity: 1 }}
         transition={{
@@ -31,11 +27,7 @@ export default function NotFound() {
         </motion.h1>
 
         <motion.p
-<<<<<<< HEAD
-          className="text-gray-700 dark:text-gray-300 text-xl mb-8"
-=======
-          className="text-gray-700 dark:text-gray-100 text-xl mb-8"
->>>>>>> main
+          className="text-gray-700 dark:text-gray-200 text-xl mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.6 }}
@@ -49,7 +41,7 @@ export default function NotFound() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
-           Go Back
+          Go Back
         </motion.button>
       </motion.div>
     </div>
