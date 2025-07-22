@@ -1,6 +1,7 @@
 const userService = require('../services/userService');
 const { sendVerificationEmail } = require('../services/emailService'); 
 const bcrypt = require("bcrypt"); 
+const { CLIENT_URL } = require("../config/config");
 
 
 const getUserById = async (req, res, next) => {
@@ -61,6 +62,16 @@ const registerUser = async (req, res, next) => {
   }
 };
 
+const verifyEmail = async (req, res, next) => {
+  try {
+    const { token } = req.query;
+    //call your service here!
+    const response = await verifyEmailToken (token); //success, message
+    res.redirect(`${CLIENT_URL}/email-verified?message=${response.message}`);
+  } catch (error) {
+    next(error);
+  }
+};
 const updateUser = async (req, res, next) => {
   try {
     const user = await userService.updateUser(req.params.id, req.body);
@@ -86,6 +97,7 @@ module.exports = {
   getUserByEmail,
   getAllUsers,
   registerUser,
+  verifyEmail,
   updateUser,
   deleteUser,
 };

@@ -1,5 +1,7 @@
 const UserModel = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
+const { verifyToken } = require("../utils/jwt");
+
 
 const getUserById = async (id) => {
   const user = await User.findById(id);
@@ -33,6 +35,28 @@ const register = async (payload) => {
   }
 };
 
+const verifyEmailToken = async (token) => {
+  const isValidToken = verifyToken(token);
+  if (isValidToken) {
+    const { id } = isValidToken;
+    const user = await UserModel.findById(id);
+    if (user.emailVerified) {
+      return {
+        success: false,
+        message: "email already has been verified",
+      };
+    } else {
+      user.emailVerified = true;
+      await user.save();
+      return {
+        success: true,
+        message: "email has been verified successfully!",
+      };
+    }
+  } else {
+    throw new Error("invalid or expired token!");
+  }
+};
 
 const updateUser = async (id, updateData) => {
   const user = await User.findByIdAndUpdate(id, updateData, { new: true });
@@ -53,6 +77,7 @@ module.exports = {
   getUserById,
   getUserByEmail,
   register,
+  verifyEmailToken,
   updateUser,
   deleteUser,
   getAllUsers,
