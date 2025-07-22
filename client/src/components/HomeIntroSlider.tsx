@@ -81,7 +81,7 @@ const HomeIntroSlider: React.FC<HomeIntroSliderProps> = ({ onNext }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 text-center bg-white dark:bg-black text-black dark:text-white transition-colors">
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 text-center  text-black dark:text-white transition-colors">
       {!done && (
         <button
           onClick={skip}

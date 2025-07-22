@@ -1,5 +1,8 @@
 const userService = require('../services/userService');
 
+
+
+
 const getUserById = async (req, res, next) => {
   try {
     const user = await userService.getUserById(req.params.id);
@@ -29,12 +32,69 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
-const createUser = async (req, res, next) => {
+const registerUser = async (req, res, next) => {
   try {
-    const user = await userService.createUser(req.body);
-    res.status(201).json(user);
-  } catch (err) {
-    next(err);
+    //password hash
+    const { password } = req.body;
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    if (req.file && req.file.path) {
+      req.body.profileImage = req.file.path;
+      req.body.public_id = req.file.filename;
+    }
+    const response = await register({
+      ...req.body,
+      password: hashedPassword,
+    });
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+
+    //send email service ...
+    const token = generateToken({
+      id: response.data._id,
+      email: req.body.email,
+      fullName: req.body.fullName,
+    });
+    const verificationLink = `${process.env.SERVER_URL}/auth/verify-email?token=${token}`;
+    sendVerificationEmail(req.body.email, req.body.fullName, verificationLink);
+
+    res.status(201).json({
+      message: "user registered successfully | verify your email",
+      data: response.data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const verifyEmail = async (req, res, next) => {
+  try {
+    const { token } = req.query;
+    //call your service here!
+    const response = await verifyEmailToken (token); //success, message
+    res.redirect(`${CLIENT_URL}/email-verified?message=${response.message}`);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const login = async (req, res, next) => {
+  try {
+    const credentials = {
+      email: req.body.email,
+      password: req.body.password,
+    };
+    const response = await loginService(credentials);
+    res.status(200).json({
+      message: response.message,
+      token: response.token,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -70,7 +130,9 @@ module.exports = {
   getUserById,
   getUserByEmail,
   getAllUsers,
-  createUser,
+  registerUser,
+  login,
+  verifyEmail,
   updateUser,
   deleteUser,
   login

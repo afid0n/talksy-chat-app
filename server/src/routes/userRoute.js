@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const uploadMiddleware = require("../middlewares/uploadMiddleware");
+
+const upload = uploadMiddleware("userImages");
+
 
 // Get all users
 router.get('/', userController.getAllUsers);
@@ -13,8 +17,14 @@ router.get('/:id', userController.getUserById);
 // Get user by email
 router.get('/email/:email', userController.getUserByEmail);
 
-// Create user
-router.post('/', userController.createUser);
+// Register user
+router.post('/register', upload.single("profileImage"), userController.registerUser);
+
+//Verify Email
+router.get("/verify-email", userController.verifyEmail);
+
+// Login user
+// router.post('/login', login);
 
 // Update user
 router.put('/:id', userController.updateUser);
