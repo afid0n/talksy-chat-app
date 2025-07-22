@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
+const jwt = require('jsonwebtoken');
 
 const getUserById = async (id) => {
   const user = await User.findById(id);
@@ -31,6 +32,31 @@ const getAllUsers = async () => {
   return formatMongoData(users);
 };
 
+const loginUser = async ({ email, password }) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  const isMatch = await User.findOne({password});
+  if (!isMatch) {
+    throw new Error('Invalid credentials');
+  }
+
+  const token = jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: '7d' }
+  );
+
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    token
+  };
+};
+
 module.exports = {
   getUserById,
   getUserByEmail,
@@ -38,4 +64,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getAllUsers,
+  loginUser
 };
