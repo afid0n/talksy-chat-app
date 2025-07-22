@@ -5,7 +5,6 @@ module.exports = {
   DB_URL: process.env.DB_URL,
   DB_USERNAME: process.env.DB_USERNAME,
   DB_PASSWORD: process.env.DB_PASSWORD,
-<<<<<<< HEAD
   JWT_ACCESS_SECRET_KEY: process.env.JWT_ACCESS_SECRET_KEY,
   JWT_REFRESH_SECRET_KEY: process.env.JWT_REFRESH_SECRET_KEY,
   JWT_RESET_PASSWORD_SECRET_KEY: process.env.JWT_RESET_PASSWORD_SECRET_KEY,
@@ -16,12 +15,10 @@ module.exports = {
   JWT_REFRESH_TOKEN_EXPIRATION: process.env.JWT_REFRESH_TOKEN_EXPIRATION || "7d",
   JWT_RESET_PASSWORD_URL: process.env.JWT_RESET_PASSWORD_URL || "http://localhost:3030/api/auth/reset-password",
   JWT_VERIFY_EMAIL_URL: process.env.JWT_VERIFY_EMAIL_URL,
-  JWT_SECRET: process.env.JWT_SECRET_KEY                                                       
-=======
+  JWT_SECRET: process.env.JWT_SECRET_KEY,                                                       
   JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
   GMAIL_APP_NAME: process.env.GMAIL_APP_NAME,
   GMAIL_USER: process.env.GMAIL_USER,
   SERVER_URL: process.env.SERVER_URL,
   CLIENT_URL: process.env.CLIENT_URL,
->>>>>>> main
 };

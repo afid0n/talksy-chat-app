@@ -82,21 +82,21 @@ const verifyEmail = async (req, res, next) => {
 };
 
 
-const login = async (req, res, next) => {
-  try {
-    const credentials = {
-      email: req.body.email,
-      password: req.body.password,
-    };
-    const response = await loginService(credentials);
-    res.status(200).json({
-      message: response.message,
-      token: response.token,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+// const login = async (req, res, next) => {
+//   try {
+//     const credentials = {
+//       email: req.body.email,
+//       password: req.body.password,
+//     };
+//     const response = await loginService(credentials);
+//     res.status(200).json({
+//       message: response.message,
+//       token: response.token,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 const updateUser = async (req, res, next) => {
   try {

@@ -1,16 +1,10 @@
 const UserModel = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
-<<<<<<< HEAD
-const jwt = require('jsonwebtoken');
-=======
 const { verifyToken, generateToken } = require("../utils/jwt");
-const bcrypt = require("bcrypt");
-const moment = require("moment");
+
 
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 10 * 60 * 1000; //10 minutes
-
->>>>>>> main
 
 const getUserById = async (id) => {
   const user = await User.findById(id);
