@@ -8,12 +8,12 @@ interface FailedVerificationProps {
 const FailedVerification: React.FC<FailedVerificationProps> = ({ onResend, onBack }) => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4">
-      <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+      <div className="bg-white dark:bg-zinc-800 p-8 rounded-xl shadow-lg flex flex-col items-center">
         <XCircle className="text-red-500 mb-4" size={64} />
-        <h1 className="text-2xl font-bold mb-2 text-gray-800">
+        <h1 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100">
           Verification Failed
         </h1>
-        <p className="text-gray-600 mb-6 text-center max-w-xs">
+        <p className="text-gray-600 dark:text-gray-300 mb-6 text-center max-w-xs">
           We couldn't verify your email. The verification link may have expired or
           is invalid.
         </p>
