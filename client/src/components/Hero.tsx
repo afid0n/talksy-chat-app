@@ -6,8 +6,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onNext }) => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden bg-white dark:bg-black text-black dark:text-white transition-colors">
-      {/* Arxa dairə effekti */}
+    <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden  text-black dark:text-white transition-colors">
       <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-yellow-100 dark:bg-yellow-900 rounded-full blur-3xl opacity-50 z-0" />
 
       <motion.div
