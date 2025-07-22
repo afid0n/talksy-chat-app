@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function ResetPasswordForm() {
   const [email, setEmail] = useState('');
@@ -12,11 +13,11 @@ export default function ResetPasswordForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-white dark:bg-black text-black dark:text-white transition-colors">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 text-black dark:text-white transition-colors">
       <div className="mb-6 text-center">
         <h1 className="text-4xl font-bold">
-          <span className="text-black dark:text-white">Chat </span>
-          <span className="text-green-600">Wave</span>
+          <span className="text-black dark:text-white">Talk</span>
+          <span className="text-yellow-600">sy</span>
         </h1>
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mt-2">
           Reset your password
@@ -37,30 +38,30 @@ export default function ResetPasswordForm() {
           <input
             type="email"
             placeholder="Enter your email"
-            className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
         {submitted && (
-          <p className="text-sm text-green-600 dark:text-green-400 mb-4">
+          <p className="text-sm text-yellow-600 dark:text-yellow-400 mb-4">
             If this email is registered, a password reset link has been sent.
           </p>
         )}
 
         <button
           type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-all"
+          className="w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-all"
         >
           Send Reset Link
         </button>
 
         <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
           Remember your password?{' '}
-          <a href="#" className="text-green-600 font-medium hover:underline">
+          <Link to={"/auth/login"} className="text-yellow-600 font-medium hover:underline">
             Sign in
-          </a>
+          </Link>
         </p>
       </form>
     </div>
