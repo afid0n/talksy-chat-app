@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { DB_PASSWORD, PORT, DB_URL } = require("./config");
+
 const connectToDB = (app) => {
   mongoose
     .connect(DB_URL.replace("<db_password>", DB_PASSWORD))
