@@ -1,6 +1,6 @@
+const bcrypt = require('bcrypt');
 const userService = require('../services/userService');
-
-
+const { generateToken } = require('../utils/jwt');
 
 
 const getUserById = async (req, res, next) => {
@@ -43,7 +43,7 @@ const registerUser = async (req, res, next) => {
       req.body.profileImage = req.file.path;
       req.body.public_id = req.file.filename;
     }
-    const response = await register({
+    const response = await userService.register({
       ...req.body,
       password: hashedPassword,
     });
@@ -57,7 +57,7 @@ const registerUser = async (req, res, next) => {
       email: req.body.email,
       fullName: req.body.fullName,
     });
-    const verificationLink = `${process.env.SERVER_URL}/auth/verify-email?token=${token}`;
+    const verificationLink = `${SERVER_URL}/auth/verify-email?token=${token}`;
     sendVerificationEmail(req.body.email, req.body.fullName, verificationLink);
 
     res.status(201).json({
@@ -74,7 +74,7 @@ const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query;
     //call your service here!
-    const response = await verifyEmailToken (token); //success, message
+    const response = await verifyEmailToken(token); //success, message
     res.redirect(`${CLIENT_URL}/email-verified?message=${response.message}`);
   } catch (error) {
     next(error);
@@ -120,7 +120,7 @@ const deleteUser = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const user = await userService.loginUser(req.body);
+    const user = await userService.login(req.body);
     res.status(200).json(user);
   } catch (error) {
     res.status(401).json({ error: error.message });
@@ -135,5 +135,4 @@ module.exports = {
   verifyEmail,
   updateUser,
   deleteUser,
-  login
 };
