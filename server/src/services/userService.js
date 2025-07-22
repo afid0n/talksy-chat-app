@@ -1,12 +1,10 @@
 const UserModel = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
 const { verifyToken, generateToken } = require("../utils/jwt");
-const bcrypt = require("bcrypt");
-const moment = require("moment");
+
 
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 10 * 60 * 1000; //10 minutes
-
 
 const getUserById = async (id) => {
   const user = await User.findById(id);
@@ -149,6 +147,31 @@ const getAllUsers = async () => {
   return formatMongoData(users);
 };
 
+const loginUser = async ({ email, password }) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  const isMatch = await User.findOne({password});
+  if (!isMatch) {
+    throw new Error('Invalid credentials');
+  }
+
+  const token = jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: '7d' }
+  );
+
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    token
+  };
+};
+
 module.exports = {
   getUserById,
   getUserByEmail,
@@ -158,4 +181,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getAllUsers,
+  loginUser
 };

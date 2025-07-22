@@ -58,6 +58,7 @@ const getMessages = async (req, res, next) => {
     next(error);
   }
 };
+
 module.exports = {
   getMessageById,
   getMessagesForChat,

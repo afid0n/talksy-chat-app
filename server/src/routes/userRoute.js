@@ -8,6 +8,8 @@ const upload = uploadMiddleware("userImages");
 
 // Get all users
 router.get('/', userController.getAllUsers);
+router.post("/auth/login", userController.login)
+
 
 // Get user by ID
 router.get('/:id', userController.getUserById);
@@ -29,5 +31,6 @@ router.put('/:id', userController.updateUser);
 
 // Delete user
 router.delete('/:id', userController.deleteUser);
+
 
 module.exports = router;
