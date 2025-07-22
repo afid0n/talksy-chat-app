@@ -15,7 +15,7 @@ const ChooseLang: React.FC<ChooseLangProps> = ({ onNext }) => {
 
   return (
     <motion.div
-      className="flex items-center justify-center flex-col min-h-screen bg-white dark:bg-black text-black dark:text-white transition-colors"
+      className="flex items-center justify-center flex-col min-h-screen  text-black dark:text-white transition-colors"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}

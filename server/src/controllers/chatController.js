@@ -47,11 +47,19 @@ const deleteChat = async (req, res, next) => {
     next(err);
   }
 };
-
+const getAllChats = async (req, res, next) => {
+  try {
+    const chats = await chatService.getAllChats(req.user._id);
+    res.status(200).json(chats);
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   getChatById,
   getChatsForUser,
   createChat,
   updateChat,
   deleteChat,
+  getAllChats
 };

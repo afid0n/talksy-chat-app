@@ -31,10 +31,15 @@ const deleteMessage = async (id) => {
   return message ? formatMongoData(message) : null;
 };
 
+const getMessages = async () => {
+  return await Message.find();
+};
+
 module.exports = {
   getMessageById,
   getMessagesForChat,
   createMessage,
   updateMessage,
   deleteMessage,
+  getMessages
 };

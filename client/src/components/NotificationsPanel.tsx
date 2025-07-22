@@ -23,13 +23,13 @@ const NotificationToggle = ({
     <label className="inline-flex items-center cursor-pointer">
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only peer" />
       <div
-        className={`w-11 h-6 rounded-full peer transition-colors duration-300 ${
-          checked ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
+        className={`w-12 h-6 flex items-center rounded-full px-0.5 peer transition-colors duration-300 ${
+          checked ? "bg-yellow-500" : "bg-gray-300 dark:bg-gray-600"
         }`}
       >
         <div
-          className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-            checked ? "translate-x-5" : "translate-x-1"
+          className={`w-5 h-5 bg-white rounded-full  shadow-md transform transition-transform duration-300 ${
+            checked ? "translate-x-6" : "translate-x-0"
           }`}
         />
       </div>

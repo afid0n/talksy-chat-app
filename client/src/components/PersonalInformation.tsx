@@ -8,7 +8,7 @@ const PersonalInformation = () => {
   const [location, setLocation] = useState("San Francisco, CA");
 
   return (
-    <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-sm space-y-6">
+    <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-sm space-y-6 border border-gray-200 dark:border-zinc-700">
       <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Personal Information</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

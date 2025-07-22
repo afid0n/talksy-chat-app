@@ -3,7 +3,7 @@ const router = express.Router();
 const chatController = require('../controllers/chatController');
 
 // Get all chats for a user
-router.get('/user/:userId', chatController.getChatsForUser);
+router.get('/', chatController.getAllChats);
 
 // Get chat by ID
 router.get('/:id', chatController.getChatById);
