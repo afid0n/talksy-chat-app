@@ -2,6 +2,8 @@ const userService = require('../services/userService');
 const { sendVerificationEmail } = require('../services/emailService'); 
 const bcrypt = require("bcrypt"); 
 const { CLIENT_URL } = require("../config/config");
+const { generateToken } = require("../utils/jwt");
+
 
 
 const getUserById = async (req, res, next) => {
@@ -40,6 +42,10 @@ const registerUser = async (req, res, next) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    if (req.file && req.file.path) {
+      req.body.profileImage = req.file.path;
+      req.body.public_id = req.file.filename;
+    }
     const response = await register({
       ...req.body,
       password: hashedPassword,
@@ -49,18 +55,23 @@ const registerUser = async (req, res, next) => {
     }
 
     //send email service ...
-    const token = "test";
+    const token = generateToken({
+      id: response.data._id,
+      email: req.body.email,
+      fullName: req.body.fullName,
+    });
     const verificationLink = `${process.env.SERVER_URL}/auth/verify-email?token=${token}`;
     sendVerificationEmail(req.body.email, req.body.fullName, verificationLink);
 
     res.status(201).json({
       message: "user registered successfully | verify your email",
-      data: response,
+      data: response.data,
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 const verifyEmail = async (req, res, next) => {
   try {
