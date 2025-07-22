@@ -22,7 +22,7 @@ router.post('/register', upload.single("profileImage"), userController.registerU
 router.get("/verify-email", userController.verifyEmail);
 
 // Login user
-router.post('/login', login);
+// router.post('/login', login);
 
 // Update user
 router.put('/:id', userController.updateUser);

@@ -1,8 +1,5 @@
 const userService = require('../services/userService');
-const { sendVerificationEmail } = require('../services/emailService'); 
-const bcrypt = require("bcrypt"); 
-const { CLIENT_URL } = require("../config/config");
-const { generateToken } = require("../utils/jwt");
+
 
 
 
