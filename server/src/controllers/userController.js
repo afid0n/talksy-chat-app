@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const userService = require('../services/userService');
 const { generateToken } = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/mailService');
-const { SERVER_URL } = require('../config/config');
+const { SERVER_URL, CLIENT_URL } = require('../config/config');
 
 const getUserById = async (req, res, next) => {
   try {
@@ -70,12 +70,11 @@ const registerUser = async (req, res, next) => {
   }
 };
 
-
 const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query;
     //call your service here!
-    const response = await verifyEmailToken(token); //success, message
+    const response = await userService.verifyEmailToken(token); //success, message
     res.redirect(`${CLIENT_URL}/email-verified?message=${response.message}`);
   } catch (error) {
     next(error);

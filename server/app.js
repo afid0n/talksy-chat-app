@@ -19,9 +19,9 @@ app.get("/", (_, res) => {
 });
 
 // Use routes
-app.use("/api/users", userRoute);
-app.use('/api/chats', chatRoutes);
-app.use('/api/messages', messageRoutes);
+app.use("/auth/users", userRoute);
+app.use('/chats', chatRoutes);
+app.use('/messages', messageRoutes);
 
 app.use(errorHandler);
 
