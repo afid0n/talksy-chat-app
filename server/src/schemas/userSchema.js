@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema({
     },
     location: {
         country: { type: String },
-        isoCode: { type: String },
+        city: { type: String },
     },
     interests: {
         type: [String],

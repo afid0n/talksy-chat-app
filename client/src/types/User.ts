@@ -12,7 +12,7 @@ export interface User {
     };
     location: {
         country?: string;
-        isoCode?: string;
+        city?: string;
     };
     interests: string[];
     friends: string[]; // array of User ObjectIds (or populated User objects if needed)
