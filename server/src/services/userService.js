@@ -1,7 +1,8 @@
 const User = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
 const { verifyToken, generateToken } = require("../utils/jwt");
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 10 * 60 * 1000; //10 minutes
@@ -19,7 +20,7 @@ const getUserByEmail = async (email) => {
 const register = async (payload) => {
   try {
     const { email, username } = payload;
-    const existedUser = await UserModel.findOne({
+    const existedUser = await User.findOne({
       $or: [{ email }, { username }],
     });
     if (existedUser) {
@@ -65,7 +66,7 @@ const verifyEmailToken = async (token) => {
 const login = async (credentials) => {
   const { email, password } = credentials;
 
-  const user = await UserModel.findOne({ email });
+  const user = await User.findOne({ email });
 
   if (!user) {
     throw new Error("Invalid credentials!");
@@ -95,22 +96,22 @@ const login = async (credentials) => {
   }
 
   // Validate password
-  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  // const isPasswordCorrect = await bcrypt.compare(password, user.password);
+// add login hash
+  // if (!isPasswordCorrect) {
+  //   user.loginAttempts = (user.loginAttempts || 0) + 1;
 
-  if (!isPasswordCorrect) {
-    user.loginAttempts = (user.loginAttempts || 0) + 1;
+  //   if (user.loginAttempts >= MAX_ATTEMPTS) {
+  //     user.lockUntil = new Date(Date.now() + LOCK_TIME);
+  //     await user.save();
+  //     throw new Error(
+  //       "Too many login attempts. Account locked for 10 minutes."
+  //     );
+  //   }
 
-    if (user.loginAttempts >= MAX_ATTEMPTS) {
-      user.lockUntil = new Date(Date.now() + LOCK_TIME);
-      await user.save();
-      throw new Error(
-        "Too many login attempts. Account locked for 10 minutes."
-      );
-    }
-
-    await user.save();
-    throw new Error("Invalid credentials!");
-  }
+  //   await user.save();
+  //   throw new Error("Invalid credentials!");
+  // }
 
   // Success: reset loginAttempts, lockUntil, update lastLogin
   user.loginAttempts = 0;
