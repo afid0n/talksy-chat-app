@@ -8,12 +8,20 @@ const conversations = [
   { id: 5, name: "Yuki Tanaka", message: "Let’s catch up soon 😊", time: "1 day", unread: 0, initials: "YT" },
 ];
 
+interface Message {
+  from: string;
+  text: string;
+  time: string;
+  isGif?: boolean;
+}
+
 interface MessagesProps {
   selectedId: number | null;
   onSelect: (id: number) => void;
+  messages?: Message[]; // optional prop for messages
 }
 
-const Messages: FC<MessagesProps> = ({ selectedId, onSelect }) => {
+const Messages: FC<MessagesProps> = ({ selectedId, onSelect, messages = [] }) => {
   return (
     <div className="border-r p-4 overflow-y-auto bg-white/70 dark:bg-zinc-700/70 dark:border-gray-700 min-h-screen w-80">
       <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Messages</h2>
@@ -58,6 +66,8 @@ const Messages: FC<MessagesProps> = ({ selectedId, onSelect }) => {
           </li>
         ))}
       </ul>
+
+   
     </div>
   );
 };
