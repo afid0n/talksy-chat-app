@@ -1,11 +1,29 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 const ThreeBackground = () => {
   const mountRef = useRef<HTMLDivElement | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(
+    localStorage.getItem("vite-ui-theme") === "dark"
+  );
+
+  // Listen for theme changes in localStorage and custom event
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsDarkMode(localStorage.getItem("vite-ui-theme") === "dark");
+    };
+    window.addEventListener("storage", updateTheme);
+    window.addEventListener("vite-ui-theme-change", updateTheme);
+    return () => {
+      window.removeEventListener("storage", updateTheme);
+      window.removeEventListener("vite-ui-theme-change", updateTheme);
+    };
+  }, []);
 
   useEffect(() => {
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(isDarkMode ? "#101014" : "#fefce8");
+
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -32,11 +50,12 @@ const ThreeBackground = () => {
 
     const material = new THREE.PointsMaterial({
       size: 0.06,
-      color: "#facc15",
+      color: isDarkMode ? "#f59e10" : "#facc15", // orange for dark, yellow for light
     });
 
     const particles = new THREE.Points(geometry, material);
     scene.add(particles);
+
     const animate = () => {
       requestAnimationFrame(animate);
       particles.rotation.y += 0.001;
@@ -44,22 +63,24 @@ const ThreeBackground = () => {
       renderer.render(scene, camera);
     };
     animate();
+
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener("resize", handleResize);
+
     return () => {
       window.removeEventListener("resize", handleResize);
       mount?.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [isDarkMode]);
 
   return (
     <div
       ref={mountRef}
-      className="fixed top-0 left-0 w-full h-full -z-10 bg-yellow-50"
+      className="fixed top-0 left-0 w-full h-full -z-10"
     />
   );
 };

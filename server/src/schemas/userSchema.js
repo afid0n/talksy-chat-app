@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema({
         minlength: 6,
         select: false,
     },
+        birthday: {
+        type: Date,
+        default: null,
+    },
     avatar: {
         url: {
             type: String,

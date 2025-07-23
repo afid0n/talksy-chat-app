@@ -5,7 +5,7 @@ import { useState } from "react";
 
 
 const VerifyEmail = () => {
-  const [status, setStatus] = useState<"success" | "failed">("failed");
+  const [status, setStatus] = useState<"success" | "failed">("success");
 
   // Example handlers for the failed state
   const handleResend = () => {
