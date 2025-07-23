@@ -3,12 +3,14 @@ import ROUTES from "./routes";
 import ThreeBackground from "./components/three-background/ThreeBackground";
 const router = createBrowserRouter(ROUTES);
 import { ThemeProvider } from "@/components/theme-provider"
+import { SnackbarProvider } from "notistack";
  
 
 
 function App() {
   return (
     <>
+    <SnackbarProvider />
      <ThreeBackground />
      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">    
       <RouterProvider router={router} />

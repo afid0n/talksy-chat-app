@@ -131,7 +131,6 @@ console.log(user);
   //   await user.save();
   //   throw new Error("Invalid credentials!");
   // }
-  //check user provider
 
   // Success: reset loginAttempts, lockUntil, update lastLogin
   user.loginAttempts = 0;
