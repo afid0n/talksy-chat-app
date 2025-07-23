@@ -1,4 +1,4 @@
-const UserModel = require('../models/userModel');
+const User = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
 const { verifyToken, generateToken } = require("../utils/jwt");
 
