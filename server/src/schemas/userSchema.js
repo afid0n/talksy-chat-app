@@ -8,6 +8,16 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
     },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        minlength: 3,
+        maxlength: 20,
+    },
+
     fullName: {
         type: String,
         required: true,
@@ -27,7 +37,7 @@ const userSchema = new mongoose.Schema({
         minlength: 6,
         select: false,
     },
-        birthday: {
+    birthday: {
         type: Date,
         default: null,
     },
@@ -91,7 +101,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-        lastLogin: {
+    lastLogin: {
         type: Date,
         default: null,
     },
