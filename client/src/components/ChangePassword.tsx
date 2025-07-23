@@ -1,71 +1,96 @@
-import { Mail, MapPin, Phone, User } from "lucide-react";
+import { Lock, Key, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
-const PersonalInformation = () => {
-  const [fullName, setFullName] = useState("Alex Johnson");
-  const [email, setEmail] = useState("alex.johnson@email.com");
-  const [phone, setPhone] = useState("+1 (555) 123–4567");
-  const [location, setLocation] = useState("San Francisco, CA");
+const ChangePassword = () => {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+
+  const [newPassword, setNewPassword] = useState("");
+  const [showNew, setShowNew] = useState(false);
+
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
 
   return (
     <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-sm space-y-6">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Personal Information</h3>
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Change Password</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Full Name */}
-        <div className="space-y-1">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+        {/* Current Password */}
+        <div className="space-y-1 relative">
           <label className="text-sm text-gray-600 dark:text-gray-300 font-medium flex items-center gap-1">
-            <User size={16} className="text-gray-500 dark:text-gray-400" /> Full Name
+            <Lock size={16} className="text-gray-500 dark:text-gray-400" /> Current Password
           </label>
           <input
-            type="text"
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            type={showCurrent ? "text" : "password"}
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder="Enter your current password"
           />
+          <button
+            type="button"
+            className="absolute right-3 top-[38px] text-gray-500 dark:text-gray-400"
+            onClick={() => setShowCurrent(!showCurrent)}
+            aria-label={showCurrent ? "Hide password" : "Show password"}
+          >
+            {showCurrent ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
         </div>
 
-        {/* Email Address */}
-        <div className="space-y-1">
+        {/* New Password */}
+        <div className="space-y-1 relative">
           <label className="text-sm text-gray-600 dark:text-gray-300 font-medium flex items-center gap-1">
-            <Mail size={16} className="text-gray-500 dark:text-gray-400" /> Email Address
+            <Key size={16} className="text-gray-500 dark:text-gray-400" /> New Password
           </label>
           <input
-            type="email"
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type={showNew ? "text" : "password"}
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="Enter your new password"
           />
+          <button
+            type="button"
+            className="absolute right-3 top-[38px] text-gray-500 dark:text-gray-400"
+            onClick={() => setShowNew(!showNew)}
+            aria-label={showNew ? "Hide password" : "Show password"}
+          >
+            {showNew ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
         </div>
 
-        {/* Phone Number */}
-        <div className="space-y-1">
+        {/* Confirm New Password */}
+        <div className="space-y-1 relative">
           <label className="text-sm text-gray-600 dark:text-gray-300 font-medium flex items-center gap-1">
-            <Phone size={16} className="text-gray-500 dark:text-gray-400" /> Phone Number
+            <Key size={16} className="text-gray-500 dark:text-gray-400" /> Confirm New Password
           </label>
           <input
-            type="tel"
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            type={showConfirm ? "text" : "password"}
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm your new password"
           />
-        </div>
-
-        {/* Location */}
-        <div className="space-y-1">
-          <label className="text-sm text-gray-600 dark:text-gray-300 font-medium flex items-center gap-1">
-            <MapPin size={16} className="text-gray-500 dark:text-gray-400" /> Location
-          </label>
-          <input
-            type="text"
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
+          <button
+            type="button"
+            className="absolute right-3 top-[38px] text-gray-500 dark:text-gray-400"
+            onClick={() => setShowConfirm(!showConfirm)}
+            aria-label={showConfirm ? "Hide password" : "Show password"}
+          >
+            {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
         </div>
       </div>
+
+      <button
+        type="submit"
+        className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+      >
+        Update Password
+      </button>
     </div>
   );
 };
 
-export default PersonalInformation;
+export default ChangePassword;
