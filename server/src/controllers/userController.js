@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt');
 const userService = require('../services/userService');
 const { generateToken } = require('../utils/jwt');
-
+const { sendVerificationEmail } = require('../utils/mailService');
+const { SERVER_URL } = require('../config/config');
 
 const getUserById = async (req, res, next) => {
   try {
@@ -120,12 +121,34 @@ const deleteUser = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const user = await userService.login(req.body);
-    res.status(200).json(user);
+    const credentials = {
+      email: req.body.email,
+      password: req.body.password,
+    };
+    const response = await userService.login(credentials);
+
+    console.log("RESPONSE ON SERVER: ", response);
+
+    res.cookie("refreshToken", response.refreshToken, {
+      httpOnly: true,
+      secure: true, // in production (possible BUG)
+      sameSite: "strict",
+      path: "/auth/refresh",
+      maxAge: 7 * 24 * 60 * 60 * 1000, //7days
+    });
+
+    res.status(200).json({
+      message: response.message,
+      token: response.accessToken,
+    });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.json({
+      message: error.message || "internal server error",
+      statusCode: 401, //unauthorized
+    });
   }
 };
+
 module.exports = {
   getUserById,
   getUserByEmail,
