@@ -20,15 +20,65 @@ import {
   Users,
   X,
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import NotificationsPanel from "@/components/NotificationsPanel"
 import PrivacySettings from "@/components/PrivacySettings"
 import PersonalInformation from "@/components/PersonalInformation"
 import ChangePassword from "@/components/ChangePassword"
-
+import axios from 'axios';
+import moment from "moment"
+import "moment/locale/az"
 const Profile = () => {
   const [language, setLanguage] = useState("en")
   const { setTheme } = useTheme()
+  interface User {
+    id?: string
+    fullName?: string
+    email?: string
+    bio?: string
+    avatar?: {
+      url?: string
+      public_id?: string
+    }
+    location?: {
+      country?: string
+      isoCode?: string
+    }
+    birthday?: string | null
+    interests?: string[]
+    friends?: unknown[]
+    blockedUsers?: unknown[]
+    lastSeen?: string
+    emailVerified?: boolean
+    friendRequests?: unknown[]
+    language?: string
+    isOnline?: boolean
+    lastLogin?: string
+    loginAttempts?: number
+    lockUntil?: string | null
+    createdAt?: string
+    updatedAt?: string
+  }
+  const [user, setUser] = useState<User>({} as User)
+  function formatDate(dateStr?: string | null): string {
+    if (!dateStr) return ""
+    return moment(dateStr).locale("az").format("LL, HH:mm")
+  }
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const response = await axios.get(`http://localhost:7070/auth/users/687f5bfed26a40e7f58f62ae`);
+        setUser(response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        throw error;
+      }
+    };
+
+    getUsers(); // <-- call the function
+  }, []);
+
+  console.log(user);
 
   const handleThemeChange = (theme: "light" | "dark" | "system") => {
     setTheme(theme)
@@ -42,7 +92,13 @@ const Profile = () => {
       <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-md p-4 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-6 w-full mb-6">
         <div className="relative flex-shrink-0">
           <div className="w-20 h-20 bg-yellow-600 text-white font-bold text-2xl flex items-center justify-center rounded-full">
-            AJ
+            {user.fullName
+              ? user.fullName
+                .split(" ")
+                .map(word => word[0])
+                .join("")
+                .toUpperCase()
+              : ""}
           </div>
           <div className="absolute bottom-0 right-0 bg-white dark:bg-zinc-900 p-1 rounded-full shadow">
             <svg
@@ -64,17 +120,15 @@ const Profile = () => {
 
         <div className="flex-1 text-center md:text-left">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Alex Johnson
+            {user.fullName}
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">@alexj_2024</p>
+          <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
           <p className="text-gray-700 dark:text-gray-300 mt-2 max-w-md mx-auto md:mx-0">
-            Digital enthusiast, coffee lover, and ChatWave explorer! Always
-            excited to connect with new people and share interesting
-            conversations.
+            {user.bio}
           </p>
           <div className="flex xs:flex-row items-center gap-2 xs:gap-4 mt-4 justify-center md:justify-start text-sm text-gray-600 dark:text-gray-400">
-            <span className="flex items-center gap-1">📍 San Francisco, CA</span>
-            <span className="flex items-center gap-1">📅 Joined January 2024</span>
+            <span className="flex items-center gap-1">{user.location?.country}</span>
+            <span className="flex items-center gap-1">📅 {formatDate(user.createdAt)}</span>
           </div>
         </div>
 
@@ -184,11 +238,10 @@ const Profile = () => {
                 <button
                   key={lang.code}
                   onClick={() => setLanguage(lang.code)}
-                  className={`flex items-center justify-center gap-2 border px-8 sm:px-12 py-3 sm:py-5 rounded-lg transition ${
-                    language === lang.code
-                      ? "bg-yellow-50 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200 border-yellow-500"
-                      : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800"
-                  }`}
+                  className={`flex items-center justify-center gap-2 border px-8 sm:px-12 py-3 sm:py-5 rounded-lg transition ${language === lang.code
+                    ? "bg-yellow-50 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200 border-yellow-500"
+                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800"
+                    }`}
                 >
                   <span className="text-xs font-medium">{lang.region}</span>
                   <span className="text-sm">{lang.label}</span>
