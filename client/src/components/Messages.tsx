@@ -1,4 +1,4 @@
-import { useState } from "react";
+import type { FC } from "react";
 
 const conversations = [
   { id: 1, name: "Alex Chen", message: "Hey! How’s the project going?", time: "2 min", unread: 3, initials: "AC" },
@@ -8,17 +8,14 @@ const conversations = [
   { id: 5, name: "Yuki Tanaka", message: "Let’s catch up soon 😊", time: "1 day", unread: 0, initials: "YT" },
 ];
 
-const Messages = () => {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+interface MessagesProps {
+  selectedId: number | null;
+  onSelect: (id: number) => void;
+}
 
-  const handleClick = (id: number) => {
-    setSelectedId(id);
-    console.log("Selected conversation:", id);
-    // Later you can use navigate(`/chat/${id}`) or set currentChat(id)
-  };
-
+const Messages: FC<MessagesProps> = ({ selectedId, onSelect }) => {
   return (
-    <div className="border-r p-4 overflow-y-auto bg-white/70 dark:bg-zinc-700/70 dark:border-gray-700 min-h-screen">
+    <div className="border-r p-4 overflow-y-auto bg-white/70 dark:bg-zinc-700/70 dark:border-gray-700 min-h-screen w-80">
       <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Messages</h2>
 
       <input
@@ -31,7 +28,7 @@ const Messages = () => {
         {conversations.map((c) => (
           <li
             key={c.id}
-            onClick={() => handleClick(c.id)}
+            onClick={() => onSelect(c.id)}
             className={`flex items-center justify-between p-3 mb-2 rounded-lg cursor-pointer transition-all ${
               selectedId === c.id ? "bg-yellow-100 dark:bg-yellow-800" : "hover:bg-gray-100 dark:hover:bg-zinc-800"
             }`}
