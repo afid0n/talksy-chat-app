@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
             return this.authProvider === 'local';
         },
         minlength: 6,
-        select: false,
+        select: true,
     },
     birthday: {
         type: Date,

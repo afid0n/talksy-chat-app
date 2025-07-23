@@ -104,33 +104,34 @@ console.log(user);
   }
 
   // Validate password
-  // const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  // console.log(password, user.password);
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  console.log(isPasswordCorrect);
+  if (!isPasswordCorrect) {
+    user.loginAttempts = (user.loginAttempts || 0) + 1;
 
-  // if (!isPasswordCorrect) {
-  //   user.loginAttempts = (user.loginAttempts || 0) + 1;
+    if (user.loginAttempts >= MAX_ATTEMPTS) {
+      user.lockUntil = new Date(Date.now() + LOCK_TIME);
+      await user.save();
+      //send email to user to unlock their account
+      const token = generateAccessToken(
+        {
+          id: user._id,
+          email: user.email,
+          fullName: user.fullName,
+        },
+        "6h"
+      );
+      const unlockAccountLink = `${process.env.SERVER_URL}/auth/unlock-account?token=${token}`;
+      sendUnlockAccountEmail(user.email, user.fullName, unlockAccountLink);
+      throw new Error(
+        "Too many login attempts. Account locked for 10 minutes (check your email)"
+      );
+    }
 
-  //   if (user.loginAttempts >= MAX_ATTEMPTS) {
-  //     user.lockUntil = new Date(Date.now() + LOCK_TIME);
-  //     await user.save();
-  //     //send email to user to unlock their account
-  //     const token = generateAccessToken(
-  //       {
-  //         id: user._id,
-  //         email: user.email,
-  //         fullName: user.fullName,
-  //       },
-  //       "6h"
-  //     );
-  //     const unlockAccountLink = `${process.env.SERVER_URL}/auth/unlock-account?token=${token}`;
-  //     sendUnlockAccountEmail(user.email, user.fullName, unlockAccountLink);
-  //     throw new Error(
-  //       "Too many login attempts. Account locked for 10 minutes (check your email)"
-  //     );
-  //   }
-
-  //   await user.save();
-  //   throw new Error("Invalid credentials!");
-  // }
+    await user.save();
+    throw new Error("Invalid credentials!");
+  }
 
   // Success: reset loginAttempts, lockUntil, update lastLogin
   user.loginAttempts = 0;
