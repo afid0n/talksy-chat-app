@@ -2,9 +2,9 @@ import { FaGoogle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import axios from 'axios'
 import { enqueueSnackbar } from "notistack";
 import { useState } from 'react'
+import { loginUser } from '@/services/userService'
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false)
@@ -21,28 +21,26 @@ export default function LoginForm() {
     onSubmit: async (values) => {
       setLoading(true)
       try {
-        const response = await axios.post('http://localhost:7070/auth/users/login', values)
-        if(response.data.token) {
-          enqueueSnackbar(response.data.message, { variant: "success" })
-        } else{
-          enqueueSnackbar(response.data.message, { variant: "error" })
+        const response = await loginUser(values)
+        if (response.token) {
+          enqueueSnackbar(response.message, { variant: "success" })
+        } else {
+          enqueueSnackbar(response.message, { variant: "error" })
         }
 
-        console.log(response.data);
-        // Məsələn, token saxla və yönləndir
-        const { token } = response.data
+        console.log(response);
+        const { token } = response
         localStorage.setItem('token', token)
-        // navigate('/dashboard') və ya istədiyin səhifəyə yönləndir
       } catch (error: any) {
         const message = error.response?.data?.message || 'Login failed'
-       enqueueSnackbar(message, {
-            autoHideDuration: 2000,
-            anchorOrigin: {
-              vertical: "bottom",
-              horizontal: "right",
-            },
-            variant: "error",
-          });
+        enqueueSnackbar(message, {
+          autoHideDuration: 2000,
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "right",
+          },
+          variant: "error",
+        });
       } finally {
         setLoading(false)
       }
@@ -89,11 +87,10 @@ export default function LoginForm() {
             type="text"
             name="email"
             placeholder="Enter email or username"
-            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${
-              formik.errors.email && formik.touched.email
+            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.email && formik.touched.email
                 ? 'border-red-500 focus:ring-red-500'
                 : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
-            }`}
+              }`}
             value={formik.values.email}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -112,11 +109,10 @@ export default function LoginForm() {
             type="password"
             name="password"
             placeholder="Enter your password"
-            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${
-              formik.errors.password && formik.touched.password
+            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.password && formik.touched.password
                 ? 'border-red-500 focus:ring-red-500'
                 : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
-            }`}
+              }`}
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -140,9 +136,8 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-all ${
-            loading ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+          className={`w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
         >
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
