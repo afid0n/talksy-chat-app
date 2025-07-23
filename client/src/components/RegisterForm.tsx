@@ -16,7 +16,7 @@ const RegisterForm = ({ onBack }: RegisterFormProps) => {
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const isDarkMode = localStorage.getItem('vite-ui-theme') === 'dark';
+  const isDarkMode = localStorage.getItem('vite-ui-theme') === 'light';
 
   const handleCaptchaChange = (value: string | null) => {
     setCaptchaVerified(!!value);
