@@ -5,6 +5,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { getAll } from "@/services/commonRequest";
+import type { User } from "@/types/User";
 import {
   Globe,
   Search,
@@ -24,6 +26,27 @@ const Feed = () => {
 
   const toggleFilters = () => setShowFilters(!showFilters);
 
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [user, setUser] = useState<User | null>(null); //replace w redux
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await getAll<User[]>("/users");
+        setUsers(res);
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+  console.log(users)
+
   const countries = [
     "Azerbaijan", "Bosnia and Herzegovina", "United States", "Canada", "Mexico",
     "Brazil", "Argentina", "United Kingdom", "France", "Germany", "Italy",
@@ -32,10 +55,13 @@ const Feed = () => {
     "Czech Republic", "Hungary", "Romania", "Greece", "Bulgaria"
   ];
 
-  useEffect(() => {
-    localStorage.setItem("location", "Baku");
-    setLocation("Baku");
-  }, []);
+useEffect(() => {
+  if (user?.location?.country) {
+    localStorage.setItem("location", user.location.country);
+    setLocation(user.location.country);
+  }
+}, [user]);
+
 
   const handleCheckboxChange = (country: string) => {
     setTempSelectedCountries(prev =>
@@ -58,7 +84,6 @@ const Feed = () => {
 
   return (
     <div className="relative px-2 sm:px-4 md:px-8 lg:px-20 py-8 sm:py-12 md:py-14">
-      {/* Arxa overlay */}
       {showFilters && (
         <div
           style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
@@ -94,7 +119,6 @@ const Feed = () => {
           </div>
 
           <div className="w-full flex items-center justify-between gap-2">
-            {/* Search input */}
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
@@ -106,7 +130,6 @@ const Feed = () => {
               />
             </div>
 
-            {/* More Filters button */}
             <button
               onClick={toggleFilters}
               className="bg-yellow-500 text-white px-4 py-3 rounded-lg hover:bg-yellow-400 dark:hover:bg-yellow-800 dark:bg-yellow-900 transition flex items-center justify-center gap-2"
@@ -117,19 +140,33 @@ const Feed = () => {
           </div>
 
           <TabsContent value="discover">
-            <Cards searchQuery={searchQuery} countriesFilter={appliedCountries} />
+            {loading ? (
+              <div>Loading users...</div>
+            ) : (
+              <Cards
+                users={users}
+                searchQuery={searchQuery}
+                countriesFilter={appliedCountries}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="nearby">
-            {location ? (
-              <Cards city={location} searchQuery={searchQuery} countriesFilter={appliedCountries} />
+            {loading ? (
+              <div>Loading users...</div>
+            ) : location ? (
+              <Cards
+                users={users}
+                city={location}
+                searchQuery={searchQuery}
+                countriesFilter={appliedCountries}
+              />
             ) : (
               <div>Detecting location...</div>
             )}
           </TabsContent>
         </Tabs>
 
-        {/* Filter panel */}
         <div
           className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 z-50 shadow-xl transform transition-transform duration-300 ${showFilters ? 'translate-x-0' : 'translate-x-full'
             }`}
