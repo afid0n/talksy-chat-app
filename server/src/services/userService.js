@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
+const { generateAccessToken, generateRefreshToken } = require('../utils/genetareJWT');
 const { verifyToken, generateToken } = require("../utils/jwt");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -30,12 +31,12 @@ const register = async (payload) => {
       };
     } else {
       return {
-        data: await UserModel.create(payload),
+        data: await User.create(payload),
         success: true,
       };
     }
   } catch (error) {
-    return error.message || "internal server error!";
+    return "internal server error!";
   }
 };
 
@@ -65,9 +66,9 @@ const verifyEmailToken = async (token) => {
 
 const login = async (credentials) => {
   const { email, password } = credentials;
-
+  
   const user = await User.findOne({ email });
-
+console.log(user);
   if (!user) {
     throw new Error("Invalid credentials!");
   }
@@ -95,23 +96,42 @@ const login = async (credentials) => {
     throw new Error(`Account is locked. Try again after ${unlockTime}.`);
   }
 
+  //check user provider (local or email)
+  if (user.authProvider !== "local") {
+    throw new Error(
+      "this account has been created with Google, try Sign In with Google!"
+    );
+  }
+
   // Validate password
   // const isPasswordCorrect = await bcrypt.compare(password, user.password);
-// add login hash
+
   // if (!isPasswordCorrect) {
   //   user.loginAttempts = (user.loginAttempts || 0) + 1;
 
   //   if (user.loginAttempts >= MAX_ATTEMPTS) {
   //     user.lockUntil = new Date(Date.now() + LOCK_TIME);
   //     await user.save();
+  //     //send email to user to unlock their account
+  //     const token = generateAccessToken(
+  //       {
+  //         id: user._id,
+  //         email: user.email,
+  //         fullName: user.fullName,
+  //       },
+  //       "6h"
+  //     );
+  //     const unlockAccountLink = `${process.env.SERVER_URL}/auth/unlock-account?token=${token}`;
+  //     sendUnlockAccountEmail(user.email, user.fullName, unlockAccountLink);
   //     throw new Error(
-  //       "Too many login attempts. Account locked for 10 minutes."
+  //       "Too many login attempts. Account locked for 10 minutes (check your email)"
   //     );
   //   }
 
   //   await user.save();
   //   throw new Error("Invalid credentials!");
   // }
+  //check user provider
 
   // Success: reset loginAttempts, lockUntil, update lastLogin
   user.loginAttempts = 0;
@@ -120,7 +140,14 @@ const login = async (credentials) => {
 
   await user.save();
   //implement refresh token
-  const token = generateToken({
+  const accessToken = generateAccessToken({
+    email: user.email,
+    id: user._id,
+    role: user.role,
+    profileImage: user.profileImage,
+    fullName: user.fullName,
+  });
+  const refreshToken = generateRefreshToken({
     email: user.email,
     id: user._id,
     role: user.role,
@@ -129,7 +156,8 @@ const login = async (credentials) => {
 
   return {
     message: "login successful",
-    token: token,
+    accessToken: accessToken,
+    refreshToken: refreshToken,
   };
 };
 
@@ -148,30 +176,7 @@ const getAllUsers = async () => {
   return formatMongoData(users);
 };
 
-const loginUser = async ({ email, password }) => {
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new Error('User not found');
-  }
 
-  const isMatch = await User.findOne({password});
-  if (!isMatch) {
-    throw new Error('Invalid credentials');
-  }
-
-  const token = jwt.sign(
-    { id: user._id, email: user.email },
-    process.env.JWT_SECRET_KEY,
-    { expiresIn: '7d' }
-  );
-
-  return {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    token
-  };
-};
 
 module.exports = {
   getUserById,
@@ -182,5 +187,4 @@ module.exports = {
   updateUser,
   deleteUser,
   getAllUsers,
-  loginUser
 };
