@@ -20,12 +20,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: ()
   return (
     <aside
       className={`
-<<<<<<< HEAD
         fixed top-0 left-0 h-screen z-30 bg-yellow-50 shadow-[2px_0_4px_rgba(254,240,138,0.4)]
-=======
-        fixed top-0 left-0 h-screen z-50 bg-yellow-50 dark:bg-zinc-900
-        shadow-[2px_0_4px_rgba(254,240,138,0.4)] dark:shadow-[2px_0_4px_rgba(24,24,27,0.6)]
->>>>>>> 18f7f32c1789315b8da22062ce6cf03251c21578
         transition-all duration-300 flex flex-col overflow-x-hidden
         ${isOpen ? 'w-64' : 'w-16'}
       `}
