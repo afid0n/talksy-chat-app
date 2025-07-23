@@ -22,17 +22,15 @@ export default function LoginForm() {
       setLoading(true)
       try {
         const response = await loginUser(values)
-        if (response.data.token) {
-          enqueueSnackbar(response.data.message, { variant: "success" })
+        if (response.token) {
+          enqueueSnackbar(response.message, { variant: "success" })
         } else {
-          enqueueSnackbar(response.data.message, { variant: "error" })
+          enqueueSnackbar(response.message, { variant: "error" })
         }
 
-        console.log(response.data);
-        // Məsələn, token saxla və yönləndir
-        const { token } = response.data
+        console.log(response);
+        const { token } = response
         localStorage.setItem('token', token)
-        // navigate('/dashboard') və ya istədiyin səhifəyə yönləndir
       } catch (error: any) {
         const message = error.response?.data?.message || 'Login failed'
         enqueueSnackbar(message, {
