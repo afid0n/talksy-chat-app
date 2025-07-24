@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const {
   sendForgotPasswordEmail,
 } = require("../utils/mailService");
+const { CLIENT_URL } = require("../config/config");
 
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 10 * 60 * 1000; //10 minutes
