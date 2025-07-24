@@ -21,7 +21,7 @@ export default function LoginForm() {
     onSubmit: async (values) => {
       setLoading(true)
       try {
-        const response = await axios.post('http://localhost:7070/auth/users/login', values)
+        const response = await axios.post('http://localhost:7070/users/login', values)
         if(response.data.token) {
           enqueueSnackbar(response.data.message, { variant: "success" })
         } else{

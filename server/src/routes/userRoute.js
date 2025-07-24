@@ -7,6 +7,7 @@ const upload = uploadMiddleware("userImages");
 
 // Get all users
 router.get('/', userController.getAllUsers);
+
 router.post("/login", userController.login)
 
 // Get user by ID
@@ -26,6 +27,9 @@ router.get("/verify-email", userController.verifyEmail);
 
 // Update user
 router.patch('/:id', userController.updateUser);
+// update password
+router.patch('/password/:id', userController.changePassword);
+
 
 // Delete user
 router.delete('/:id', userController.deleteUser);

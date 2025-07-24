@@ -81,6 +81,22 @@ const verifyEmail = async (req, res, next) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ message: "New password is required" });
+    }
+
+    const result = await userService.changePassword(userId, currentPassword, newPassword);
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 // const login = async (req, res, next) => {
 //   try {
@@ -98,13 +114,18 @@ const verifyEmail = async (req, res, next) => {
 //   }
 // };
 
-const updateUser = async (req, res, next) => {
+const updateUser = async (req, res) => {
   try {
-    const user = await userService.updateUser(req.params.id, req.body);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user);
-  } catch (err) {
-    next(err);
+    const userId = req.params.id;
+    const updates = req.body;
+
+    const result = await userService.updateUser(userId, updates);
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message || "Internal server error",
+    });
   }
 };
 
@@ -157,4 +178,5 @@ module.exports = {
   verifyEmail,
   updateUser,
   deleteUser,
+  changePassword
 };

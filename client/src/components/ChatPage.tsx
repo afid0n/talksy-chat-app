@@ -1,7 +1,7 @@
 import { useEffect, useState, type FC } from "react";
 import { Phone, Video } from "lucide-react";
 import socket from "../socket"; // adjust path if needed
-import { Gif, Grid } from '@giphy/react-components';
+import {  Grid } from '@giphy/react-components';
 import { gf } from "@/giphy/config";
 
 interface Message {

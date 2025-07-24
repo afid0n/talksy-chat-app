@@ -161,9 +161,41 @@ console.log(user);
   };
 };
 
-const updateUser = async (id, updateData) => {
-  const user = await User.findByIdAndUpdate(id, updateData, { new: true });
-  return user ? formatMongoData(user) : null;
+const updateUser = async (userId, updates) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Əgər yeni şifrə göndərilibsə, hash et
+  if (updates.password) {
+    const hashedPassword = await bcrypt.hash(updates.password, 10);
+    user.password = hashedPassword;
+  }
+
+  // Digər sahələri update et (hər ehtimala qarşı manual)
+  if (updates.fullName !== undefined) user.fullName = updates.fullName;
+  if (updates.email !== undefined) user.email = updates.email;
+  if (updates.phone !== undefined) user.phone = updates.phone;
+  if (updates.location !== undefined) user.location = updates.location;
+  if (updates.bio !== undefined) user.bio = updates.bio;
+  if (updates.profileImage !== undefined) user.profileImage = updates.profileImage;
+
+  await user.save();
+
+  return {
+    message: "User updated successfully",
+    user: {
+      id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      phone: user.phone,
+      location: user.location,
+      bio: user.bio,
+      profileImage: user.profileImage,
+    },
+  };
 };
 
 const deleteUser = async (id) => {
@@ -176,6 +208,23 @@ const getAllUsers = async () => {
   return formatMongoData(users);
 };
 
+const changePassword = async (userId, currentPassword, newPassword) => {
+  const user = await User.findById(userId);
+  if (!user) throw new Error("User not found");
+
+  // Əgər currentPassword təqdim olunubsa – doğrula
+  if (currentPassword) {
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) throw new Error("Current password is incorrect");
+  }
+
+  // Yeni parolu hash et və saxla
+  const hashed = await bcrypt.hash(newPassword, 10);
+  user.password = hashed;
+  await user.save();
+
+  return { message: "Password updated successfully" };
+};
 
 
 module.exports = {
@@ -187,4 +236,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getAllUsers,
+  changePassword,
 };
