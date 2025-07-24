@@ -1,10 +1,12 @@
-import axios from "axios";
 import { useFormik } from "formik";
 import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
+import { changePassword } from "@/services/profileService";
+import type { ChangePasswordPayload } from "@/services/profileService";
 
 export default function ChangePassword() {
   const [showPassword, setShowPassword] = useState(false);
+  const userId = "6880b7cd8696aad839edf500";
 
   const toggleVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -17,10 +19,27 @@ export default function ChangePassword() {
       confirmPassword: "",
     },
     onSubmit: async (values) => {
+      if (values.newPassword !== values.confirmPassword) {
+        enqueueSnackbar("New password and confirmation do not match.", {
+          variant: "warning",
+          autoHideDuration: 2000,
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "right",
+          },
+        });
+        return;
+      }
+
+      const payload: ChangePasswordPayload = {
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+      };
+
       try {
-        const response = await axios.patch(`http://localhost:7070/users/6880b7cd8696aad839edf500`, values);
-        console.log("User updated:", response.data);
-        enqueueSnackbar("Profile updated successfully!", {
+        const response = await changePassword(userId, payload);
+
+        enqueueSnackbar(response.message || "Password updated successfully!", {
           variant: "success",
           autoHideDuration: 2000,
           anchorOrigin: {
@@ -28,8 +47,10 @@ export default function ChangePassword() {
             horizontal: "right",
           },
         });
+
+        formik.resetForm();
       } catch (error) {
-        enqueueSnackbar("Failed to update profile", {
+        enqueueSnackbar((error as Error).message || "Failed to update password", {
           variant: "error",
           autoHideDuration: 2000,
           anchorOrigin: {
@@ -37,7 +58,6 @@ export default function ChangePassword() {
             horizontal: "right",
           },
         });
-        // Handle error appropriately   
         console.error("Update failed:", error);
       }
     },

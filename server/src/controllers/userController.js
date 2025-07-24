@@ -154,5 +154,4 @@ module.exports = {
   verifyEmail,
   updateUser,
   deleteUser,
-  changePassword
 };
