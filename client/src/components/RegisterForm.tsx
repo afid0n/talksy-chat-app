@@ -2,6 +2,9 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import ReCAPTCHA from "react-google-recaptcha";
+import { useEffect, useState } from "react";
+import { enqueueSnackbar } from "notistack";
 
 interface RegisterFormProps {
   onBack: () => void;
@@ -15,6 +18,16 @@ interface RegisterFormProps {
 }
 
 const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
+
+
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const theme = localStorage.getItem("vite-ui-theme");
+    setIsDark(theme === "dark");
+  }, []);
+
   const initialValues = {
     username: "",
     fullName: "",
@@ -23,14 +36,36 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
   };
 
   const validationSchema = Yup.object({
-    username: Yup.string().min(3, "At least 3 characters").required("Username is required"),
-    fullName: Yup.string().min(3, "At least 3 characters").required("Full name is required"),
+    username: Yup.string()
+      .min(3, "At least 3 characters")
+      .required("Username is required"),
+    fullName: Yup.string()
+      .min(3, "At least 3 characters")
+      .required("Full name is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().min(6, "At least 6 characters").required("Password is required"),
+    password: Yup.string()
+      .min(6, "At least 6 characters")
+      .required("Password is required"),
   });
 
+  const handleCaptchaChange = (value: string | null) => {
+    if (value) {
+      setCaptchaVerified(true);
+    } else {
+      setCaptchaVerified(false);
+    }
+  };
+
   const handleFormSubmit = (values: typeof initialValues) => {
-    onSubmit(values); // This handles actual registration
+    if (!captchaVerified) {
+      enqueueSnackbar("Please complete the reCAPTCHA verification", {
+        variant: "error",
+      });
+      return;
+    }
+    // Optionally show a success snackbar here if you want:
+    // enqueueSnackbar("Form submitted successfully!", { variant: "success" });
+    onSubmit(values); // Pass data to parent
   };
 
   return (
@@ -47,13 +82,36 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
         {({ isSubmitting }) => (
           <Form className="space-y-4">
             {[
-              { name: "username", label: "Username", type: "text", placeholder: "Choose a username" },
-              { name: "fullName", label: "Full Name", type: "text", placeholder: "Enter your full name" },
-              { name: "email", label: "Email", type: "email", placeholder: "Enter your email" },
-              { name: "password", label: "Password", type: "password", placeholder: "Create a password" },
+              {
+                name: "username",
+                label: "Username",
+                type: "text",
+                placeholder: "Choose a username",
+              },
+              {
+                name: "fullName",
+                label: "Full Name",
+                type: "text",
+                placeholder: "Enter your full name",
+              },
+              {
+                name: "email",
+                label: "Email",
+                type: "email",
+                placeholder: "Enter your email",
+              },
+              {
+                name: "password",
+                label: "Password",
+                type: "password",
+                placeholder: "Create a password",
+              },
             ].map(({ name, label, type, placeholder }) => (
               <div key={name}>
-                <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label
+                  htmlFor={name}
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
                   {label}
                 </label>
                 <Field
@@ -71,6 +129,14 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
               </div>
             ))}
 
+            <div className="mt-4 flex justify-center">
+              <ReCAPTCHA
+                sitekey="6Ld0A4orAAAAAIguOQtslv-xTFOyrSDMgkRmLeax"
+                onChange={handleCaptchaChange}
+                theme={isDark ? "dark" : "light"}
+              />
+            </div>
+
             <div className="flex justify-between space-x-4 pt-4">
               <button
                 type="button"
@@ -81,8 +147,8 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
               </button>
               <button
                 type="submit"
-                disabled={loading || isSubmitting}
-                className="w-1/2 bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition"
+                disabled={loading || isSubmitting || !captchaVerified}
+                className="w-1/2 bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Creating..." : "Create Account"}
               </button>
@@ -90,7 +156,10 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
 
             <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
               Already have an account?{" "}
-              <Link to="/auth/Login" className="text-yellow-600 font-medium hover:underline">
+              <Link
+                to="/auth/Login"
+                className="text-yellow-600 font-medium hover:underline"
+              >
                 Sign In
               </Link>
             </p>
