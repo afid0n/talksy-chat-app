@@ -9,7 +9,6 @@ const registerUser = async (req, res, next) => {
   try {
     const { email, username, fullName, password, authProvider } = req.body;
 
-    // Basic validation for local auth
     if (authProvider === "local") {
       if (!email || !username || !fullName || !password) {
         return res.status(400).json({ message: "All fields are required for local registration" });
@@ -35,7 +34,7 @@ const registerUser = async (req, res, next) => {
       fullName,
     });
 
-    const verificationLink = `${SERVER_URL}/auth/verify-email?token=${token}`;
+    const verificationLink = `${SERVER_URL}/users/verify-email?token=${token}`;
     sendVerificationEmail(email, fullName, verificationLink);
 
     res.status(201).json({
@@ -45,6 +44,42 @@ const registerUser = async (req, res, next) => {
   } catch (error) {
     console.error("Register error:", error);
     next(error);
+  }
+};
+
+const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required." });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    console.log("Looking for user with email:", normalizedEmail);
+
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      console.log("User not found for email:", normalizedEmail);
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({ success: false, message: "Email is already verified." });
+    }
+
+    const token = generateToken({ id: user._id, email: user.email, fullName: user.fullName });
+
+    const verificationLink = `${SERVER_URL}/users/verify-email?token=${token}`;
+
+    await sendVerificationEmail(user.email, user.fullName, verificationLink);
+
+    res.json({ success: true, message: "Verification email resent successfully." });
+  } catch (error) {
+    console.error("Resend verification error:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
 
@@ -82,13 +117,19 @@ const getAllUsers = async (req, res, next) => {
 const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query;
-    //call your service here!
-    const response = await userService.verifyEmailToken(token); //success, message
-    res.redirect(`${CLIENT_URL}/email-verified?message=${response.message}`);
+    console.log("Received token:", token);
+
+    const response = await userService.verifyEmailToken(token);
+    console.log("Verification result:", response);
+
+    res.redirect(`${CLIENT_URL}/auth/email-verified?message=${encodeURIComponent(response.message)}`);
   } catch (error) {
-    next(error);
+    console.error("Email verification error:", error.message);
+    res.redirect(`${CLIENT_URL}/auth/email-verified?message=${encodeURIComponent(error.message)}`);
   }
 };
+
+
 
 const updateUser = async (req, res, next) => {
   try {
@@ -149,4 +190,5 @@ module.exports = {
   verifyEmail,
   updateUser,
   deleteUser,
+  resendVerificationEmail
 };
