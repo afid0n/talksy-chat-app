@@ -4,6 +4,51 @@ const { generateToken } = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/mailService');
 const { SERVER_URL, CLIENT_URL } = require('../config/config');
 
+
+const registerUser = async (req, res, next) => {
+  try {
+    const { email, username, fullName, password, authProvider } = req.body;
+
+    // Basic validation for local auth
+    if (authProvider === "local") {
+      if (!email || !username || !fullName || !password) {
+        return res.status(400).json({ message: "All fields are required for local registration" });
+      }
+    }
+
+    const hashedPassword = authProvider === "local"
+      ? await bcrypt.hash(password, 10)
+      : undefined;
+
+    const response = await userService.register({
+      ...req.body,
+      password: hashedPassword,
+    });
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+    console.log(req.body)
+
+    const token = generateToken({
+      id: response.data._id,
+      email,
+      fullName,
+    });
+
+    const verificationLink = `${SERVER_URL}/auth/verify-email?token=${token}`;
+    sendVerificationEmail(email, fullName, verificationLink);
+
+    res.status(201).json({
+      message: "user registered successfully | verify your email",
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+    next(error);
+  }
+};
+
+
 const getUserById = async (req, res, next) => {
   try {
     const user = await userService.getUserById(req.params.id);
@@ -33,42 +78,6 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
-const registerUser = async (req, res, next) => {
-  try {
-    //password hash
-    const { password } = req.body;
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    if (req.file && req.file.path) {
-      req.body.profileImage = req.file.path;
-      req.body.public_id = req.file.filename;
-    }
-    const response = await userService.register({
-      ...req.body,
-      password: hashedPassword,
-    });
-    if (!response.success) {
-      throw new Error(response.message);
-    }
-
-    //send email service ...
-    const token = generateToken({
-      id: response.data._id,
-      email: req.body.email,
-      fullName: req.body.fullName,
-    });
-    const verificationLink = `${SERVER_URL}/auth/verify-email?token=${token}`;
-    sendVerificationEmail(req.body.email, req.body.fullName, verificationLink);
-
-    res.status(201).json({
-      message: "user registered successfully | verify your email",
-      data: response.data,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
 
 const verifyEmail = async (req, res, next) => {
   try {
@@ -80,23 +89,6 @@ const verifyEmail = async (req, res, next) => {
     next(error);
   }
 };
-
-
-// const login = async (req, res, next) => {
-//   try {
-//     const credentials = {
-//       email: req.body.email,
-//       password: req.body.password,
-//     };
-//     const response = await loginService(credentials);
-//     res.status(200).json({
-//       message: response.message,
-//       token: response.token,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 
 const updateUser = async (req, res, next) => {
   try {

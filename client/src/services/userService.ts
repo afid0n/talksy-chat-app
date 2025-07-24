@@ -1,6 +1,11 @@
-import type { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse } from "@/types/Auth";
+import type {
+  LoginPayload,
+  LoginResponse,
+  RegisterPayload,
+  RegisterResponse
+} from "@/types/Auth";
 import instance from "./instance";
-
+import type { AxiosError } from "axios";
 
 // Register user
 export const registerUser = async (
@@ -8,9 +13,11 @@ export const registerUser = async (
 ): Promise<RegisterResponse> => {
   try {
     const response = await instance.post<RegisterResponse>("/users/register", payload);
+    console.log(response)
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || error.message || "Failed to register.");
+  } catch (error: unknown) {
+    const err = error as AxiosError<{ message?: string }>;
+    throw new Error(err.response?.data?.message || err.message || "Failed to register.");
   }
 };
 
@@ -21,7 +28,8 @@ export const loginUser = async (
   try {
     const response = await instance.post<LoginResponse>("/users/login", credentials);
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || error.message || "Failed to login.");
+  } catch (error: unknown) {
+    const err = error as AxiosError<{ message?: string }>;
+    throw new Error(err.response?.data?.message || err.message || "Failed to login.");
   }
 };
