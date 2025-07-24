@@ -8,16 +8,6 @@ const jwt = require('jsonwebtoken');
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 10 * 60 * 1000; //10 minutes
 
-const getUserById = async (id) => {
-  const user = await User.findById(id);
-  return user ? formatMongoData(user) : null;
-};
-
-const getUserByEmail = async (email) => {
-  const user = await User.findOne({ email });
-  return user ? formatMongoData(user) : null;
-};
-
 const register = async (payload) => {
   try {
     const { email, username } = payload;
@@ -39,6 +29,16 @@ const register = async (payload) => {
     return "internal server error!";
   }
 };
+const getUserById = async (id) => {
+  const user = await User.findById(id);
+  return user ? formatMongoData(user) : null;
+};
+
+const getUserByEmail = async (email) => {
+  const user = await User.findOne({ email });
+  return user ? formatMongoData(user) : null;
+};
+
 
 const verifyEmailToken = async (token) => {
   const isValidToken = verifyToken(token);

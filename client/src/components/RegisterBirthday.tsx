@@ -1,18 +1,39 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
 import { Cake } from "lucide-react";
 
+interface RegisterBirthdayProps {
+  onNext: () => void;
+  onBack: () => void;
+  setBirthday: (date: Date) => void;
+  birthday?: Date | null; // optional initial date from parent
+}
+
 const RegisterBirthday = ({
   onNext,
   onBack,
-}: {
-  onNext: () => void;
-  onBack: () => void;
-}) => {
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  setBirthday,
+  birthday = null,
+}: RegisterBirthdayProps) => {
+  const [date, setDate] = React.useState<Date | undefined>(birthday || undefined);
   const [showCalendar, setShowCalendar] = React.useState(false);
+
+  // Sync local date with parent on mount or when birthday changes
+  useEffect(() => {
+    if (birthday) {
+      setDate(birthday);
+      setShowCalendar(true);
+    }
+  }, [birthday]);
+
+  // Update parent whenever date changes
+  useEffect(() => {
+    if (date) {
+      setBirthday(date);
+    }
+  }, [date, setBirthday]);
 
   const calculateAge = (birthDate: Date) => {
     const today = new Date();
@@ -37,6 +58,7 @@ const RegisterBirthday = ({
         <button
           onClick={() => setShowCalendar(true)}
           className="bg-yellow-400 dark:bg-yellow-500 flex items-center gap-2 w-full justify-center text-lg text-white px-6 py-2 rounded mb-4 hover:bg-yellow-500 dark:hover:bg-yellow-600 transition-all"
+          type="button"
         >
           <p>Click to select birthday</p>
           <Cake />
@@ -58,8 +80,7 @@ const RegisterBirthday = ({
       {date && (
         <div className="mt-2 mb-4 text-center text-gray-700 dark:text-gray-300">
           <p>
-            🎂 Your birthday is{" "}
-            <strong>{format(date, "MMMM d, yyyy")}</strong>
+            🎂 Your birthday is <strong>{format(date, "MMMM d, yyyy")}</strong>
           </p>
           <p>
             🎉 You are <strong>{calculateAge(date)}</strong> years old
@@ -71,6 +92,7 @@ const RegisterBirthday = ({
         <button
           onClick={onBack}
           className="text-sm underline text-gray-600 dark:text-gray-400"
+          type="button"
         >
           ← Back
         </button>
@@ -78,6 +100,7 @@ const RegisterBirthday = ({
           onClick={onNext}
           disabled={!date}
           className="bg-yellow-500 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-yellow-600 dark:hover:bg-yellow-600"
+          type="button"
         >
           Continue →
         </button>

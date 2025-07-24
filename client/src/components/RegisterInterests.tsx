@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const allInterests = [
@@ -10,14 +10,26 @@ const allInterests = [
   "Science", "Architecture", "Theater"
 ];
 
+interface RegisterInterestsProps {
+  onNext: () => void;
+  onBack: () => void;
+  setInterests: (interests: string[]) => void;
+  initialInterests?: string[]; // optional to prefill selections
+}
+
 const RegisterInterests = ({
   onNext,
   onBack,
-}: {
-  onNext: () => void;
-  onBack: () => void;
-}) => {
-  const [selected, setSelected] = useState<string[]>([]);
+  setInterests,
+  initialInterests = [],
+}: RegisterInterestsProps) => {
+  // Initialize with parent's interests if any
+  const [selected, setSelected] = useState<string[]>(initialInterests);
+
+  // Sync selected interests back to parent on changes
+  useEffect(() => {
+    setInterests(selected);
+  }, [selected, setInterests]);
 
   const toggleInterest = (interest: string) => {
     if (selected.includes(interest)) {
@@ -58,6 +70,7 @@ const RegisterInterests = ({
                     : "bg-gray-100 hover:bg-gray-200 cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
                 }
               `}
+              type="button"
             >
               {interest}
             </button>
@@ -69,6 +82,7 @@ const RegisterInterests = ({
         <button
           onClick={onBack}
           className="text-sm underline text-gray-600 dark:text-gray-300"
+          type="button"
         >
           ← Back
         </button>
@@ -76,6 +90,7 @@ const RegisterInterests = ({
           onClick={onNext}
           disabled={selected.length < 3}
           className="bg-yellow-500 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          type="button"
         >
           Continue →
         </button>

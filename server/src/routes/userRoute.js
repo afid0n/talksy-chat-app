@@ -5,25 +5,21 @@ const uploadMiddleware = require("../middlewares/uploadMiddleware");
 
 const upload = uploadMiddleware("userImages");
 
-// Get all users
-router.get('/', userController.getAllUsers);
+// Register user
+router.post('/register', userController.registerUser);
 
-router.post("/login", userController.login)
+// Login user
+router.post('/login', userController.login);
 
-// Get user by ID
-router.get('/:id', userController.getUserById);
+// Verify email
+router.get('/verify-email', userController.verifyEmail);
 
 // Get user by email
 router.get('/email/:email', userController.getUserByEmail);
 
-// Register user
-router.post('/register', upload.single("profileImage"), userController.registerUser);
+// Get all users
+router.get('/', userController.getAllUsers);
 
-//Verify Email
-router.get("/verify-email", userController.verifyEmail);
-
-// Login user
-// router.post('/login', login);
 
 // Update user
 router.patch('/:id', userController.updateUser);
@@ -33,5 +29,8 @@ router.patch('/password/:id', userController.changePassword);
 
 // Delete user
 router.delete('/:id', userController.deleteUser);
+
+// Get user by ID 
+router.get('/:id', userController.getUserById);
 
 module.exports = router;
