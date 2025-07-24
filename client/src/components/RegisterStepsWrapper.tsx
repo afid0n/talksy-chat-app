@@ -17,9 +17,37 @@ export default function RegisterStepsWrapper() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const [location, setLocation] = useState({ country: "", city: "" });
-  const [interests, setInterests] = useState<string[]>([]);
-  const [birthday, setBirthday] = useState<Date | null>(null);
+  const [location, setLocation] = useState<{ country: string; city: string }>(() => {
+    const saved = localStorage.getItem("register_location");
+    return saved ? JSON.parse(saved) : { country: "", city: "" };
+  });
+
+  const [interests, setInterests] = useState<string[]>(() => {
+    const saved = localStorage.getItem("register_interests");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [birthday, setBirthday] = useState<Date | null>(() => {
+    const saved = localStorage.getItem("register_birthday");
+    return saved ? new Date(saved) : null;
+  });
+
+  const updateLocation = (loc: { country: string; city: string }) => {
+    setLocation(loc);
+    localStorage.setItem("register_location", JSON.stringify(loc));
+  };
+
+  const updateInterests = (ints: string[]) => {
+    setInterests(ints);
+    localStorage.setItem("register_interests", JSON.stringify(ints));
+  };
+
+  const updateBirthday = (date: Date | null) => {
+    setBirthday(date);
+    if (date) localStorage.setItem("register_birthday", date.toISOString());
+    else localStorage.removeItem("register_birthday");
+  };
+
 
   const next = () => step < 3 && setStep((prev) => prev + 1);
   const back = () => step > 0 && setStep((prev) => prev - 1);
@@ -34,25 +62,31 @@ export default function RegisterStepsWrapper() {
   }) => {
     setLoading(true);
     try {
+      const birthdayIso = birthday ? birthday.toISOString() : localStorage.getItem("register_birthday") || "";
+
       const payload: RegisterPayload = {
         email: values.email,
         username: values.username,
         fullName: values.fullName,
         authProvider: "local",
         password: values.password,
-        birthday: birthday ? birthday.toISOString() : "",
-        location: {
-          country: location.country || "",
-          city: location.city || "",
-        },
-        interests: interests.length ? interests : [],
+        birthday: birthdayIso,
+        location: location.country
+          ? location
+          : JSON.parse(localStorage.getItem("register_location") || '{"country":"","city":""}'),
+        interests: interests.length
+          ? interests
+          : JSON.parse(localStorage.getItem("register_interests") || "[]"),
         language: navigator.language || "en",
       };
 
       console.log("📦 Sending register payload:", payload);
       await registerUser(payload);
+      localStorage.removeItem("register_location");
+      localStorage.removeItem("register_interests");
+      localStorage.removeItem("register_birthday");
 
-      enqueueSnackbar("Successfully registered!", { variant: "success" });
+      enqueueSnackbar("Successfully registered! Verify your email", { variant: "success" });
       navigate("/auth/login");
     } catch (err: any) {
       enqueueSnackbar(err.message || "Registration failed", { variant: "error" });
@@ -74,13 +108,13 @@ export default function RegisterStepsWrapper() {
         <ProgressBar currentStep={step + 1} totalSteps={4} />
         <AnimatePresence mode="wait">
           {step === 0 && (
-            <RegisterCountry key="step1" onNext={next} setLocation={setLocation} />
+            <RegisterCountry key="step1" onNext={next} setLocation={updateLocation} />
           )}
           {step === 1 && (
-            <RegisterInterests key="step2" onNext={next} onBack={back} setInterests={setInterests} />
+            <RegisterInterests key="step2" onNext={next} onBack={back} setInterests={updateInterests} />
           )}
           {step === 2 && (
-            <RegisterBirthday key="step3" onNext={next} onBack={back} setBirthday={setBirthday} />
+            <RegisterBirthday key="step3" onNext={next} onBack={back} setBirthday={updateBirthday} />
           )}
           {step === 3 && (
             <RegisterForm
