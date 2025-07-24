@@ -5,7 +5,7 @@ export interface RegisterPayload {
   fullName: string;
   authProvider: "local" | "google" | "github";
   password?: string; // optional for non-local
-  birthday: string;
+  birthday: Date | string; // ISO string or Date object
   avatar?: { url: string };
   location: {
     country: string;
@@ -13,7 +13,6 @@ export interface RegisterPayload {
   };
   interests: string[];
   language: string;
-  bio?: string;
 }
 
 export interface RegisterResponse {
@@ -47,7 +46,7 @@ export interface RegisterResponse {
 
 export interface LoginPayload {
   email: string;
-  password?: string; // optional for Google/GitHub
+  password?: string;
 }
 
 export interface LoginResponse {

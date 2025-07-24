@@ -16,25 +16,25 @@ export default function RegisterStepsWrapper() {
   const [location, setLocation] = useState({ country: "", city: "" });
   const [interests, setInterests] = useState<string[]>([]);
   const [birthday, setBirthday] = useState<Date | null>(null);
-  const [formData, setFormData] = useState({
-    email: "",
-    username: "",
-    fullName: "",
-    password: "",
-  });
+
 
   const next = () => step < 3 && setStep((prev) => prev + 1);
   const back = () => step > 0 && setStep((prev) => prev - 1);
 
- const handleSubmit = async () => {
+const handleSubmit = async (values: {
+  username: string;
+  fullName: string;
+  email: string;
+  password: string;
+}) => {
   setLoading(true);
   try {
     const payload: RegisterPayload = {
-      email: formData.email,
-      username: formData.username,
-      fullName: formData.fullName,
+      email: values.email,
+      username: values.username,
+      fullName: values.fullName,
       authProvider: "local",
-      password: formData.password,
+      password: values.password,
       birthday: birthday ? birthday.toISOString() : "",
       location: {
         country: location.country || "",
@@ -42,20 +42,18 @@ export default function RegisterStepsWrapper() {
       },
       interests: interests.length ? interests : [],
       language: navigator.language || "en",
-      bio: "",
     };
 
+    console.log("📦 Sending register payload:", payload);
     await registerUser(payload);
-    console.log(payload)
     alert("Successfully registered!");
-    // Redirect or something else
   } catch (err: any) {
     alert(err.message);
   } finally {
     setLoading(false);
   }
-  
 };
+
 
 
   return (
@@ -83,7 +81,6 @@ export default function RegisterStepsWrapper() {
             <RegisterForm
               key="step4"
               onBack={back}
-              setFormData={setFormData}
               onSubmit={handleSubmit}
               loading={loading}
             />

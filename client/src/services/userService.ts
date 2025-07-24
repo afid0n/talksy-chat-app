@@ -12,8 +12,8 @@ export const registerUser = async (
   payload: RegisterPayload
 ): Promise<RegisterResponse> => {
   try {
+    console.log("📦 Sending register payload:", payload);
     const response = await instance.post<RegisterResponse>("/users/register", payload);
-    console.log(response)
     return response.data;
   } catch (error: unknown) {
     const err = error as AxiosError<{ message?: string }>;

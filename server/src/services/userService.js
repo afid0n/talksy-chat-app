@@ -4,31 +4,55 @@ const { generateAccessToken, generateRefreshToken } = require('../utils/genetare
 const { verifyToken, generateToken } = require("../utils/jwt");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { registerSchema } = require('../validations/registerValidate');
 
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 10 * 60 * 1000; //10 minutes
 
 const register = async (payload) => {
   try {
+    console.log("🔍 Incoming register payload:", payload);
+
+    // ✅ Validate using Joi
+    const { error } = registerSchema.validate(payload, { abortEarly: false });
+
+    if (error) {
+      const validationMessages = error.details.map((d) => d.message);
+      return {
+        success: false,
+        message: `Validation failed: ${validationMessages.join(', ')}`,
+      };
+    }
+
     const { email, username } = payload;
+
     const existedUser = await User.findOne({
       $or: [{ email }, { username }],
     });
+
     if (existedUser) {
       return {
         success: false,
-        message: "username or email already taken!",
-      };
-    } else {
-      return {
-        data: await User.create(payload),
-        success: true,
+        message: 'Username or email already taken!',
       };
     }
+
+    const newUser = await User.create(payload);
+
+    return {
+      success: true,
+      data: newUser,
+    };
   } catch (error) {
-    return "internal server error!";
+    console.error("❌ Registration error:", error);
+    return {
+      success: false,
+      message: 'Internal server error!',
+    };
   }
 };
+
+
 const getUserById = async (id) => {
   const user = await User.findById(id);
   return user ? formatMongoData(user) : null;
