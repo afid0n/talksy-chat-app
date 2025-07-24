@@ -13,6 +13,7 @@ router.post('/login', userController.login);
 
 // Verify email
 router.get('/verify-email', userController.verifyEmail);
+router.post("/resend-verification-email", userController.resendVerificationEmail);
 
 // Get user by email
 router.get('/email/:email', userController.getUserByEmail);
