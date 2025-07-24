@@ -1,6 +1,6 @@
 export interface User {
-    id: string; 
-    email: string;
+    id: string ; 
+    email: string  
     fullName: string;
     username: string;
     authProvider: 'google' | 'github' | 'local';

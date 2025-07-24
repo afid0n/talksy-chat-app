@@ -19,7 +19,6 @@ const Cards = ({ city, searchQuery, countriesFilter, users }: CardsProps) => {
 
   const [likedIds, setLikedIds] = useState<string[]>([]);
 
-console.log("hey cards",users)
   const toggleLike = (id: string) => {
     setLikedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]

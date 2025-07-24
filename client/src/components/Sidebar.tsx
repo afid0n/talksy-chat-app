@@ -1,4 +1,6 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '@/features/userSlice'; // ✅ Update path as needed
 import {
   Menu,
   X,
@@ -7,6 +9,7 @@ import {
   MessageCircle,
   LogOut,
 } from 'lucide-react';
+import { enqueueSnackbar } from 'notistack';
 
 const navItems = [
   { label: 'Feed', icon: Users, path: '/feed' },
@@ -22,6 +25,14 @@ const Sidebar = ({
   toggleSidebar: () => void;
 }) => {
   const location = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    enqueueSnackbar('Logged out successfully.', { variant: 'success' });
+    navigate('/auth/login');
+  };
 
   return (
     <aside
@@ -77,6 +88,7 @@ const Sidebar = ({
 
         {/* Logout Button */}
         <button
+          onClick={handleLogout}
           className={`flex items-center cursor-pointer px-4 py-2 rounded-md text-sm font-medium
             text-red-600 dark:text-red-400 transition
             hover:bg-yellow-100 dark:hover:bg-zinc-800
