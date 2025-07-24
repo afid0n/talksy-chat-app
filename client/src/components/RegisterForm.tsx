@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { enqueueSnackbar } from "notistack";
 
 interface RegisterFormProps {
@@ -13,15 +13,16 @@ interface RegisterFormProps {
     fullName: string;
     email: string;
     password: string;
-  }) => void;
+  }) => Promise<void>; 
   loading?: boolean;
 }
 
 const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
-
-
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [isDark, setIsDark] = useState(false);
+
+  // Ref for resetting captcha
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   useEffect(() => {
     const theme = localStorage.getItem("vite-ui-theme");
@@ -49,23 +50,31 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
   });
 
   const handleCaptchaChange = (value: string | null) => {
-    if (value) {
-      setCaptchaVerified(true);
-    } else {
-      setCaptchaVerified(false);
-    }
+    setCaptchaVerified(!!value);
   };
 
-  const handleFormSubmit = (values: typeof initialValues) => {
+  const handleFormSubmit = async (values: typeof initialValues) => {
     if (!captchaVerified) {
       enqueueSnackbar("Please complete the reCAPTCHA verification", {
         variant: "error",
       });
       return;
     }
-    // Optionally show a success snackbar here if you want:
-    // enqueueSnackbar("Form submitted successfully!", { variant: "success" });
-    onSubmit(values); // Pass data to parent
+
+    try {
+      await onSubmit(values);
+   
+    } catch (error: any) {
+      setCaptchaVerified(false);
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
+
+      enqueueSnackbar(
+        error?.message || "Registration failed. Please try again.",
+        { variant: "error" }
+      );
+    }
   };
 
   return (
@@ -131,6 +140,7 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
 
             <div className="mt-4 flex justify-center">
               <ReCAPTCHA
+                ref={recaptchaRef}
                 sitekey="6Ld0A4orAAAAAIguOQtslv-xTFOyrSDMgkRmLeax"
                 onChange={handleCaptchaChange}
                 theme={isDark ? "dark" : "light"}

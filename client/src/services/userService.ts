@@ -33,3 +33,14 @@ export const loginUser = async (
     throw new Error(err.response?.data?.message || err.message || "Failed to login.");
   }
 };
+
+// Resend verification email
+export const resendVerificationEmail = async (email: string): Promise<{ success: boolean; message: string }> => {
+  try {
+    const response = await instance.post<{ success: boolean; message: string }>("/users/resend-verification-email", { email });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as AxiosError<{ message?: string }>;
+    throw new Error(err.response?.data?.message || err.message || "Failed to resend verification email.");
+  }
+};

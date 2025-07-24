@@ -13,7 +13,6 @@ const register = async (payload) => {
   try {
     console.log("🔍 Incoming register payload:", payload);
 
-    // ✅ Validate using Joi
     const { error } = registerSchema.validate(payload, { abortEarly: false });
 
     if (error) {
@@ -44,7 +43,7 @@ const register = async (payload) => {
       data: newUser,
     };
   } catch (error) {
-    console.error("❌ Registration error:", error);
+    console.error("Registration error:", error);
     return {
       success: false,
       message: 'Internal server error!',
@@ -64,27 +63,23 @@ const getUserByEmail = async (email) => {
 };
 
 
+
 const verifyEmailToken = async (token) => {
-  const isValidToken = verifyToken(token);
-  if (isValidToken) {
-    const { id } = isValidToken;
-    const user = await UserModel.findById(id);
-    if (user.emailVerified) {
-      return {
-        success: false,
-        message: "email already has been verified",
-      };
-    } else {
-      user.emailVerified = true;
-      await user.save();
-      return {
-        success: true,
-        message: "email has been verified successfully!",
-      };
-    }
-  } else {
-    throw new Error("invalid or expired token!");
+  const decoded = verifyToken(token);
+
+  if (!decoded) throw new Error("Invalid or expired token!");
+
+  const user = await User.findById(decoded.id);
+  if (!user) throw new Error("User not found!");
+
+  if (user.emailVerified) {
+    return { success: false, message: "Email already verified." };
   }
+
+  user.emailVerified = true;
+  await user.save();
+
+  return { success: true, message: "Email verified successfully!" };
 };
 
 
