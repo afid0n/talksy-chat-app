@@ -12,10 +12,9 @@ interface RegisterFormProps {
     password: string;
   }) => void;
   loading?: boolean;
-  setFormData: (data: any) => void;
 }
 
-const RegisterForm = ({ onBack, onSubmit, loading, setFormData }: RegisterFormProps) => {
+const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
   const initialValues = {
     username: "",
     fullName: "",
@@ -31,7 +30,6 @@ const RegisterForm = ({ onBack, onSubmit, loading, setFormData }: RegisterFormPr
   });
 
   const handleFormSubmit = (values: typeof initialValues) => {
-    setFormData(values); // This sends the values to the parent wrapper
     onSubmit(values); // This handles actual registration
   };
 
