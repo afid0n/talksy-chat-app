@@ -18,18 +18,18 @@ const sendVerificationEmail = async (
 ) => {
   try {
     await transporter.sendMail({
-      from: `"Bazaar" <${process.env.GMAIL_USER}>`,
+      from: `"Talksy" <${process.env.GMAIL_USER}>`,
       to: toEmail,
       subject: "Verify Your Email Address",
       html: ` <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px;">
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
       <div style="background-color: #1e90ff; padding: 20px; color: white; text-align: center;">
-        <h2 style="margin: 0;">Welcome to Bazaar!</h2>
+        <h2 style="margin: 0;">Welcome to Talksy!</h2>
       </div>
       <div style="padding: 30px; color: #333;">
         <p style="font-size: 16px;">Hi ${userFullName},</p>
         <p style="font-size: 16px;">
-          Thanks for signing up to <strong>Bazaar</strong>. Please verify your email address by clicking the button below:
+          Thanks for signing up to <strong>Talksy</strong>. Please verify your email address by clicking the button below:
         </p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${verificationLink}" target="_blank" 
@@ -42,7 +42,7 @@ const sendVerificationEmail = async (
         </p>
       </div>
       <div style="background-color: #f4f4f4; padding: 20px; text-align: center; font-size: 12px; color: #999;">
-        &copy; ${new Date().getFullYear()} Bazaar. All rights reserved.
+        &copy; ${new Date().getFullYear()} Talksy. All rights reserved.
       </div>
     </div>
   </div>`,
@@ -65,9 +65,9 @@ const sendUnlockAccountEmail = async (
     const formattedEnd = lockEnd.toLocaleString();
 
     await transporter.sendMail({
-      from: `"Bazaar" <${process.env.GMAIL_USER}>`,
+      from: `"Talksy" <${process.env.GMAIL_USER}>`,
       to: toEmail,
-      subject: "Account Locked — Unlock Your Bazaar Account",
+      subject: "Account Locked — Unlock Your Talksy Account",
       html: ` <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px;">
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
       <div style="background-color: #ff6b6b; padding: 20px; color: white; text-align: center;">
@@ -76,7 +76,7 @@ const sendUnlockAccountEmail = async (
       <div style="padding: 30px; color: #333;">
         <p style="font-size: 16px;">Hello ${userFullName},</p>
         <p style="font-size: 16px;">
-          Your <strong>Bazaar</strong> account has been <span style="color: #d9534f;"><strong>locked</strong></span> after <strong>3 unsuccessful login attempts</strong>.
+          Your <strong>Talksy</strong> account has been <span style="color: #d9534f;"><strong>locked</strong></span> after <strong>3 unsuccessful login attempts</strong>.
         </p>
         <p style="font-size: 16px;">
           Your account will remain locked for <strong>10 minutes</strong>.
@@ -96,7 +96,7 @@ const sendUnlockAccountEmail = async (
         </p>
       </div>
       <div style="background-color: #f4f4f4; padding: 20px; text-align: center; font-size: 12px; color: #999;">
-        &copy; ${new Date().getFullYear()} Bazaar. All rights reserved.
+        &copy; ${new Date().getFullYear()} Talksy. All rights reserved.
       </div>
     </div>
   </div>`,
@@ -108,20 +108,20 @@ const sendUnlockAccountEmail = async (
 const sendForgotPasswordEmail = async (toEmail, resetPasswordLink) => {
   try {
     await transporter.sendMail({
-      from: `"Bazaar" <${process.env.GMAIL_USER}>`,
+      from: `"Talksy" <${process.env.GMAIL_USER}>`,
       to: toEmail,
-      subject: "Bazaar Password Reset Request",
+      subject: "Talksy Password Reset Request",
       html: `
   <div style="font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 40px;">
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
       <div style="background-color: #1e90ff; padding: 24px 20px; color: white; text-align: center;">
         <h1 style="margin: 0; font-size: 24px;">Password Reset</h1>
-        <p style="margin: 5px 0 0; font-size: 14px;">Secure your Bazaar account</p>
+        <p style="margin: 5px 0 0; font-size: 14px;">Secure your Talksy account</p>
       </div>
       <div style="padding: 32px 28px; color: #333;">
         <p style="font-size: 16px; margin-bottom: 24px;">Hello,</p>
         <p style="font-size: 15px; line-height: 1.6;">
-          We received a request to reset your <strong>Bazaar</strong> account password. If you made this request, please click the button below to reset your password.
+          We received a request to reset your <strong>Talksy</strong> account password. If you made this request, please click the button below to reset your password.
           This link will expire in <strong>30 minutes</strong>.
         </p>
         <div style="text-align: center; margin: 35px 0;">
@@ -138,7 +138,7 @@ const sendForgotPasswordEmail = async (toEmail, resetPasswordLink) => {
         </p>
       </div>
       <div style="background-color: #f8f8f8; padding: 18px; text-align: center; font-size: 12px; color: #aaa;">
-        &copy; ${new Date().getFullYear()} Bazaar. All rights reserved.
+        &copy; ${new Date().getFullYear()} Talksy. All rights reserved.
       </div>
     </div>
   </div>

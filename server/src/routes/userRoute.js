@@ -21,8 +21,8 @@ router.post('/register', upload.single("profileImage"), userController.registerU
 //Verify Email
 router.get("/verify-email", userController.verifyEmail);
 
-// Login user
-// router.post('/login', login);
+//Forgot Password
+router.post("/forgot-password", userController.forgotPassword);
 
 // Update user
 router.patch('/:id', userController.updateUser);

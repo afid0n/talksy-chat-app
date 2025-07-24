@@ -1,9 +1,12 @@
-const User = require('../models/userModel');
+const UserModel = require('../models/userModel');
 const formatMongoData = require('../utils/formatMongoData');
 const { generateAccessToken, generateRefreshToken } = require('../utils/genetareJWT');
 const { verifyToken, generateToken } = require("../utils/jwt");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const {
+  sendForgotPasswordEmail,
+} = require("../utils/mailService");
 
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 10 * 60 * 1000; //10 minutes
@@ -161,6 +164,24 @@ console.log(user);
   };
 };
 
+const forgotPassword = async (email) => {
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    throw new Error("email does not exist!");
+  } else {
+    //send email
+    const token = generateAccessToken(
+      {
+        id: user._id,
+        email: user.email,
+      },
+      "30m"
+    );
+    const resetPasswordLink = `${CLIENT_URL}/auth/reset-password/${token}`;
+    sendForgotPasswordEmail(email, resetPasswordLink);
+  }
+};
+
 const updateUser = async (id, updateData) => {
   const user = await User.findByIdAndUpdate(id, updateData, { new: true });
   return user ? formatMongoData(user) : null;
@@ -184,6 +205,7 @@ module.exports = {
   register,
   verifyEmailToken,
   login,
+  forgotPassword,
   updateUser,
   deleteUser,
   getAllUsers,

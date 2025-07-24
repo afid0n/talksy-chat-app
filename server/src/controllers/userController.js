@@ -81,6 +81,21 @@ const verifyEmail = async (req, res, next) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    await forgotPassword(email);
+    res.status(200).json({
+      message: "reset password email was sent!",
+    });
+  } catch (error) {
+    res.json({
+      message: error.message || "internal server error",
+      statusCode: 401,
+    });
+  }
+};
+
 
 // const login = async (req, res, next) => {
 //   try {
@@ -155,6 +170,7 @@ module.exports = {
   registerUser,
   login,
   verifyEmail,
+  forgotPassword,
   updateUser,
   deleteUser,
 };
