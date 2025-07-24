@@ -1,33 +1,39 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { getLocalizedCountries } from "@/services/countriesAPI";
+import mockCountries from "@/data/mockCountries";
 
 interface LocalizedCountry {
   code: string;
-  name: string;
+  name: string; // resolved localized name
   cities: string[];
 }
 
-const RegisterCountry = ({ onNext }: { onNext: () => void }) => {
+const RegisterCountry = ({ onNext, setLocation }: { onNext: () => void; setLocation: (location: { city: string; country: string }) => void; }) => {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState("");
   const [countries, setCountries] = useState<LocalizedCountry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // You can store the selected language here or get it from context/store
-  const lang = "en"; // For example, hardcoded now
+  // Selected language for country names
+  const lang = "en";
 
   useEffect(() => {
-    async function loadCountries() {
-      setLoading(true);
-      const data = getLocalizedCountries(lang); // synchronous since mock
-      setCountries(data);
+    setLoading(true);
+
+    // Simulate async fetch (could be replaced with real API call)
+    setTimeout(() => {
+      // Map mockCountries to LocalizedCountry[], picking country name by lang
+      const localized: LocalizedCountry[] = mockCountries.map((c) => ({
+        code: c.code,
+        name: c.name[lang] || c.name.en, // fallback to English if missing
+        cities: c.cities,
+      }));
+      setCountries(localized);
       setLoading(false);
-    }
-    loadCountries();
+    }, 300);
   }, [lang]);
 
-  // Create array like "City, CountryName"
+  // Compose array like "City, CountryName"
   const cityCountryList = countries.flatMap((country) =>
     country.cities.map((city) => `${city}, ${country.name}`)
   );
@@ -35,6 +41,14 @@ const RegisterCountry = ({ onNext }: { onNext: () => void }) => {
   const filtered = cityCountryList.filter((item) =>
     item.toLowerCase().includes(query.toLowerCase())
   );
+
+  // When user selects a city-country item
+  const handleSelect = (item: string) => {
+    setSelected(item);
+    const [city, country] = item.split(",").map((v) => v.trim());
+    setLocation({ city, country });
+    onNext();
+  };
 
   return (
     <motion.div
@@ -71,10 +85,7 @@ const RegisterCountry = ({ onNext }: { onNext: () => void }) => {
                 className={`p-2 cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-600/20 dark:text-gray-100 ${
                   selected === item ? "bg-yellow-200 dark:bg-yellow-700" : ""
                 }`}
-                onClick={() => {
-                  setSelected(item);
-                  onNext();
-                }}
+                onClick={() => handleSelect(item)}
               >
                 {item}
               </li>

@@ -1,10 +1,10 @@
 import { FaGoogle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
-import * as Yup from 'yup'
 import { enqueueSnackbar } from "notistack";
 import { useState } from 'react'
 import { loginUser } from '@/services/userService'
+import { loginValidationSchema } from '@/validations/authValidation';
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false)
@@ -14,10 +14,7 @@ export default function LoginForm() {
       email: '',
       password: '',
     },
-    validationSchema: Yup.object({
-      email: Yup.string().required('Email or username is required'),
-      password: Yup.string().min(4).required('Password is required'),
-    }),
+    validationSchema:loginValidationSchema,
     onSubmit: async (values) => {
       setLoading(true)
       try {
