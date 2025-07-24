@@ -26,14 +26,16 @@ const userSchema = new mongoose.Schema({
     authProvider: {
         type: String,
         enum: ['google', 'github', 'local'],
+        default: 'local',
         required: true,
     },
+    googleId: { type: String, default: null },
     password: {
         type: String,
         // Required only if local auth
-        required: function () {
-            return this.authProvider === 'local';
-        },
+        // required: function () {
+        //     return this.authProvider === 'local';
+        // },
         minlength: 6,
         select: true,
     },
@@ -57,10 +59,10 @@ const userSchema = new mongoose.Schema({
     },
     interests: {
         type: [String],
-        validate: {
-            validator: (arr) => arr.length >= 3 && arr.length <= 5,
-            message: 'You must choose between 3 and 5 interests.',
-        },
+        // validate: {
+        //     validator: (arr) => arr.length >= 3 && arr.length <= 5,
+        //     message: 'You must choose between 3 and 5 interests.',
+        // },
     },
     friends: [
         {

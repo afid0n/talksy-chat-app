@@ -7,6 +7,8 @@ const path = require("path");
 const userRoute = require("./src/routes/userRoute");
 const chatRoutes = require("./src/routes/chatRoute");
 const messageRoutes = require("./src/routes/messageRoute");
+const googleAuthRoute = require("./src/routes/googleAuthRoute");
+require("./src/config/passport");
 
 const app = express();
 app.use(cors());
@@ -22,6 +24,9 @@ app.get("/", (_, res) => {
 app.use("/users", userRoute);
 app.use('/chats', chatRoutes);
 app.use('/messages', messageRoutes);
+
+// app.use(passport.session());
+app.use("/auth", googleAuthRoute);
 
 app.use(errorHandler);
 

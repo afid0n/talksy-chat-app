@@ -24,6 +24,9 @@ router.get('/', userController.getAllUsers);
 
 // Update user
 router.patch('/:id', userController.updateUser);
+// update password
+// router.patch('/password/:id', userController.changePassword);
+
 
 // Delete user
 router.delete('/:id', userController.deleteUser);
