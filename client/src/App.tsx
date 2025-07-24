@@ -10,7 +10,7 @@ import { SnackbarProvider } from "notistack";
 function App() {
   return (
     <>
-    <SnackbarProvider />
+    <SnackbarProvider maxSnack={3}/>
      <ThreeBackground />
      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">    
       <RouterProvider router={router} />

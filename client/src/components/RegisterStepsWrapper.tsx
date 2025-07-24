@@ -7,54 +7,59 @@ import RegisterInterests from "@/components/RegisterInterests";
 import { AnimatePresence } from "framer-motion";
 import { registerUser } from "@/services/userService";
 import type { RegisterPayload } from "@/types/Auth";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
+
 
 export default function RegisterStepsWrapper() {
+
+
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Central state
   const [location, setLocation] = useState({ country: "", city: "" });
   const [interests, setInterests] = useState<string[]>([]);
   const [birthday, setBirthday] = useState<Date | null>(null);
 
-
   const next = () => step < 3 && setStep((prev) => prev + 1);
   const back = () => step > 0 && setStep((prev) => prev - 1);
-
-const handleSubmit = async (values: {
-  username: string;
-  fullName: string;
-  email: string;
-  password: string;
-}) => {
-  setLoading(true);
-  try {
-    const payload: RegisterPayload = {
-      email: values.email,
-      username: values.username,
-      fullName: values.fullName,
-      authProvider: "local",
-      password: values.password,
-      birthday: birthday ? birthday.toISOString() : "",
-      location: {
-        country: location.country || "",
-        city: location.city || "",
-      },
-      interests: interests.length ? interests : [],
-      language: navigator.language || "en",
-    };
-
-    console.log("📦 Sending register payload:", payload);
-    await registerUser(payload);
-    alert("Successfully registered!");
-  } catch (err: any) {
-    alert(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  const navigate = useNavigate();
 
 
+  const handleSubmit = async (values: {
+    username: string;
+    fullName: string;
+    email: string;
+    password: string;
+  }) => {
+    setLoading(true);
+    try {
+      const payload: RegisterPayload = {
+        email: values.email,
+        username: values.username,
+        fullName: values.fullName,
+        authProvider: "local",
+        password: values.password,
+        birthday: birthday ? birthday.toISOString() : "",
+        location: {
+          country: location.country || "",
+          city: location.city || "",
+        },
+        interests: interests.length ? interests : [],
+        language: navigator.language || "en",
+      };
+
+      console.log("📦 Sending register payload:", payload);
+      await registerUser(payload);
+
+      enqueueSnackbar("Successfully registered!", { variant: "success" });
+      navigate("/auth/login");
+    } catch (err: any) {
+      enqueueSnackbar(err.message || "Registration failed", { variant: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4 text-black dark:text-white transition-colors">
