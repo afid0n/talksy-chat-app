@@ -1,34 +1,25 @@
-import type { AxiosResponse } from "axios";
+import type { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse } from "@/types/Auth";
 import instance from "./instance";
 
 
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  success?: boolean;
-}
-
-export const getAllUsers = async <T = any>(): Promise<T> => {
+// Register user
+export const registerUser = async (
+  payload: RegisterPayload
+): Promise<RegisterResponse> => {
   try {
-    const response: AxiosResponse<T> = await instance.get("/users");
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.message || "Failed to fetch users.");
-  }
-};
-
-export const registerUser = async <T = any>(payload: any): Promise<T> => {
-  try {
-    const response: AxiosResponse<T> = await instance.post("/users/register", payload);
+    const response = await instance.post<RegisterResponse>("/users/register", payload);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message || "Failed to register.");
   }
 };
 
-export const loginUser = async <T = any>(credentials: { email: string; password: string; }): Promise<T> => {
+// Login user
+export const loginUser = async (
+  credentials: LoginPayload
+): Promise<LoginResponse> => {
   try {
-    const response: AxiosResponse<T> = await instance.post("/users/login", credentials);
+    const response = await instance.post<LoginResponse>("/users/login", credentials);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message || "Failed to login.");
