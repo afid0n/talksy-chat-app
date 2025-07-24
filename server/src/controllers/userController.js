@@ -184,6 +184,23 @@ const login = async (req, res, next) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ message: "New password is required" });
+    }
+
+    const result = await userService.changePassword(userId, currentPassword, newPassword);
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getUserById,
   getUserByEmail,
@@ -193,5 +210,6 @@ module.exports = {
   verifyEmail,
   updateUser,
   deleteUser,
-  resendVerificationEmail
+  resendVerificationEmail,
+  changePassword
 };
