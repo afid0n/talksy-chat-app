@@ -27,9 +27,12 @@ import PersonalInformation from "@/components/PersonalInformation"
 import ChangePassword from "@/components/ChangePassword"
 import axios from 'axios';
 import moment from "moment"
+import type { RootState } from "../../store/store"
+import { useSelector } from "react-redux"
 const Profile = () => {
   const [language, setLanguage] = useState("en")
   const { setTheme } = useTheme()
+  const userSate = useSelector((state: RootState) => state.user);
   interface User {
     id?: string
     fullName?: string
@@ -66,13 +69,14 @@ const Profile = () => {
   useEffect(() => {
     const getUsers = async () => {
       try {
-        const response = await axios.get(`http://localhost:7070/users/6880b7cd8696aad839edf500`);
+        const response = await axios.get(`http://localhost:7070/users/${userSate.id}`);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
         throw error;
       }
     };
+    console.log(userSate.id);
 
     getUsers(); // <-- call the function
   }, []);

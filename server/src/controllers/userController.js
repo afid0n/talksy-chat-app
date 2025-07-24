@@ -25,9 +25,9 @@ const registerUser = async (req, res, next) => {
       password: hashedPassword,
     });
     if (!response.success) {
-      throw new Error(response.message);
+      return res.status(400).json({ message: response.message });
     }
-    console.log(req.body)
+
 
     const token = generateToken({
       id: response.data._id,

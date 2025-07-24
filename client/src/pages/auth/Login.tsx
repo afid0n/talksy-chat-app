@@ -1,24 +1,29 @@
 import { FaGoogle } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
 import { enqueueSnackbar } from "notistack";
 import { useState } from 'react'
 import { loginUser } from '@/services/userService'
 import { loginValidationSchema } from '@/validations/authValidation';
+import { useDispatch } from 'react-redux';
+import { jwtDecode } from 'jwt-decode';
+import { setUser } from '@/features/userSlice';
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false)
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
       email: '',
       password: '',
     },
-    validationSchema:loginValidationSchema,
+    validationSchema: loginValidationSchema,
     onSubmit: async (values) => {
       setLoading(true)
       try {
         const response = await loginUser(values)
+        console.log("response: ", response);
         if (response.token) {
           enqueueSnackbar(response.message, { variant: "success" })
         } else {
@@ -28,6 +33,38 @@ export default function LoginForm() {
         console.log(response);
         const { token } = response
         localStorage.setItem('token', token)
+        if (response.token) {
+          const decoded: {
+            role: string;
+            email: string;
+            fullName: string;
+            profileImage: string;
+            id: string;
+            iat: Date;
+            exp: Date;
+          } = jwtDecode(response.token);
+          localStorage.setItem("token", JSON.stringify(response.token));
+
+          dispatch(
+            setUser({
+              id: decoded.id,
+              email: decoded.email,
+              role: decoded.role,
+              fullName: decoded.fullName,
+              profileImage: decoded.profileImage,
+              token: response.token,
+            })
+          );
+
+          if (decoded.role === "admin") {
+            navigate("/admin");
+          } else if (
+            decoded.role === "customer" ||
+            decoded.role === "vendor"
+          ) {
+            navigate("/shop");
+          }
+        }
       } catch (error: any) {
         const message = error.response?.data?.message || 'Login failed'
         enqueueSnackbar(message, {
@@ -63,6 +100,7 @@ export default function LoginForm() {
         {/* Google */}
         <button
           type="button"
+          onClick={() => window.location.href = `http://localhost:7070/auth/google`}
           className="flex items-center justify-center w-full py-2 mb-4 border border-gray-300 dark:border-zinc-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
         >
           <FaGoogle className="mr-2" /> Continue with Google
@@ -85,8 +123,8 @@ export default function LoginForm() {
             name="email"
             placeholder="Enter email or username"
             className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.email && formik.touched.email
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
               }`}
             value={formik.values.email}
             onChange={formik.handleChange}
@@ -107,8 +145,8 @@ export default function LoginForm() {
             name="password"
             placeholder="Enter your password"
             className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.password && formik.touched.password
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
               }`}
             value={formik.values.password}
             onChange={formik.handleChange}
