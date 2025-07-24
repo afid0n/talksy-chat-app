@@ -6,6 +6,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { getAll } from "@/services/commonRequest";
+import type { RootState } from "@/store/store";
 import type { User } from "@/types/User";
 import {
   Globe,
@@ -15,21 +16,18 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const Feed = () => {
+  const user = useSelector((state: RootState) => state.user);
   const [location, setLocation] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [tempSelectedCountries, setTempSelectedCountries] = useState<string[]>([]);
   const [appliedCountries, setAppliedCountries] = useState<string[]>([]);
 
-  const toggleFilters = () => setShowFilters(!showFilters);
-
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const [user, setUser] = useState<User | null>(null); //replace w redux
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -42,26 +40,21 @@ const Feed = () => {
         setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
-  console.log(users)
 
-  const countries = [
-    "Azerbaijan", "Bosnia and Herzegovina", "United States", "Canada", "Mexico",
-    "Brazil", "Argentina", "United Kingdom", "France", "Germany", "Italy",
-    "Spain", "Portugal", "Netherlands", "Belgium", "Switzerland", "Austria",
-    "Sweden", "Norway", "Denmark", "Turkey", "Russia", "Ukraine", "Poland",
-    "Czech Republic", "Hungary", "Romania", "Greece", "Bulgaria"
-  ];
+  useEffect(() => {
+    const stored = localStorage.getItem("location");
 
-useEffect(() => {
-  if (user?.location?.country) {
-    localStorage.setItem("location", user.location.country);
-    setLocation(user.location.country);
-  }
-}, [user]);
+    if (user?.location?.country) {
+      localStorage.setItem("location", user.location.country);
+      setLocation(user.location.country);
+    } else if (stored) {
+      setLocation(stored);
+    }
+  }, [user]);
 
+  const toggleFilters = () => setShowFilters(!showFilters);
 
   const handleCheckboxChange = (country: string) => {
     setTempSelectedCountries(prev =>
@@ -82,6 +75,14 @@ useEffect(() => {
     setShowFilters(false);
   };
 
+  const countries = [
+    "Azerbaijan", "Bosnia and Herzegovina", "United States", "Canada", "Mexico",
+    "Brazil", "Argentina", "United Kingdom", "France", "Germany", "Italy",
+    "Spain", "Portugal", "Netherlands", "Belgium", "Switzerland", "Austria",
+    "Sweden", "Norway", "Denmark", "Turkey", "Russia", "Ukraine", "Poland",
+    "Czech Republic", "Hungary", "Romania", "Greece", "Bulgaria"
+  ];
+
   return (
     <div className="relative px-2 sm:px-4 md:px-8 lg:px-20 py-8 sm:py-12 md:py-14">
       {showFilters && (
@@ -93,19 +94,14 @@ useEffect(() => {
       )}
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          Discover People
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Discover People</h1>
         <p>Find and connect with other users</p>
         <button>Create Group</button>
 
         <Tabs defaultValue="discover" className="w-full flex flex-col gap-5 mt-5">
           <div className="w-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
             <TabsList className="bg-white dark:bg-zinc-900 flex gap-2">
-              {[
-                { value: "discover", icon: Globe, label: "Discover" },
-                { value: "nearby", icon: MapPin, label: "Nearby" },
-              ].map(({ value, icon: Icon, label }) => (
+              {[{ value: "discover", icon: Globe, label: "Discover" }, { value: "nearby", icon: MapPin, label: "Nearby" }].map(({ value, icon: Icon, label }) => (
                 <TabsTrigger
                   key={value}
                   value={value}
@@ -143,11 +139,7 @@ useEffect(() => {
             {loading ? (
               <div>Loading users...</div>
             ) : (
-              <Cards
-                users={users}
-                searchQuery={searchQuery}
-                countriesFilter={appliedCountries}
-              />
+              <Cards users={users} searchQuery={searchQuery} countriesFilter={appliedCountries} />
             )}
           </TabsContent>
 
@@ -155,18 +147,14 @@ useEffect(() => {
             {loading ? (
               <div>Loading users...</div>
             ) : location ? (
-              <Cards
-                users={users}
-                city={location}
-                searchQuery={searchQuery}
-                countriesFilter={appliedCountries}
-              />
+              <Cards users={users} city={location} searchQuery={searchQuery} countriesFilter={appliedCountries} />
             ) : (
               <div>Detecting location...</div>
             )}
           </TabsContent>
         </Tabs>
 
+        {/* Filters Sidebar */}
         <div
           className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 z-50 shadow-xl transform transition-transform duration-300 ${showFilters ? 'translate-x-0' : 'translate-x-full'
             }`}

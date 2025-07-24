@@ -1,18 +1,20 @@
-import { FaGoogle } from 'react-icons/fa'
-import { Link, useNavigate } from 'react-router-dom'
-import { useFormik } from 'formik'
+import { FaGoogle } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { useFormik } from 'formik';
 import { enqueueSnackbar } from "notistack";
-import { useState } from 'react'
-import { loginUser } from '@/services/userService'
+import { useState } from 'react';
+import { loginUser } from '@/services/userService';
 import { loginValidationSchema } from '@/validations/authValidation';
 import { useDispatch } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
 import { setUser } from '@/features/userSlice';
+import type { User } from '@/types/User';
 
 export default function LoginForm() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -20,53 +22,23 @@ export default function LoginForm() {
     },
     validationSchema: loginValidationSchema,
     onSubmit: async (values) => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const response = await loginUser(values)
-        console.log("response: ", response);
+        const response = await loginUser(values);
+
         if (response.token) {
-          enqueueSnackbar(response.message, { variant: "success" })
+          enqueueSnackbar(response.message, { variant: "success" });
+
+          const decoded = jwtDecode<User>(response.token);
+
+          dispatch(setUser({ user: decoded, token: response.token }));
+
+          navigate("/feed");
         } else {
-          enqueueSnackbar(response.message, { variant: "error" })
-        }
-
-        console.log(response);
-        const { token } = response
-        localStorage.setItem('token', token)
-        if (response.token) {
-          const decoded: {
-            role: string;
-            email: string;
-            fullName: string;
-            profileImage: string;
-            id: string;
-            iat: Date;
-            exp: Date;
-          } = jwtDecode(response.token);
-          localStorage.setItem("token", JSON.stringify(response.token));
-
-          dispatch(
-            setUser({
-              id: decoded.id,
-              email: decoded.email,
-              role: decoded.role,
-              fullName: decoded.fullName,
-              profileImage: decoded.profileImage,
-              token: response.token,
-            })
-          );
-
-          if (decoded.role === "admin") {
-            navigate("/admin");
-          } else if (
-            decoded.role === "customer" ||
-            decoded.role === "vendor"
-          ) {
-            navigate("/shop");
-          }
+          enqueueSnackbar(response.message, { variant: "error" });
         }
       } catch (error: any) {
-        const message = error.response?.data?.message || 'Login failed'
+        const message = error.response?.data?.message || 'Login failed';
         enqueueSnackbar(message, {
           autoHideDuration: 2000,
           anchorOrigin: {
@@ -76,10 +48,10 @@ export default function LoginForm() {
           variant: "error",
         });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-  })
+  });
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-black dark:text-white transition-colors">
@@ -97,7 +69,6 @@ export default function LoginForm() {
         onSubmit={formik.handleSubmit}
         className="bg-white dark:bg-zinc-900 shadow-md rounded-lg p-8 w-full max-w-md border border-gray-200 dark:border-zinc-700"
       >
-        {/* Google */}
         <button
           type="button"
           onClick={() => window.location.href = `http://localhost:7070/auth/google`}
@@ -106,14 +77,12 @@ export default function LoginForm() {
           <FaGoogle className="mr-2" /> Continue with Google
         </button>
 
-        {/* Divider */}
         <div className="flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm mb-4">
           <span className="border-t border-gray-300 dark:border-zinc-600 flex-grow" />
           <span className="mx-3">Or continue with email</span>
           <span className="border-t border-gray-300 dark:border-zinc-600 flex-grow" />
         </div>
 
-        {/* Email Input */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Email or Username
@@ -135,7 +104,6 @@ export default function LoginForm() {
           )}
         </div>
 
-        {/* Password Input */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Password
@@ -157,7 +125,6 @@ export default function LoginForm() {
           )}
         </div>
 
-        {/* Remember & Forgot */}
         <div className="flex items-center justify-between text-sm mb-4">
           <label className="flex items-center text-gray-700 dark:text-gray-300">
             <input type="checkbox" className="mr-1" /> Remember me
@@ -167,7 +134,6 @@ export default function LoginForm() {
           </Link>
         </div>
 
-        {/* Submit */}
         <button
           type="submit"
           disabled={loading}
@@ -177,7 +143,6 @@ export default function LoginForm() {
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
 
-        {/* Sign Up */}
         <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
           Don’t have an account?{" "}
           <Link to="/auth/register" className="text-yellow-600 font-medium hover:underline">
@@ -186,5 +151,5 @@ export default function LoginForm() {
         </p>
       </form>
     </div>
-  )
+  );
 }

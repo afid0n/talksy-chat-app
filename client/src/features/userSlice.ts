@@ -1,50 +1,51 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { jwtDecode } from "jwt-decode";
+import type { User } from "@/types/User"; // Adjust this import path as needed
 
-interface UserState {
-  id: string | null;
-  email: string | null;
-  role: string | null;
-  fullName: string | null;
-  profileImage: string | null;
+interface UserState extends Partial<User> {
   token: string | null;
   isAuthenticated: boolean;
 }
 
 const initialState: UserState = {
-  id: null,
-  email: null,
-  role: null,
-  fullName: null,
-  profileImage: null,
-  token: localStorage.getItem("token"), // persist token if already stored
+  id: undefined,
+  email: undefined,
+  fullName: undefined,
+  username: "",
+  authProvider: "local",
+  birthday: null,
+  avatar: { url: "", public_id: "" },
+  location: { country: "", city: "" },
+  interests: [],
+  friends: [],
+  blockedUsers: [],
+  lastSeen: "",
+  bio: "",
+  emailVerified: false,
+  friendRequests: [],
+  language: "en",
+  isOnline: false,
+  lastLogin: null,
+  loginAttempts: 0,
+  lockUntil: null,
+  createdAt: "",
+  updatedAt: "",
+  token: localStorage.getItem("token"),
   isAuthenticated: !!localStorage.getItem("token"),
 };
 
-function loadInitialUserData(initialUser: UserState) {
+function loadInitialUserData(state: UserState) {
   try {
     const token = localStorage.getItem("token");
     if (token) {
-      const decoded: {
-        role: string;
-        email: string;
-        fullName: string;
-        profileImage: string;
-        id: string;
-        iat: Date;
-        exp: Date;
-      } = jwtDecode(token);
-      initialUser.id = decoded.id;
-      initialUser.email = decoded.email;
-      initialUser.role = decoded.role;
-      initialUser.fullName = decoded.fullName;
-      initialState.profileImage = decoded.profileImage;
-      initialUser.isAuthenticated = true;
-      initialUser.token = token;
+      const decoded: User = jwtDecode(token);
+      Object.assign(state, decoded); // Populate user fields
+      state.token = token;
+      state.isAuthenticated = true;
     }
   } catch (error) {
-    console.log("error: ", error);
+    console.error("JWT decode error:", error);
   }
 }
 
@@ -56,32 +57,16 @@ const userSlice = createSlice({
   reducers: {
     setUser: (
       state,
-      action: PayloadAction<{
-        id: string;
-        email: string;
-        role: string;
-        fullName: string;
-        profileImage: string;
-        token: string;
-      }>
+      action: PayloadAction<{ user: User; token: string }>
     ) => {
-      const { id, email, role, fullName, profileImage, token } = action.payload;
-      console.log("action payload: ", action.payload);
-      state.id = id;
-      state.email = email;
-      state.role = role;
-      state.fullName = fullName;
-      state.profileImage = profileImage;
+      const { user, token } = action.payload;
+      Object.assign(state, user);
       state.token = token;
       state.isAuthenticated = true;
       localStorage.setItem("token", token);
     },
     logoutUser: (state) => {
-      state.id = null;
-      state.email = null;
-      state.role = null;
-      state.fullName = null;
-      state.profileImage = null;
+      Object.assign(state, initialState);
       state.token = null;
       state.isAuthenticated = false;
       localStorage.removeItem("token");
