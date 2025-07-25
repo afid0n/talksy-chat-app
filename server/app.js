@@ -12,8 +12,11 @@ const chatRoutes = require("./src/routes/chatRoute");
 const messageRoutes = require("./src/routes/messageRoute");
 const googleAuthRoute = require("./src/routes/googleAuthRoute");
 const { CLIENT_URL } = require("./src/config/config");
+const cookieParser = require("cookie-parser");
+
 
 const app = express();
+app.use(cookieParser());
 
 // Setup CORS
 app.use(cors({

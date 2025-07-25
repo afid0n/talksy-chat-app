@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
 import { jwtDecode } from "jwt-decode";
 import { useDispatch } from "react-redux";
-import { setUser } from "../../features/userSlice";
+import { setUser } from "../../redux/userSlice";
 
 const AuthCallback = () => {
   const navigate = useNavigate();

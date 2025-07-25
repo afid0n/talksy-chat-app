@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '@/features/userSlice'; // ✅ Update path as needed
+import { logoutUser } from '@/redux/userSlice'; // ✅ Update path as needed
 import {
   Menu,
   X,

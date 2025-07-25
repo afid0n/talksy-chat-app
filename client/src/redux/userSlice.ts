@@ -1,4 +1,3 @@
-// userSlice.ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { UserState } from "@/types/User";
 

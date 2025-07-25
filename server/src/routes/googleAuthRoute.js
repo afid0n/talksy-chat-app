@@ -1,48 +1,54 @@
 const router = require("express").Router();
 const passport = require("passport");
 const { CLIENT_URL } = require("../config/config");
+const jwt = require("../utils/jwt");
 
 // Step 1: Redirect to Google
-router.get("/google", (req, res, next) => {
-  const { birthday, location, interests } = req.query;
-  req.session = req.session || {};
-  req.session.registerData = {
-    birthday,
-    location: location ? JSON.parse(location) : undefined,
-    interests: interests ? JSON.parse(interests) : undefined,
-  };
-  next();
-}, passport.authenticate("google", {
-  scope: ["profile", "email"],
-  prompt: "select_account",
-}));
+router.get(
+  "/google",
+  (req, res, next) => {
+    const { birthday, location, interests } = req.query;
+    req.session = req.session || {};
+    req.session.registerData = {
+      birthday,
+      location: location ? JSON.parse(location) : undefined,
+      interests: interests ? JSON.parse(interests) : undefined,
+    };
+    next();
+  },
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    prompt: "select_account",
+  })
+);
 
-// Step 2: Google callback URL
+// Step 2: Google callback
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `${CLIENT_URL}/auth/login?error=google_failed`,
+    failureRedirect: `${CLIENT_URL}/auth/login`, // fallback in case of error
     session: false,
   }),
   (req, res) => {
-    const jwt = require("../utils/jwt");
     const accessToken = jwt.generateAccessToken({
       id: req.user._id,
-      role: req.user.role,
       email: req.user.email,
-      profileImage: req.user.profileImage,
       fullName: req.user.fullName,
-    });
-    const refreshToken = jwt.generateRefreshToken({
-      email: req.user.email,
-      id: req.user._id,
       role: req.user.role,
-      fullName: req.user.fullName,
+      location: req.user.location,
+      interests: req.user.interests,
+      avatar: req.user.avatar?.url || "",
     });
 
-    //set refresh token to cookie
+    res.cookie("token", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
-    res.redirect(`${CLIENT_URL}/auth/success/${accessToken}`);
+    // Redirect to frontend where /me Redux fetch will happen
+    res.redirect(`${CLIENT_URL}/feed`);
   }
 );
 

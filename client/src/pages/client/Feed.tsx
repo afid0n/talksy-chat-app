@@ -5,9 +5,11 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { loginSuccess } from "@/redux/userSlice";
 import { getAll } from "@/services/commonRequest";
 import type { RootState } from "@/store/store";
 import type { User } from "@/types/User";
+import axios from "axios";
 import {
   Globe,
   Search,
@@ -16,7 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const Feed = () => {
   const user = useSelector((state: RootState) => state.user);
@@ -27,7 +29,26 @@ const Feed = () => {
 
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const res = await axios.get("http://localhost:7070/users/me", {
+          withCredentials: true, // important for cookies
+        });
+
+        dispatch(loginSuccess({
+          ...res.data,
+          isAuthenticated: true,
+        }));
+      } catch (error) {
+        console.error("Failed to load current user:", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, [dispatch]);
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -41,7 +62,7 @@ const Feed = () => {
     };
     fetchUsers();
   }, []);
- console.log("redux user",user)
+  console.log("redux user", user)
 
   const toggleFilters = () => setShowFilters(!showFilters);
 
