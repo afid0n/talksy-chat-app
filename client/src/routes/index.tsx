@@ -51,7 +51,7 @@ const ROUTES = [
                 element: <ForgotPassword />,
             },
             {
-                path: "reset-password/:token",
+                path: "reset-password",
                 element: <ResetPassword />,
             },
             {
