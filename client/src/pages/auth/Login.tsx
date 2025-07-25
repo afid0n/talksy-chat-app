@@ -33,7 +33,7 @@ export default function LoginForm() {
         }
 
         const token = response.token;
-console.log("Login token:", response.token);
+        console.log("Login token:", response.token);
 
         // Step 2: get user with token
         const userRes = await axios.get<UserState>("http://localhost:7070/users/me", {
@@ -108,11 +108,10 @@ console.log("Login token:", response.token);
             type="text"
             name="email"
             placeholder="Enter email or username"
-            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${
-              formik.errors.email && formik.touched.email
+            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.email && formik.touched.email
                 ? 'border-red-500 focus:ring-red-500'
                 : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
-            }`}
+              }`}
             value={formik.values.email}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -131,11 +130,10 @@ console.log("Login token:", response.token);
             type="password"
             name="password"
             placeholder="Enter your password"
-            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${
-              formik.errors.password && formik.touched.password
+            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.password && formik.touched.password
                 ? 'border-red-500 focus:ring-red-500'
                 : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
-            }`}
+              }`}
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -154,9 +152,8 @@ console.log("Login token:", response.token);
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-all ${
-            loading ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+          className={`w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
         >
           {loading ? 'Signing in...' : 'Sign In'}
         </button>

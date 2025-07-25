@@ -1,13 +1,10 @@
-import {  useState } from "react";
-import {
-  MapPin,
-  Users,
-  MessageCircle,
-  UserRoundPlus,
-  Heart,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { UserRoundPlus, MessageCircle } from "lucide-react";
 import type { User } from "@/types/User";
-
+import { useSelector } from "react-redux";
+import { sendFriendRequest } from "@/services/commonRequest";
+import { enqueueSnackbar } from "notistack";
+import type { RootState } from "@/redux/store/store";
 
 interface CardsProps {
   city?: string;
@@ -56,7 +53,19 @@ const Cards = ({
     if (b.id === currentUserId) return 1;
     return 0;
   });
+  const token = useSelector((state: RootState) => state.user.token);
+const [requestedIds, setRequestedIds] = useState<string[]>([]);
 
+const handleSendRequest = async (targetId: string) => {
+  try {
+    const res = await sendFriendRequest(targetId, token);
+    enqueueSnackbar(res.message || "Request sent", { variant: "success" });
+    setRequestedIds((prev) => [...prev, targetId]);
+  } catch (err: any) {
+    console.error(err);
+    enqueueSnackbar("Failed to send friend request", { variant: "error" });
+  }
+};
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
       {sortedUsers.map((user) => {
@@ -106,10 +115,19 @@ const Cards = ({
 
             {!isCurrentUser && (
               <div className="flex justify-between mt-4">
-                <button className="text-sm flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 transition px-4 py-1.5 rounded-md">
-                  <UserRoundPlus size={13} /> Connect
+                <button
+                  className="text-sm flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 transition px-4 py-1.5 rounded-md"
+                  onClick={() => handleLike(user.id)}
+                >
+                  <UserRoundPlus size={13}
+                  onClick={() => handleSendRequest(user.id)}
+                  />
+                  {liked ? "Liked" : "Connect"}
                 </button>
-                <button className="text-sm flex items-center gap-1 bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 transition px-4 py-1.5 rounded-md">
+                <button 
+                className="text-sm flex items-center gap-1 bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 transition px-4 py-1.5 rounded-md"
+                >
+                  
                   <MessageCircle size={13} /> Message
                 </button>
               </div>
