@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '@/redux/userSlice'; // ✅ Update path as needed
+
 import {
   Menu,
   X,
@@ -10,6 +10,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { enqueueSnackbar } from 'notistack';
+import { logoutUser } from '@/redux/userSlice';
 
 const navItems = [
   { label: 'Feed', icon: Users, path: '/feed' },

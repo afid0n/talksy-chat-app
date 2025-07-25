@@ -241,13 +241,15 @@ const getCurrentUser = async (req, res) => {
       fullName: user.fullName,
       username: user.username,
       email: user.email,
-      role: user.role,
       location: user.location,
       interests: user.interests,
       birthday: user.birthday,
       avatar: user.avatar,
       authProvider: user.authProvider,
       language: user.language || "en",
+      bio: user.bio,
+      emailVerified: user.emailVerified,  
+      
     });
   } catch (error) {
     console.error("Get current user error:", error);
