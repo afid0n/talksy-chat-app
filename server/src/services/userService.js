@@ -255,21 +255,23 @@ const resetPass = async (newPassword, email) => {
 
 const forgotPassword = async (email) => {
   const user = await User.findOne({ email });
-  console.log(user);
   if (!user) {
     throw new Error("email does not exist!");
-  } else {
-    //send email
-    const token = generateAccessToken(
-      {
-        id: user._id,
-        email: user.email,
-      },
-      "30m"
-    );
-    const resetPasswordLink = `${CLIENT_URL}/auth/reset-password?token=${token}`;
-    sendForgotPasswordEmail(email, resetPasswordLink);
   }
+
+  const token = generateAccessToken(
+    {
+      id: user._id,
+      email: user.email,
+    },
+    "30m"
+  );
+
+  const resetPasswordLink = `${CLIENT_URL}/auth/reset-password?token=${token}`;
+  console.log("Reset link:", resetPasswordLink); // əlavə et
+
+  // Əgər bu funksiyada xəta varsa, 500 verəcək:
+  await sendForgotPasswordEmail(email, resetPasswordLink);
 };
 
 module.exports = {

@@ -3,7 +3,7 @@ import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 import { changePassword } from "@/services/profileService";
 import type { ChangePasswordPayload } from "@/services/profileService";
-import type { RootState } from "../store/store"
+import type { RootState } from "../redux/store/store"
 import { useSelector } from "react-redux";
 
 export default function ChangePassword() {

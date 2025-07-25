@@ -3,9 +3,9 @@ const userService = require('../services/userService');
 const { generateToken } = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/mailService');
 const { SERVER_URL, CLIENT_URL } = require('../config/config');
-const { verifyAccessToken } = require('../utils/jwt');
 const User = require('../models/userModel');
 const { get } = require('../schemas/userSchema');
+const { verifyAccessToken } = require('../utils/genetareJWT');
 
 
 
@@ -170,10 +170,10 @@ const login = async (req, res, next) => {
 
     res.cookie("refreshToken", response.refreshToken, {
       httpOnly: true,
-      secure: true, // in production (possible BUG)
+      secure: true, 
       sameSite: "strict",
       path: "/auth/refresh",
-      maxAge: 7 * 24 * 60 * 60 * 1000, //7days
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
     });
 
     res.status(200).json({
@@ -266,9 +266,9 @@ const forgotPassword = async (req, res) => {
       message: "reset password email was sent!",
     });
   } catch (error) {
-    res.json({
-      message: error.message || "internal server error",
-      statusCode: 401,
+    console.error("Forgot Password Error:", error); // bunu əlavə et
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
     });
   }
 };
@@ -287,7 +287,6 @@ module.exports = {
   changePassword,
   resetPassword,
   forgotPassword,
-
   changePassword,
    getCurrentUser
 };

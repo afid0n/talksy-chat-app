@@ -20,7 +20,7 @@ const ForgotPasswordCom: React.FC<Props> = ({ onSubmit }) => {
       const res: {
         message: string;
         statusCode?: number;
-      } = await post(`${endpoints.users}/forgot-password`, {
+      } = await post(`http://localhost:7070/users/forgot-password`, {
         email,
       });
 
@@ -36,7 +36,7 @@ const ForgotPasswordCom: React.FC<Props> = ({ onSubmit }) => {
       });
 
       onSubmit(email);
-    } catch (error) {
+    } catch {
       enqueueSnackbar("Something went wrong. Try again later.", {
         variant: "error",
       });

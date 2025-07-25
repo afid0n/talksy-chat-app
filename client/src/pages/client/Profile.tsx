@@ -15,71 +15,34 @@ import {
   Moon,
   Settings,
   Shield,
+  Star,
   Sun,
-  User,
+
   Users,
   X,
 } from "lucide-react"
-import { useEffect, useState } from "react"
+import {  useState } from "react"
 import NotificationsPanel from "@/components/NotificationsPanel"
 import PrivacySettings from "@/components/PrivacySettings"
 import PersonalInformation from "@/components/PersonalInformation"
 import ChangePassword from "@/components/ChangePassword"
-import axios from 'axios';
-import moment from "moment"
-import type { RootState } from "../../store/store"
-import { useSelector } from "react-redux"
-const Profile = () => {
-  const [language, setLanguage] = useState("en")
-  const { setTheme } = useTheme()
-  const userSate = useSelector((state: RootState) => state.user);
-  interface User {
-    id?: string
-    fullName?: string
-    email?: string
-    bio?: string
-    avatar?: {
-      url?: string
-      public_id?: string
-    }
-    location?: {
-      country?: string
-      isoCode?: string
-    }
-    birthday?: string | null
-    interests?: string[]
-    friends?: unknown[]
-    blockedUsers?: unknown[]
-    lastSeen?: string
-    emailVerified?: boolean
-    friendRequests?: unknown[]
-    language?: string
-    isOnline?: boolean
-    lastLogin?: string
-    loginAttempts?: number
-    lockUntil?: string | null
-    createdAt?: string
-    updatedAt?: string
-  }
-  const [user, setUser] = useState<User>({} as User)
-  function formatDate(dateStr?: string | null): string {
-    if (!dateStr) return ""
-    return moment(dateStr).locale("az").format("LL, HH:mm")
-  }
-  useEffect(() => {
-    const getUsers = async () => {
-      try {
-        const response = await axios.get(`http://localhost:7070/users/${userSate.id}`);
-        setUser(response.data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        throw error;
-      }
-    };
-    console.log(userSate.id);
 
-    getUsers(); // <-- call the function
-  }, []);
+import moment from "moment"
+import { useAppSelector } from "@/redux/store/hooks"
+import type { UserState } from "@/types/User"
+
+
+const Profile = () => {
+  const { setTheme } = useTheme();
+
+  const user = useAppSelector((state) => state.user) as UserState;
+
+  const [language, setLanguage] = useState("en");
+
+  function formatDate(dateStr?: string | null): string {
+    if (!dateStr) return "";
+    return moment(dateStr).locale("az").format("LL, HH:mm");
+  }
 
   console.log(user);
 
@@ -95,7 +58,7 @@ const Profile = () => {
       <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-md p-4 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-6 w-full mb-6">
         <div className="relative flex-shrink-0">
           <div className="w-20 h-20 bg-yellow-600 text-white font-bold text-2xl flex items-center justify-center rounded-full">
-            {user.fullName
+            {user?.fullName
               ? user.fullName
                 .split(" ")
                 .map(word => word[0])
@@ -123,15 +86,15 @@ const Profile = () => {
 
         <div className="flex-1 text-center md:text-left">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {user.fullName}
+            {user?.fullName}
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
+          <p className="text-gray-600 dark:text-gray-400">{user?.email}</p>
           <p className="text-gray-700 dark:text-gray-300 mt-2 max-w-md mx-auto md:mx-0">
-            {user.bio}
+            {user?.bio}
           </p>
           <div className="flex xs:flex-row items-center gap-2 xs:gap-4 mt-4 justify-center md:justify-start text-sm text-gray-600 dark:text-gray-400">
-            <span className="flex items-center gap-1">{user.location?.country}</span>
-            <span className="flex items-center gap-1">📅 {formatDate(user.createdAt)}</span>
+            <span className="flex items-center gap-1">{user?.location?.country}</span>
+            <span className="flex items-center gap-1">📅 {formatDate(user?.createdAt)}</span>
           </div>
         </div>
 
@@ -146,7 +109,7 @@ const Profile = () => {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="w-full bg-white dark:bg-zinc-900 p-1 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between h-auto gap-2 sm:gap-0">
           {[
-            { value: "overview", icon: User, label: "Overview" },
+            { value: "overview", icon: Star, label: "Overview" },
             { value: "settings", icon: Settings, label: "Settings" },
             { value: "privacy", icon: Shield, label: "Privacy" },
             { value: "account", icon: Key, label: "Account" },

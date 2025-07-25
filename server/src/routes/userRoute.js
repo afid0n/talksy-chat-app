@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 const uploadMiddleware = require("../middlewares/uploadMiddleware");
+const  verifyAccessToken  = require('../middlewares/authToken');
+
 
 const upload = uploadMiddleware("userImages");
 
@@ -35,10 +37,9 @@ router.delete('/:id', userController.deleteUser);
 // Get user by ID 
 router.get('/:id', userController.getUserById);
 
-// Reset password
-router.post("/reset-password", userController.resetPassword);
-
-// Forgot password
-router.post("/forgot-password", userController.forgotPassword);
+// Forgot password  
+router.post('/forgot-password', userController.forgotPassword);
+// Reset password   
+router.post('/reset-password', userController.resetPassword);
 
 module.exports = router;

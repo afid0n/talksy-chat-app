@@ -6,6 +6,7 @@ import type {
 } from "@/types/Auth";
 import instance from "./instance";
 import type { AxiosError } from "axios";
+import type {UserState } from "@/types/User";
 
 // Register user
 export const registerUser = async (
@@ -42,5 +43,15 @@ export const resendVerificationEmail = async (email: string): Promise<{ success:
   } catch (error: unknown) {
     const err = error as AxiosError<{ message?: string }>;
     throw new Error(err.response?.data?.message || err.message || "Failed to resend verification email.");
+  }
+};
+
+export const getCurrentUser = async (): Promise<UserState> => {
+  try {
+    const res = await instance.get<UserState>("/users/me");
+    return res.data;
+  } catch (error: unknown) {
+    const err = error as AxiosError<{ message?: string }>;
+    throw new Error(err.response?.data?.message || err.message || "Failed to fetch user.");
   }
 };
