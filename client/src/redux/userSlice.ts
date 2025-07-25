@@ -25,28 +25,20 @@ const initialState: UserState = {
   lockUntil: null,
   createdAt: "",
   updatedAt: "",
-  token: "",
+  token: undefined, 
   isAuthenticated: false,
 };
-
-
-const savedUser = localStorage.getItem("user");
-if (savedUser) {
-  Object.assign(initialState, JSON.parse(savedUser));
-}
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    loginSuccess: (state, action: PayloadAction<UserState>) => {
+    loginSuccess: (state, action: PayloadAction<Partial<UserState>>) => {
       Object.assign(state, action.payload);
       state.isAuthenticated = true;
-      localStorage.setItem("user", JSON.stringify({ ...state }));
     },
     logoutUser: (state) => {
       Object.assign(state, initialState);
-      localStorage.removeItem("user");
     },
   },
 });

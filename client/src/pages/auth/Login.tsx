@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { enqueueSnackbar } from "notistack";
 import { useState } from 'react';
+import axios from "axios";
 import { loginUser } from '@/services/userService';
 import { loginValidationSchema } from '@/validations/authValidation';
 import { useDispatch } from 'react-redux';
-import { jwtDecode } from 'jwt-decode';
-import { loginSuccess } from '@/redux/userSlice'; 
-import type { User } from '@/types/User';
+import { loginSuccess } from '@/redux/userSlice';
+import type { UserState } from '@/types/User';
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -21,56 +21,53 @@ export default function LoginForm() {
       password: '',
     },
     validationSchema: loginValidationSchema,
-   onSubmit: async (values) => {
-  setLoading(true);
-  try {
-    const response = await loginUser(values);
+    onSubmit: async (values) => {
+      setLoading(true);
+      try {
+        // Step 1: login to get token
+        const response = await loginUser(values);
 
-    if (response.token) {
-      enqueueSnackbar(response.message, { variant: "success" });
+        if (!response?.token) {
+          enqueueSnackbar(response.message || "Invalid login response", { variant: "error" });
+          return;
+        }
 
-      const decoded = jwtDecode<User>(response.token);
+        const token = response.token;
+console.log("Login token:", response.token);
 
-      const extras = {
-        birthday: "",
-        interests: [],
-        language: "en",
-        avatar: { url: "", public_id: "" },
-        location: { country: "", city: "" },
-        username: "",
-        ...JSON.parse(localStorage.getItem("userExtras") || "{}"),
-      };
+        // Step 2: get user with token
+        const userRes = await axios.get<UserState>("http://localhost:7070/users/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      const fullUser = {
-        ...decoded,
-        ...extras,
-        token: response.token,
-        isAuthenticated: true,
-      };
+        const user = userRes.data;
 
-      dispatch(loginSuccess(fullUser));
-      localStorage.removeItem("userExtras");
-      
+        const fullUser: UserState = {
+          ...user,
+          token,
+          isAuthenticated: true,
+        };
 
-      navigate("/feed");
-    } else {
-      enqueueSnackbar(response.message, { variant: "error" });
+        // Step 3: dispatch to Redux
+        dispatch(loginSuccess(fullUser));
+
+        // Step 4: navigate
+        navigate("/feed");
+        enqueueSnackbar("Login successful!", { variant: "success" });
+
+      } catch (error: any) {
+        const message = error.response?.data?.message || 'Login failed';
+        enqueueSnackbar(message, {
+          autoHideDuration: 2000,
+          anchorOrigin: { vertical: "bottom", horizontal: "right" },
+          variant: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
     }
-  } catch (error: any) {
-    const message = error.response?.data?.message || 'Login failed';
-    enqueueSnackbar(message, {
-      autoHideDuration: 2000,
-      anchorOrigin: {
-        vertical: "bottom",
-        horizontal: "right",
-      },
-      variant: "error",
-    });
-  } finally {
-    setLoading(false);
-  }
-}
-
   });
 
   return (
@@ -111,10 +108,11 @@ export default function LoginForm() {
             type="text"
             name="email"
             placeholder="Enter email or username"
-            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.email && formik.touched.email
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
-              }`}
+            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${
+              formik.errors.email && formik.touched.email
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
+            }`}
             value={formik.values.email}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -133,10 +131,11 @@ export default function LoginForm() {
             type="password"
             name="password"
             placeholder="Enter your password"
-            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.password && formik.touched.password
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
-              }`}
+            className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${
+              formik.errors.password && formik.touched.password
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
+            }`}
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -155,8 +154,9 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+          className={`w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-all ${
+            loading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
