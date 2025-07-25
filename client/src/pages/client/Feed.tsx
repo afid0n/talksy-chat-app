@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/tabs";
 import { loginSuccess } from "@/redux/userSlice";
 import { getAll } from "@/services/commonRequest";
-import { getCurrentUser } from "@/services/userService";
 import type { RootState } from "@/redux/store/store";
 import type { User } from "@/types/User";
 import {
@@ -19,7 +18,6 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import instance from "@/services/instance";
 
 const Feed = () => {
@@ -61,6 +59,7 @@ const Feed = () => {
     };
     fetchUsers();
   }, []);
+
   console.log("redux user", user)
 
   const toggleFilters = () => setShowFilters(!showFilters);
@@ -147,28 +146,50 @@ const Feed = () => {
           <TabsContent value="discover">
             {loading ? (
               <div>Loading users...</div>
-            ) : (
-              <Cards users={users} searchQuery={searchQuery} countriesFilter={appliedCountries} />
-            )}
+            ) :
+              user?.id && (
+                <Cards
+                  users={users}
+                  searchQuery={searchQuery}
+                  countriesFilter={appliedCountries}
+                  currentUserId={user.id}
+                />
+              )}
+
+
           </TabsContent>
 
           <TabsContent value="nearby">
             {loading ? (
               <div>Loading users...</div>
-            ) : user?.location?.country ? (
-              <Cards
-                users={users.filter(
+            ) : user?.id && user?.location?.country ? (
+              (() => {
+                const userCountry = user.location.country;
+                const nearbyUsers = users.filter(
                   (u) =>
-                    u.location?.country?.toLowerCase() === user.location?.country?.toLowerCase()
-                )}
-                city={user.location.country}
-                searchQuery={searchQuery}
-                countriesFilter={appliedCountries}
-              />
+                    u.id !== user.id && // 👈 Exclude self
+                    u.location?.country?.toLowerCase() === userCountry.toLowerCase()
+                );
+
+                return nearbyUsers.length > 0 ? (
+                  <Cards
+                    users={nearbyUsers}
+                    city={userCountry}
+                    searchQuery={searchQuery}
+                    countriesFilter={appliedCountries}
+                    currentUserId={user.id}
+                  />
+                ) : (
+                  <div>No nearby people found in {userCountry}.</div>
+                );
+              })()
             ) : (
               <div>Detecting location...</div>
             )}
           </TabsContent>
+
+
+
         </Tabs>
 
         {/* Filters Sidebar */}
