@@ -4,20 +4,24 @@ import { useFormik } from "formik";
 import axios from "axios";
 import { enqueueSnackbar } from "notistack";
 
-const PersonalInformation = () => {
+const PersonalInformation = ({ userr }) => {
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      fullName: "Alex Johnson",
-      email: "alex.johnson@email.com",
-      phone: "+1 (555) 123–4567",
-      location: "San Francisco, CA",
-      bio: "test bio",
+      fullName: userr.fullName || "Alex Johnson",
+      email: userr.email || "alex.johnson@email.com",
+      phone: userr.phone || "+1 (555) 123–4567",
+      location: {
+        city: userr?.location?.city || "",
+        country: userr?.location?.country || "",
+      },
+      bio: userr.bio || "test bio",
     },
     onSubmit: async (values) => {
       try {
-        const response = await axios.patch(`http://localhost:7070/users/6880b7cd8696aad839edf500`, values);
+        const response = await axios.patch(`http://localhost:7070/users/${userr.id}`, values);
         console.log("User updated:", response.data);
-        enqueueSnackbar("Profile updated successfully!", {
+        enqueueSnackbar("Failed to update profile", {
           variant: "success",
           autoHideDuration: 2000,
           anchorOrigin: {
@@ -34,7 +38,6 @@ const PersonalInformation = () => {
             horizontal: "right",
           },
         });
-        // Handle error appropriately   
         console.error("Update failed:", error);
       }
     },
@@ -90,17 +93,31 @@ const PersonalInformation = () => {
           />
         </div>
 
-        {/* Location */}
+        {/* City */}
         <div className="space-y-1">
-          <label className="text-sm font-medium flex items-center gap-1 text-gray-600 dark:text-gray-300">
-            <MapPin size={16} className="text-gray-500 dark:text-gray-400" /> Location
+          <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
+            City
           </label>
           <input
-            name="location"
+            name="location.city"
             type="text"
-            value={formik.values.location}
+            value={formik.values.location.city}
             onChange={formik.handleChange}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+          />
+        </div>
+
+        {/* Country */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
+            Country
+          </label>
+          <input
+            name="location.country"
+            type="text"
+            value={formik.values.location.country}
+            onChange={formik.handleChange}
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           />
         </div>
 

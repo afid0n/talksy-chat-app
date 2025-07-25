@@ -319,7 +319,7 @@ const Profile = () => {
         {/* Account */}
         <TabsContent className="flex flex-col justify-center gap-5" value="account">
           <div>
-            <PersonalInformation />
+            <PersonalInformation userr={userr}/>
           </div>
           <div className="w-full">
             <ChangePassword />
