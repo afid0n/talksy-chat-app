@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/tabs";
 import { loginSuccess } from "@/redux/userSlice";
 import { getAll } from "@/services/commonRequest";
-import type { RootState } from "@/store/store";
+import { getCurrentUser } from "@/services/userService";
+import type { RootState } from "@/redux/store/store";
 import type { User } from "@/types/User";
-import axios from "axios";
 import {
   Globe,
   Search,
@@ -32,23 +32,15 @@ const Feed = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const res = await axios.get("http://localhost:7070/users/me", {
-          withCredentials: true, // important for cookies
-        });
+    getCurrentUser()
+      .then(user => {
+        dispatch(loginSuccess({ ...user, isAuthenticated: true }));
+      })
+      .catch(err => {
+        console.error("Failed to load current user:", err);
+      });
+  }, [dispatch]); 
 
-        dispatch(loginSuccess({
-          ...res.data,
-          isAuthenticated: true,
-        }));
-      } catch (error) {
-        console.error("Failed to load current user:", error);
-      }
-    };
-
-    fetchCurrentUser();
-  }, [dispatch]);
   useEffect(() => {
     const fetchUsers = async () => {
       try {

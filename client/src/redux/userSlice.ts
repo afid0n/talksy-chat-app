@@ -3,18 +3,31 @@ import type { UserState } from "@/types/User";
 
 const initialState: UserState = {
   id: "",
+  email: "",
   fullName: "",
   username: "",
-  email: "",
-  token: "",
   authProvider: "local",
-  birthday: undefined,
-  location: { country: undefined, city: undefined },
+  password: undefined,
+  birthday: null,
   avatar: { url: "", public_id: undefined },
+  location: { country: undefined, city: undefined },
   interests: [],
+  friends: [],
+  blockedUsers: [],
+  lastSeen: "",
+  bio: "",
+  emailVerified: false,
+  friendRequests: [],
   language: "en",
+  isOnline: false,
+  lastLogin: null,
+  loginAttempts: 0,
+  lockUntil: null,
+  createdAt: "",
+  token: "",
   isAuthenticated: false,
 };
+
 
 const savedUser = localStorage.getItem("user");
 if (savedUser) {
