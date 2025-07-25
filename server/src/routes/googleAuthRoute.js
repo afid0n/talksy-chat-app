@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const passport = require("passport");
 const { CLIENT_URL } = require("../config/config");
-const jwt = require("../utils/jwt");
 
 // Step 1: Redirect to Google
 router.get(
@@ -47,8 +46,9 @@ router.get(
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    // Redirect to frontend where /me Redux fetch will happen
-    res.redirect(`${CLIENT_URL}/feed`);
+    //set refresh token to cookie
+
+    res.redirect(`${CLIENT_URL}/auth/success/${accessToken}`);
   }
 );
 

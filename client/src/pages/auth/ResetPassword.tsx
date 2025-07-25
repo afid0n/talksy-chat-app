@@ -1,69 +1,142 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useFormik } from "formik";
+import { enqueueSnackbar } from "notistack";
+import { useSearchParams, Link } from "react-router-dom";
+import resetPasswordValidationSchema from "../../validations/resetPasswordValidation";
+import { post } from "../../services/commonRequest";
 
-export default function ResetPasswordForm() {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+const ResetPassword = () => {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+  console.log("token: ", token);
+  const formik = useFormik({
+    initialValues: {
+      newPassword: "",
+      confirmNewPassword: "",
+    },
+    validationSchema: resetPasswordValidationSchema,
+    onSubmit: async (values, actions) => {
+      try {
+        const res: {
+          message: string;
+          statusCode?: number;
+        } = await post(`http://localhost:7070/users/reset-password`, {
+          token,
+          newPassword: values.newPassword,
+        });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setSubmitted(true);
-    console.log('Reset password link sent to:', email);
-  };
+        if (res.statusCode === 400 || res.statusCode === 401) {
+          enqueueSnackbar(res.message || "Invalid or expired token", {
+            autoHideDuration: 2500,
+            anchorOrigin: { vertical: "bottom", horizontal: "right" },
+            variant: "error",
+          });
+        } else {
+          enqueueSnackbar("Password reset successfully!", {
+            autoHideDuration: 2500,
+            anchorOrigin: { vertical: "bottom", horizontal: "right" },
+            variant: "success",
+          });
+        }
+
+        actions.resetForm();
+      } catch {
+        enqueueSnackbar("Something went wrong. Try again later.", {
+          autoHideDuration: 2500,
+          anchorOrigin: { vertical: "bottom", horizontal: "right" },
+          variant: "error",
+        });
+      }
+    },
+  });
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 text-black dark:text-white transition-colors">
-      <div className="mb-6 text-center">
-        <h1 className="text-4xl font-bold">
-          <span className="text-black dark:text-white">Talk</span>
-          <span className="text-yellow-600">sy</span>
-        </h1>
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mt-2">
-          Reset your password
+    <div className="min-h-screen flex items-center justify-center px-4 transition-colors bg-gradient-to-br  ">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-700 transition-colors">
+        <h2 className="text-3xl font-bold text-center text-yellow-700 dark:text-yellow-400 mb-6">
+          Reset Password
         </h2>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Enter your email to receive a reset link
+
+        <p className="text-center text-gray-600 dark:text-gray-400 mb-6 text-sm">
+          Enter your new password below and confirm it to reset your account.
         </p>
-      </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-md rounded-lg p-8 w-full max-w-md transition"
-      >
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Email Address
-          </label>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+        <form onSubmit={formik.handleSubmit} className="space-y-5 text-sm">
+          <div>
+            <label
+              htmlFor="newPassword"
+              className="block font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              New Password
+            </label>
+            <input
+              id="newPassword"
+              type="password"
+              required
+              value={formik.values.newPassword}
+              name="newPassword"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="New password"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-600 rounded-xl bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+            {formik.errors.newPassword && formik.touched.newPassword && (
+              <span className="text-red-500 text-sm">
+                {formik.errors.newPassword}
+              </span>
+            )}
+          </div>
 
-        {submitted && (
-          <p className="text-sm text-yellow-600 dark:text-yellow-400 mb-4">
-            If this email is registered, a password reset link has been sent.
-          </p>
-        )}
+          <div>
+            <label
+              htmlFor="confirmNewPassword"
+              className="block font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Confirm New Password
+            </label>
+            <input
+              id="confirmNewPassword"
+              type="password"
+              required
+              value={formik.values.confirmNewPassword}
+              name="confirmNewPassword"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Confirm password"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-600 rounded-xl bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+            {formik.errors.confirmNewPassword &&
+              formik.touched.confirmNewPassword && (
+                <span className="text-red-500 text-sm">
+                  {formik.errors.confirmNewPassword}
+                </span>
+              )}
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-all"
-        >
-          Send Reset Link
-        </button>
+          <button
+            disabled={
+              formik.isSubmitting ||
+              !formik.dirty ||
+              Object.entries(formik.errors).length > 0
+            }
+            type="submit"
+            className="w-full py-3 disabled:bg-yellow-400 disabled:cursor-not-allowed cursor-pointer bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl transition"
+          >
+            Reset Password
+          </button>
+        </form>
 
-        <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
-          Remember your password?{' '}
-          <Link to={"/auth/login"} className="text-yellow-600 font-medium hover:underline">
-            Sign in
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+          Return to{" "}
+          <Link
+            to="/auth/login"
+            className="text-yellow-600 dark:text-yellow-400 hover:underline"
+          >
+            Login
           </Link>
         </p>
-      </form>
+      </div>
     </div>
   );
-}
+};
+
+export default ResetPassword;

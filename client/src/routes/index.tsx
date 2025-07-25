@@ -12,70 +12,71 @@ import Home from "../pages/client/Home";
 import Profile from "../pages/client/Profile";
 import NotFound from "../pages/Common/NotFound";
 
-
-
 const ROUTES = [
-    {
-        path: "/",
-        element: <Home />
-    },
-    {
-        path: "/",
-        element: <ClientLayout />,
-        children: [
-            {
-                path: "chat",
-                element: <RequireAuth>
-                    <Chat />
-                </RequireAuth>
-            },
-            {
-                path: "feed",
-                element:<RequireAuth >
-                    <Feed />
-                    </RequireAuth >
-
-
-            },
-{
-    path: "profile",
-        element: <RequireAuth>
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/",
+    element: <ClientLayout />,
+    children: [
+      {
+        path: "chat",
+        element: (
+          <RequireAuth>
+            <Chat />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "feed",
+        element: (
+          <RequireAuth>
+            <Feed />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <RequireAuth>
             <Profile />
-        </RequireAuth>
-
-},
-        ]
-    },
-{
+          </RequireAuth>
+        ),
+      },
+    ],
+  },
+  {
     path: "/auth/",
-        element: <AuthLayout />,
-            children: [
-                {
-                    path: "login",
-                    element: <Login />,
-                },
-                {
-                    path: "register",
-                    element: <Register />,
-                },
-                {
-                    path: "forgot-password",
-                    element: <ForgotPassword />,
-                },
-                {
-                    path: "reset-password/:token",
-                    element: <ResetPassword />,
-                },
-                {
-                    path: "email-verified",
-                    element: <VerifyEmail />,
-                }
-            ]
-},
-{
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "reset-password/:token", 
+        element: <ResetPassword />,
+      },
+      {
+        path: "email-verified",
+        element: <VerifyEmail />,
+      },
+    ],
+  },
+  {
     path: "*",
-        element: <NotFound />,
-    }
-]
+    element: <NotFound />,
+  },
+];
 
-export default ROUTES
+export default ROUTES;
