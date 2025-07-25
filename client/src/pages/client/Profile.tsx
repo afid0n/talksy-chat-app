@@ -21,7 +21,7 @@ import {
   Users,
   X,
 } from "lucide-react"
-import {  useState } from "react"
+import { useEffect, useState } from "react"
 import NotificationsPanel from "@/components/NotificationsPanel"
 import PrivacySettings from "@/components/PrivacySettings"
 import PersonalInformation from "@/components/PersonalInformation"
@@ -30,27 +30,42 @@ import ChangePassword from "@/components/ChangePassword"
 import moment from "moment"
 import { useAppSelector } from "@/redux/store/hooks"
 import type { UserState } from "@/types/User"
-import FriendRequestList from "@/components/FriendRequestList"
-import Cards from "@/components/Cards"
+import axios from "axios"
+import { enqueueSnackbar } from "notistack"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/redux/store/store"
 
 
 const Profile = () => {
   const { setTheme } = useTheme();
-const [incomingRequests, setIncomingRequests] = useState<User[]>([]);
+  const [userr, setUserr] = useState<any>(null);
   const user = useAppSelector((state) => state.user) as UserState;
-  const [users, setUsers] = useState<User[]>([]);
-const [loading, setLoading] = useState(true);
-const [searchQuery, setSearchQuery] = useState("");
-const [appliedCountries, setAppliedCountries] = useState<string[]>([]);
-
   const [language, setLanguage] = useState("en");
-
+  const token = useSelector((state: RootState) => state.user.token);
   function formatDate(dateStr?: string | null): string {
     if (!dateStr) return "";
     return moment(dateStr).locale("az").format("LL, HH:mm");
   }
 
   console.log(user);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:7070/users/${user.id}`
+        );
+        setUserr(res.data);
+        console.log("User:", res.data);
+      } catch (err) {
+        console.error("Error loading user:", err);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  console.log("userr:", userr);
 
   const handleThemeChange = (theme: "light" | "dark" | "system") => {
     setTheme(theme)
@@ -59,8 +74,34 @@ const [appliedCountries, setAppliedCountries] = useState<string[]>([]);
   }
 
 
-  // Fetch users and incoming friend requests
-  
+
+  const handleAccept = async (requesterId: string) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:7070/users/accept-request/${requesterId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      enqueueSnackbar(res.data.message, { variant: "success" });
+
+      // Local state update
+      setUserr((prev) =>
+        prev
+          ? {
+              ...prev,
+              friendRequests: prev.friendRequests.filter((u) => u._id !== requesterId),
+            }
+          : prev
+      );
+    } catch  {
+        enqueueSnackbar( "Error", { variant: "error" });
+    }
+  };
+
 
   return (
     <div className="px-2 sm:px-4 md:px-8 lg:px-20 py-8 sm:py-12 md:py-14">
@@ -147,7 +188,7 @@ const [appliedCountries, setAppliedCountries] = useState<string[]>([]);
                 color: "yellow",
               },
               {
-                count: 47,
+                count: userr?.friends?.length || 0,
                 label: "Connections",
                 icon: Users,
                 color: "blue",
@@ -159,6 +200,7 @@ const [appliedCountries, setAppliedCountries] = useState<string[]>([]);
                 color: "purple",
               },
             ].map(({ count, label, icon: Icon, color }, idx) => (
+              <div>
               <div
                 key={idx}
                 className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm p-4 sm:p-6 flex items-center gap-4"
@@ -170,6 +212,7 @@ const [appliedCountries, setAppliedCountries] = useState<string[]>([]);
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{count}</p>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">{label}</p>
                 </div>
+              </div>
               </div>
             ))}
           </div>
@@ -296,17 +339,45 @@ const [appliedCountries, setAppliedCountries] = useState<string[]>([]);
           </div>
         </TabsContent>
       </Tabs>
-       {loading ? (
-    <div>Loading users...</div>
+
+      <div className="max-w-2xl mx-auto mt-6">
+  <h2 className="text-xl font-bold mb-4">Friend Requests</h2>
+  {!userr?.friendRequests || userr.friendRequests.length === 0 ? (
+    <p className="text-gray-500">You have no friend requests.</p>
   ) : (
-    <>
-      <FriendRequestList
-        requests={incomingRequests}
-        onRefresh={() => window.location.reload()} // refresh etmək üçün
-      />
-      <Cards users={users} searchQuery={searchQuery} countriesFilter={appliedCountries} />
-    </>
+    userr.friendRequests.map((req) => (
+      <div
+        key={req._id}
+        className="flex items-center justify-between bg-white dark:bg-zinc-800 p-4 mb-3 rounded shadow"
+      >
+        <div className="flex items-center gap-3">
+          <img
+            src={req.avatar?.url}
+            alt={req.username}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <p className="font-semibold">{req.fullName}</p>
+            <p className="text-sm text-gray-500">@{req.username}</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+          onClick={() => handleAccept(req.id)}
+            className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+          >
+            Accept
+          </button>
+          {/* <button
+            className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            Reject
+          </button> */}
+        </div>
+      </div>
+    ))
   )}
+</div>
     </div>
   )
 }

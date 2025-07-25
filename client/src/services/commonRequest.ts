@@ -87,11 +87,15 @@ export const sendFriendRequest = async (targetId: string, token: string) => {
 };
 
 export const acceptFriendRequest = async (requesterId: string, token: string) => {
-  const res = await axios.post(`http://localhost:7070/users/accept-request/${requesterId}`, {}, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await axios.post(
+    `http://localhost:7070/users/accept-request/${requesterId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return res.data;
 };
 
@@ -101,11 +105,7 @@ export const fetchAllUsers = async () => {
 };
 
 
-export const getUserById = async (id: string, token: string) => {
-  const res = await axios.get(`http://localhost:7070/users/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const getUserById = async (id: string) => {
+  const res = await axios.get(`http://localhost:7070/users/${id}`);
   return res.data;
 };
