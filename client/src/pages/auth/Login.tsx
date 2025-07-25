@@ -50,6 +50,7 @@ export default function LoginForm() {
 
       dispatch(loginSuccess(fullUser));
       localStorage.removeItem("userExtras");
+      
 
       navigate("/feed");
     } else {

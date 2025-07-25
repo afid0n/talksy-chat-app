@@ -24,6 +24,7 @@ const initialState: UserState = {
   loginAttempts: 0,
   lockUntil: null,
   createdAt: "",
+  updatedAt: "",
   token: "",
   isAuthenticated: false,
 };
