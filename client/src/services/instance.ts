@@ -4,18 +4,24 @@ import { API_BASE_URL } from "./api";
 const instance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10_000,
+  withCredentials: true, 
   headers: { "api-key": "code_academy" },
 });
 
-axios.interceptors.request.use(config => {
-  const userStr = localStorage.getItem("user");
-  if (userStr) {
-    const user = JSON.parse(userStr);
-    if (user.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;
+const getAccessToken = () => localStorage.getItem("token");
+
+instance.interceptors.request.use(
+  function (config) {
+    const token = getAccessToken(); 
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
+    return config;
+  },
+  function (error) {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 export default instance;

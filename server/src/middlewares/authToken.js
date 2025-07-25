@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { JWT_ACCESS_SECRET_KEY } = require("../config/config");
+const { JWT_ACCESS_SECRET_KEY, JWT_SECRET_KEY } = require("../config/config");
 
 module.exports = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -17,3 +17,15 @@ module.exports = (req, res, next) => {
     next();
   });
 };
+
+
+const verifyToken = (req, res, next) => {
+  const token = req.cookies?.token;
+  if (!token) return res.status(401).json({ message: 'no token provided!' });
+
+  const decoded = jwt.verify(token, JWT_SECRET_KEY);
+  req.user = decoded;
+  next();
+};
+
+module.exports = verifyToken;

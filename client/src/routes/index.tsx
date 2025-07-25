@@ -1,3 +1,4 @@
+import RequireAuth from "@/components/ProtectedAuth";
 import AuthLayout from "../layouts/AuthLayout";
 import ClientLayout from "../layouts/ClientLayout";
 import ForgotPassword from "../pages/auth/ForgotPassword";
@@ -11,6 +12,8 @@ import Home from "../pages/client/Home";
 import Profile from "../pages/client/Profile";
 import NotFound from "../pages/Common/NotFound";
 
+
+
 const ROUTES = [
     {
         path: "/",
@@ -22,46 +25,55 @@ const ROUTES = [
         children: [
             {
                 path: "chat",
-                element: <Chat />
+                element: <RequireAuth>
+                    <Chat />
+                </RequireAuth>
             },
             {
                 path: "feed",
-                element: <Feed />
+                element:<RequireAuth >
+                    <Feed />
+                    </RequireAuth >
+
+
             },
-            {
-                path: "profile",
-                element: <Profile />
-            },
+{
+    path: "profile",
+        element: <RequireAuth>
+            <Profile />
+        </RequireAuth>
+
+},
         ]
     },
-    {
-        path: "/auth/",
+{
+    path: "/auth/",
         element: <AuthLayout />,
-        children: [
-            {
-                path: "login",
-                element: <Login />,
-            },
-            {
-                path: "register",
-                element: <Register />,
-            },
-            {
-                path: "forgot-password",
-                element: <ForgotPassword />,
-            },
-            {
-                path: "reset-password/:token",
-                element: <ResetPassword />,
-            },
-            {
-                path: "email-verified",
-                element: <VerifyEmail />,
-            }
-        ]
-    },
-    {
-        path: "*",
+            children: [
+                {
+                    path: "login",
+                    element: <Login />,
+                },
+                {
+                    path: "register",
+                    element: <Register />,
+                },
+                {
+                    path: "forgot-password",
+                    element: <ForgotPassword />,
+                },
+                {
+                    path: "reset-password/:token",
+                    element: <ResetPassword />,
+                },
+                {
+                    path: "email-verified",
+                    element: <VerifyEmail />,
+                }
+            ]
+},
+{
+    path: "*",
         element: <NotFound />,
     }
 ]

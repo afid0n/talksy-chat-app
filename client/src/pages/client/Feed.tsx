@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import instance from "@/services/instance";
 
 const Feed = () => {
   const user = useSelector((state: RootState) => state.user);
@@ -32,14 +34,19 @@ const Feed = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    getCurrentUser()
-      .then(user => {
-        dispatch(loginSuccess({ ...user, isAuthenticated: true }));
-      })
-      .catch(err => {
-        console.error("Failed to load current user:", err);
-      });
-  }, [dispatch]); 
+    const fetchUser = async () => {
+      try {
+        const { data } = await instance.get("/users/me", { withCredentials: true });
+        dispatch(loginSuccess(data));
+      } catch (error) {
+        console.log("Not logged in", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  console.log("current user", user);
 
   useEffect(() => {
     const fetchUsers = async () => {

@@ -4,7 +4,7 @@ const userController = require('../controllers/userController');
 const uploadMiddleware = require("../middlewares/uploadMiddleware");
 const  verifyAccessToken  = require('../middlewares/authToken');
 
-
+const verifyToken = require('../middlewares/authToken');
 const upload = uploadMiddleware("userImages");
 
 // Register user
@@ -23,7 +23,7 @@ router.get('/email/:email', userController.getUserByEmail);
 // Get all users
 router.get('/', userController.getAllUsers);
 
-router.get("/me", verifyAccessToken, userController.getCurrentUser);
+router.get("/me", verifyToken, userController.getCurrentUser);
 
 // Update user
 router.patch('/:id', userController.updateUser);

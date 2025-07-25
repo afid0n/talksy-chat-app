@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useState } from "react";
 import {
   MapPin,
   Users,
@@ -12,11 +12,10 @@ interface CardsProps {
   city?: string;
   searchQuery?: string;
   countriesFilter?: string[];
-  users: User[]; // Add this
+  users: User[];
 }
 
 const Cards = ({ city, searchQuery, countriesFilter, users }: CardsProps) => {
-
   const [likedIds, setLikedIds] = useState<string[]>([]);
 
   const toggleLike = (id: string) => {
@@ -33,8 +32,10 @@ const Cards = ({ city, searchQuery, countriesFilter, users }: CardsProps) => {
       : true;
 
     const matchesSearch = searchQuery
-      ? user.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.username?.toLowerCase().includes(searchQuery.toLowerCase())
+      ? (typeof user.fullName === "string" &&
+          user.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (typeof user.username === "string" &&
+          user.username.toLowerCase().includes(searchQuery.toLowerCase()))
       : true;
 
     const matchesCountry =
@@ -52,7 +53,30 @@ const Cards = ({ city, searchQuery, countriesFilter, users }: CardsProps) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredUsers.map((user) => {
           const liked = likedIds.includes(user.id);
-          const fullLocation = user.location?.country || "Unknown";
+          const fullName =
+            typeof user.fullName === "string" ? user.fullName : "Unknown User";
+          const username =
+            typeof user.username === "string" ? user.username : "unknown";
+          const initials =
+            fullName.length > 0 ? fullName.charAt(0).toUpperCase() : "?";
+          const country =
+            typeof user.location?.country === "string"
+              ? user.location.country
+              : "Unknown";
+          const city =
+            typeof user.location?.city === "string"
+              ? user.location.city
+              : "";
+
+          const locationLabel = city
+            ? `${city}, ${country}`
+            : country;
+
+          const mutuals = Array.isArray(user.friends)
+            ? user.friends.length
+            : typeof user.friends === "number"
+            ? user.friends
+            : 0;
 
           return (
             <div
@@ -73,7 +97,7 @@ const Cards = ({ city, searchQuery, countriesFilter, users }: CardsProps) => {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <span className="bg-yellow-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">
-                    {user.fullName[0]}
+                    {initials}
                   </span>
                   {user.isOnline && (
                     <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-white dark:border-zinc-900 rounded-full" />
@@ -81,35 +105,37 @@ const Cards = ({ city, searchQuery, countriesFilter, users }: CardsProps) => {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-                    {user.fullName}
+                    {fullName}
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    @{user.username}
+                    @{username}
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 mt-3">
                 <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                  <MapPin size={14} /> {fullLocation}
+                  <MapPin size={14} /> {locationLabel}
                 </p>
                 <span className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1">
-                  <Users size={14} /> {user.friends} mutuals
+                  <Users size={14} /> {mutuals} mutuals
                 </span>
               </div>
 
-              <p className="mt-3 text-sm text-gray-700 dark:text-gray-300">
-                {user.bio}
-              </p>
+              {typeof user.bio === "string" && user.bio.trim().length > 0 && (
+                <p className="mt-3 text-sm text-gray-700 dark:text-gray-300">
+                  {user.bio}
+                </p>
+              )}
 
-              {user.interests && user.interests.length > 0 && (
+              {Array.isArray(user.interests) && user.interests.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {user.interests.map((hobby, idx) => (
                     <span
                       key={idx}
                       className="px-2 py-0.5 bg-gray-100 dark:bg-zinc-800 text-xs text-gray-700 dark:text-gray-200 rounded-full"
                     >
-                      {hobby}
+                      {typeof hobby === "string" ? hobby : "Unknown"}
                     </span>
                   ))}
                 </div>

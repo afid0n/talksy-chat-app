@@ -6,7 +6,7 @@ import type {
 } from "@/types/Auth";
 import instance from "./instance";
 import type { AxiosError } from "axios";
-import type {UserState } from "@/types/User";
+import type {User } from "@/types/User";
 
 // Register user
 export const registerUser = async (
@@ -46,12 +46,13 @@ export const resendVerificationEmail = async (email: string): Promise<{ success:
   }
 };
 
-export const getCurrentUser = async (): Promise<UserState> => {
+export const getCurrentUser = async (): Promise<User> => {
   try {
-    const res = await instance.get<UserState>("/users/me");
+    const res = await instance.get<User>("/users/me", {
+      withCredentials: true,
+    });
     return res.data;
-  } catch (error: unknown) {
-    const err = error as AxiosError<{ message?: string }>;
-    throw new Error(err.response?.data?.message || err.message || "Failed to fetch user.");
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message || "Failed to fetch current user");
   }
 };

@@ -31,6 +31,6 @@ export interface User {
 }
 
 export interface UserState extends Partial<User> {
-  token?: string;
+  token?: string | null;
   isAuthenticated: boolean;
 }
