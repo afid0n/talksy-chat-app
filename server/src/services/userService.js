@@ -218,23 +218,23 @@ const getAllUsers = async () => {
   return formatMongoData(users);
 };
 
-// const changePassword = async (userId, currentPassword, newPassword) => {
-//   const user = await User.findById(userId);
-//   if (!user) throw new Error("User not found");
+const changePassword = async (userId, currentPassword, newPassword) => {
+  const user = await User.findById(userId);
+  if (!user) throw new Error("User not found");
 
-//   // Əgər currentPassword təqdim olunubsa – doğrula
-//   if (currentPassword) {
-//     const isMatch = await bcrypt.compare(currentPassword, user.password);
-//     if (!isMatch) throw new Error("Current password is incorrect");
-//   }
+  // Əgər currentPassword təqdim olunubsa – doğrula
+  if (currentPassword) {
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) throw new Error("Current password is incorrect");
+  }
 
-//   // Yeni parolu hash et və saxla
-//   const hashed = await bcrypt.hash(newPassword, 10);
-//   user.password = hashed;
-//   await user.save();
+  // Yeni parolu hash et və saxla
+  const hashed = await bcrypt.hash(newPassword, 10);
+  user.password = hashed;
+  await user.save();
 
-//   return { message: "Password updated successfully" };
-// };
+  return { message: "Password updated successfully" };
+};
 
 
 module.exports = {
@@ -246,4 +246,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getAllUsers,
+  changePassword,
 };

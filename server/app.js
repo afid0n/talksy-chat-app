@@ -8,6 +8,8 @@ const userRoute = require("./src/routes/userRoute");
 const chatRoutes = require("./src/routes/chatRoute");
 const messageRoutes = require("./src/routes/messageRoute");
 const googleAuthRoute = require("./src/routes/googleAuthRoute");
+const session = require("express-session");
+const passport = require("passport");
 require("./src/config/passport");
 
 const app = express();
@@ -24,6 +26,15 @@ app.get("/", (_, res) => {
 app.use("/users", userRoute);
 app.use('/chats', chatRoutes);
 app.use('/messages', messageRoutes);
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || "keyboard cat",
+  resave: false,
+  saveUninitialized: false,
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // app.use(passport.session());
 app.use("/auth", googleAuthRoute);

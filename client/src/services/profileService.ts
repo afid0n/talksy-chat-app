@@ -16,7 +16,7 @@ export const changePassword = async (
 ): Promise<ChangePasswordResponse> => {
   try {
     const response = await instance.patch<ChangePasswordResponse>(
-      `/users/${userId}/change-password`,
+      `/users/password/${userId}`,
       payload
     );
     return response.data;
