@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const passport = require("passport");
 const { CLIENT_URL } = require("../config/config");
+const { token } = require("morgan");
 
 // Step 1: Redirect to Google
 router.get("/google", (req, res, next) => {
@@ -42,7 +43,7 @@ router.get(
 
     //set refresh token to cookie
 
-    res.redirect(`${CLIENT_URL}/auth/success/${accessToken}`);
+    res.redirect(`${CLIENT_URL}/feed/${accessToken}`);
   }
 );
 

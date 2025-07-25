@@ -3,6 +3,7 @@ const userService = require('../services/userService');
 const { generateToken } = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/mailService');
 const { SERVER_URL, CLIENT_URL } = require('../config/config');
+const { verifyAccessToken } = require('../utils/genetareJWT');
 
 
 const registerUser = async (req, res, next) => {
@@ -201,6 +202,46 @@ const changePassword = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res, next) => {
+  try {
+    const { newPassword, token } = req.body;
+
+    console.log("Token:", token);
+    const decoded = verifyAccessToken(token);
+
+    if (!decoded || !decoded.email) {
+      throw new Error("Invalid or expired token");
+    }
+
+    const email = decoded.email;
+
+    await userService.resetPass(newPassword, email);
+
+    res.status(200).json({
+      message: "Password reset successfully!",
+    });
+  } catch (error) {
+    console.error("Error in resetPassword:", error);
+    next(error);
+  }
+};
+
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    await userService.forgotPassword(email);
+    res.status(200).json({
+      message: "reset password email was sent!",
+    });
+  } catch (error) {
+    res.json({
+      message: error.message || "internal server error",
+      statusCode: 401,
+    });
+  }
+};
+
 module.exports = {
   getUserById,
   getUserByEmail,
@@ -211,5 +252,7 @@ module.exports = {
   updateUser,
   deleteUser,
   resendVerificationEmail,
-  changePassword
+  changePassword,
+  resetPassword,
+  forgotPassword,
 };

@@ -46,6 +46,7 @@ app.use("/chats", chatRoutes);
 app.use("/messages", messageRoutes);
 app.use("/auth", googleAuthRoute); // MUST come after session & passport
 
+
 // Global error handler
 app.use(errorHandler);
 

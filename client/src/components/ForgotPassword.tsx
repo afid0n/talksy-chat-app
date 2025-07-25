@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { post } from "@/services/commonRequest";
+import { endpoints } from "@/services/api";
+import { enqueueSnackbar } from "notistack";
 
 interface Props {
   onSubmit: (email: string) => void;
@@ -6,27 +9,58 @@ interface Props {
 
 const ForgotPasswordCom: React.FC<Props> = ({ onSubmit }) => {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Burada API çağırışı edə bilərsən (məsələn: await axios.post...)
-    onSubmit(email);
+
+    try {
+      setLoading(true);
+
+      const res: {
+        message: string;
+        statusCode?: number;
+      } = await post(`${endpoints.users}/forgot-password`, {
+        email,
+      });
+
+      if (res.statusCode === 401) {
+        enqueueSnackbar(res.message || "Unauthorized request", {
+          variant: "error",
+        });
+        return;
+      }
+
+      enqueueSnackbar("Reset password email was sent!", {
+        variant: "success",
+      });
+
+      onSubmit(email);
+    } catch (error) {
+      enqueueSnackbar("Something went wrong. Try again later.", {
+        variant: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center  px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 ">
       <div className="w-full max-w-md bg-white dark:bg-zinc-800 p-8 rounded-xl shadow-xl">
-        <h1 className="text-3xl font-bold text-center mb-2">
+        <h1 className="text-3xl font-bold text-center mb-2 text-gray-900 dark:text-white">
           Talk<span className="text-yellow-500">sy</span>
         </h1>
-        <p className="text-center  mb-6">Forgot your password?</p>
+        <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
+          Forgot your password?
+        </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="text-sm font-medium">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
             Email Address
             <input
               type="email"
-              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="mt-1 w-full p-3 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -36,9 +70,10 @@ const ForgotPasswordCom: React.FC<Props> = ({ onSubmit }) => {
 
           <button
             type="submit"
-            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-md"
+            disabled={loading}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-md disabled:opacity-60"
           >
-            Send Reset Link
+            {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
       </div>
