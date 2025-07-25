@@ -33,6 +33,7 @@ export default function LoginForm() {
         }
 
         const token = response.token;
+console.log("Login token:", response.token);
 
         // Step 2: get user with token
         const userRes = await axios.get<UserState>("http://localhost:7070/users/me", {
