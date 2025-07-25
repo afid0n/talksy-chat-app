@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 const uploadMiddleware = require("../middlewares/uploadMiddleware");
-const { forgotPassword } = require('../services/userService');
 
 const upload = uploadMiddleware("userImages");
 
@@ -22,6 +21,7 @@ router.get('/email/:email', userController.getUserByEmail);
 // Get all users
 router.get('/', userController.getAllUsers);
 
+router.get("/me", verifyAccessToken, userController.getCurrentUser);
 
 // Update user
 router.patch('/:id', userController.updateUser);

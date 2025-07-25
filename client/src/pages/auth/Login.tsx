@@ -7,7 +7,7 @@ import { loginUser } from '@/services/userService';
 import { loginValidationSchema } from '@/validations/authValidation';
 import { useDispatch } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
-import { loginSuccess } from '@/features/userSlice'; 
+import { loginSuccess } from '@/redux/userSlice'; 
 import type { User } from '@/types/User';
 
 export default function LoginForm() {
