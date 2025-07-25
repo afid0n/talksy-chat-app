@@ -77,21 +77,22 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
       );
     }
   };
-const birthday = localStorage.getItem("register_birthday") || undefined;;
-const location = localStorage.getItem("register_location") || undefined;;
-const interests = localStorage.getItem("register_interests") || undefined;;
+  const birthday = localStorage.getItem("register_birthday") || undefined;;
+  const location = localStorage.getItem("register_location") || undefined;;
+  const interests = localStorage.getItem("register_interests") || undefined;;
 
-const params = new URLSearchParams({
-  birthday,
-  location,
-  interests,
-});
+  const params = new URLSearchParams();
+
+  if (birthday) params.append("birthday", birthday);
+  if (location) params.append("location", location);
+  if (interests) params.append("interests", interests);
+
 
   return (
     <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-md rounded-lg py-3 px-8 w-full max-w-md mx-auto transition">
       <button
         type="button"
-        onClick={() => window.location.href = `http://localhost:7070/auth/prepare-google?${params.toString()}`}
+        onClick={() => window.location.href = `http://localhost:7070/auth/google?${params.toString()}`}
         className="flex items-center justify-center w-full py-2 mb-4 border border-gray-300 dark:border-zinc-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
       >
         <FaGoogle className="mr-2" /> Continue with Google
