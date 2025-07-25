@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 const Feed = () => {
   const user = useSelector((state: RootState) => state.user);
   const [showFilters, setShowFilters] = useState(false);
+  const [incomingRequests, setIncomingRequests] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [tempSelectedCountries, setTempSelectedCountries] = useState<string[]>([]);
   const [appliedCountries, setAppliedCountries] = useState<string[]>([]);
@@ -30,7 +31,35 @@ const Feed = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await getAll<User[]>("/users");
+        setUsers(res);
 
+        if (!user.id) {
+          throw new Error("User ID is not available in Redux state");
+        }
+
+        const myId = user.id;
+
+        // Düzgün şəkildə friendRequests massivini yoxla
+        const requests = res.filter((u) =>
+          Array.isArray(u.friendRequests) &&
+          u.friendRequests.map((id: any) => id.toString()).includes(myId)
+        );
+
+        setIncomingRequests(requests);
+        console.log("Sənə request göndərənlər:", requests);
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [user.id]);
   useEffect(() => {
     getCurrentUser()
       .then(user => {
@@ -39,7 +68,7 @@ const Feed = () => {
       .catch(err => {
         console.error("Failed to load current user:", err);
       });
-  }, [dispatch]); 
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchUsers = async () => {

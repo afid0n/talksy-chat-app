@@ -7,6 +7,10 @@ import {
   Heart,
 } from "lucide-react";
 import type { User } from "@/types/User";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store/store";
+import { sendFriendRequest } from "@/services/commonRequest";
+import { enqueueSnackbar } from "notistack";
 
 interface CardsProps {
   city?: string;
@@ -16,7 +20,20 @@ interface CardsProps {
 }
 
 const Cards = ({ city, searchQuery, countriesFilter, users }: CardsProps) => {
+const token = useSelector((state: RootState) => state.user.token);
+const [sentRequests, setSentRequests] = useState<string[]>([]);
 
+const handleSendRequest = async (targetId: string) => {
+  if (sentRequests.includes(targetId)) return;
+
+  try {
+    const result = await sendFriendRequest(targetId, token);
+    enqueueSnackbar(result.message, { variant: 'success' });
+    setSentRequests((prev) => [...prev, targetId]);
+  } catch (err: any) {
+    enqueueSnackbar(err.response?.data?.message || "Error", { variant: "error" });
+  }
+};
   const [likedIds, setLikedIds] = useState<string[]>([]);
 
   const toggleLike = (id: string) => {
@@ -46,6 +63,7 @@ const Cards = ({ city, searchQuery, countriesFilter, users }: CardsProps) => {
 
     return matchesCity && matchesSearch && matchesCountry;
   });
+  
 
   return (
     <div className="w-full">
@@ -116,7 +134,11 @@ const Cards = ({ city, searchQuery, countriesFilter, users }: CardsProps) => {
               )}
 
               <div className="flex justify-between mt-4">
-                <button className="text-sm flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 transition px-4 py-1.5 rounded-md">
+                <button 
+                className="text-sm flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 transition px-4 py-1.5 rounded-md"
+                onClick={() => handleSendRequest(user.id)}
+                >
+                  
                   <UserRoundPlus size={13} /> Connect
                 </button>
                 <button className="text-sm flex items-center gap-1 bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 transition px-4 py-1.5 rounded-md">

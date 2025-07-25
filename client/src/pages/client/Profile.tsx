@@ -30,12 +30,18 @@ import ChangePassword from "@/components/ChangePassword"
 import moment from "moment"
 import { useAppSelector } from "@/redux/store/hooks"
 import type { UserState } from "@/types/User"
+import FriendRequestList from "@/components/FriendRequestList"
+import Cards from "@/components/Cards"
 
 
 const Profile = () => {
   const { setTheme } = useTheme();
-
+const [incomingRequests, setIncomingRequests] = useState<User[]>([]);
   const user = useAppSelector((state) => state.user) as UserState;
+  const [users, setUsers] = useState<User[]>([]);
+const [loading, setLoading] = useState(true);
+const [searchQuery, setSearchQuery] = useState("");
+const [appliedCountries, setAppliedCountries] = useState<string[]>([]);
 
   const [language, setLanguage] = useState("en");
 
@@ -51,6 +57,10 @@ const Profile = () => {
     localStorage.setItem("vite-ui-theme", theme)
     window.dispatchEvent(new Event("vite-ui-theme-change"))
   }
+
+
+  // Fetch users and incoming friend requests
+  
 
   return (
     <div className="px-2 sm:px-4 md:px-8 lg:px-20 py-8 sm:py-12 md:py-14">
@@ -286,6 +296,17 @@ const Profile = () => {
           </div>
         </TabsContent>
       </Tabs>
+       {loading ? (
+    <div>Loading users...</div>
+  ) : (
+    <>
+      <FriendRequestList
+        requests={incomingRequests}
+        onRefresh={() => window.location.reload()} // refresh etmək üçün
+      />
+      <Cards users={users} searchQuery={searchQuery} countriesFilter={appliedCountries} />
+    </>
+  )}
     </div>
   )
 }

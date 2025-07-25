@@ -64,12 +64,7 @@ const userSchema = new mongoose.Schema({
         //     message: 'You must choose between 3 and 5 interests.',
         // },
     },
-    friends: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-        },
-    ],
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     blockedUsers: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -89,12 +84,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    friendRequests: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-        },
-    ],
+    friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     language: {
         type: String,
         default: 'en',

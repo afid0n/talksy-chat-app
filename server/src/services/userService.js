@@ -218,7 +218,8 @@ const deleteUser = async (id) => {
 };
 
 const getAllUsers = async () => {
-  const users = await User.find();
+  const users = await User.find().populate('friendRequests', 'fullName username avatar bio')
+    .populate('friendRequests');
   return formatMongoData(users);
 };
 

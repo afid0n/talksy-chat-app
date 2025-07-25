@@ -243,6 +243,7 @@ const getCurrentUser = async (req, res) => {
       email: user.email,
       location: user.location,
       interests: user.interests,
+      friendRequests: user.friendRequests,
       birthday: user.birthday,
       avatar: user.avatar,
       authProvider: user.authProvider,
@@ -276,6 +277,82 @@ const forgotPassword = async (req, res) => {
 };
 
 
+const sendFriendRequest = async (req, res, next) => {
+  const senderId = req.user.id;
+  const targetId = req.params.targetId;
+
+  if (senderId === targetId) {
+    return res.status(400).json({ message: "You cannot send request to yourself." });
+  }
+
+  try {
+    const targetUser = await User.findById(targetId);
+    const senderUser = await User.findById(senderId);
+
+    if (!targetUser || !senderUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // artıq dostdurlarsa
+    if (targetUser.friends.includes(senderId)) {
+      return res.status(400).json({ message: "You are already friends." });
+    }
+
+    // artıq sorğu göndərilibsə
+    if (targetUser.friendRequests.includes(senderId)) {
+      return res.status(400).json({ message: "Friend request already sent." });
+    }
+
+    targetUser.friendRequests.push(senderId);
+    await targetUser.save();
+
+    res.status(200).json({ message: "Friend request sent successfully." });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const acceptFriendRequest = async (req, res, next) => {
+  const receiverId = req.user.id;
+  const requesterId = req.params.requesterId;
+
+  if (receiverId === requesterId) {
+    return res.status(400).json({ message: "You cannot accept your own request." });
+  }
+
+  try {
+    const receiver = await User.findById(receiverId);
+    const requester = await User.findById(requesterId);
+
+    if (!receiver || !requester) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // sorğu yoxdursa
+    if (!receiver.friendRequests.includes(requesterId)) {
+      return res.status(400).json({ message: "No friend request from this user." });
+    }
+
+    // əlavə et
+    receiver.friends.push(requesterId);
+    requester.friends.push(receiverId);
+
+    // sil sorğudan
+    receiver.friendRequests = receiver.friendRequests.filter(
+      (id) => id.toString() !== requesterId
+    );
+
+    await receiver.save();
+    await requester.save();
+
+    res.status(200).json({ message: "Friend request accepted." });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
 module.exports = {
   getUserById,
   getUserByEmail,
@@ -290,5 +367,7 @@ module.exports = {
   resetPassword,
   forgotPassword,
   changePassword,
-   getCurrentUser
+   getCurrentUser,
+   sendFriendRequest,
+   acceptFriendRequest,
 };

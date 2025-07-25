@@ -42,4 +42,7 @@ router.post('/forgot-password', userController.forgotPassword);
 // Reset password   
 router.post('/reset-password', userController.resetPassword);
 
+router.post('/send-request/:targetId', verifyAccessToken, userController.sendFriendRequest);
+router.post('/accept-request/:requesterId', verifyAccessToken, userController.acceptFriendRequest);
+
 module.exports = router;
