@@ -85,9 +85,8 @@ const verifyEmailToken = async (token) => {
 
 const login = async (credentials) => {
   const { email, password } = credentials;
-  
+
   const user = await User.findOne({ email });
-console.log(user);
   if (!user) {
     throw new Error("Invalid credentials!");
   }
@@ -95,18 +94,6 @@ console.log(user);
   //is verified
   if (!user.emailVerified) {
     throw new Error("email should be verified first!");
-  }
-
-  // Check if banned
-  if (user.isBanned) {
-    if (!user.banUntil || new Date(user.banUntil) > new Date()) {
-      throw new Error("You are banned from logging in.");
-    } else {
-      // Ban has expired, remove it
-      user.isBanned = false;
-      user.banUntil = null;
-      await user.save();
-    }
   }
 
   // Check if locked
@@ -137,7 +124,11 @@ console.log(user);
         {
           id: user._id,
           email: user.email,
+          username: user.username,
           fullName: user.fullName,
+          birthday: user.birthday,
+          location: user.location,
+          interests: user.interests,
         },
         "6h"
       );

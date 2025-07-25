@@ -54,46 +54,61 @@ export default function RegisterStepsWrapper() {
   const navigate = useNavigate();
 
 
-  const handleSubmit = async (values: {
-    username: string;
-    fullName: string;
-    email: string;
-    password: string;
-  }) => {
-    setLoading(true);
-    try {
-      const birthdayIso = birthday ? birthday.toISOString() : localStorage.getItem("register_birthday") || "";
+ const handleSubmit = async (values: {
+  username: string;
+  fullName: string;
+  email: string;
+  password: string;
+}) => {
+  setLoading(true);
+  try {
+    const birthdayIso = birthday
+      ? birthday.toISOString()
+      : localStorage.getItem("register_birthday") || "";
 
-      const payload: RegisterPayload = {
-        email: values.email,
-        username: values.username,
-        fullName: values.fullName,
-        authProvider: "local",
-        password: values.password,
-        birthday: birthdayIso,
-        location: location.country
-          ? location
-          : JSON.parse(localStorage.getItem("register_location") || '{"country":"","city":""}'),
-        interests: interests.length
-          ? interests
-          : JSON.parse(localStorage.getItem("register_interests") || "[]"),
-        language: navigator.language || "en",
-      };
+    const payload: RegisterPayload = {
+      email: values.email,
+      username: values.username,
+      fullName: values.fullName,
+      authProvider: "local",
+      password: values.password,
+      birthday: birthdayIso,
+      location: location.country
+        ? location
+        : JSON.parse(localStorage.getItem("register_location") || '{"country":"","city":""}'),
+      interests: interests.length
+        ? interests
+        : JSON.parse(localStorage.getItem("register_interests") || "[]"),
+      language: navigator.language || "en",
+    };
 
-      console.log("📦 Sending register payload:", payload);
-      await registerUser(payload);
-      localStorage.removeItem("register_location");
-      localStorage.removeItem("register_interests");
-      localStorage.removeItem("register_birthday");
+    console.log("📦 Sending register payload:", payload);
+    await registerUser(payload);
 
-      enqueueSnackbar("Successfully registered! Verify your email", { variant: "success" });
-      navigate("/auth/login");
-    } catch (err: any) {
-      enqueueSnackbar(err.message || "Registration failed", { variant: "error" });
-    } finally {
-      setLoading(false);
-    }
-  };
+    const userExtras = {
+      birthday: birthdayIso,
+      location: payload.location,
+      interests: payload.interests,
+      language: payload.language,
+      avatar: { url: "", public_id: "" },
+      username: values.username,
+    };
+
+    localStorage.setItem("userExtras", JSON.stringify(userExtras));
+
+    localStorage.removeItem("register_location");
+    localStorage.removeItem("register_interests");
+    localStorage.removeItem("register_birthday");
+
+    enqueueSnackbar("Successfully registered! Verify your email", { variant: "success" });
+    navigate("/auth/login");
+  } catch (err: any) {
+    enqueueSnackbar(err.message || "Registration failed", { variant: "error" });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4 text-black dark:text-white transition-colors">

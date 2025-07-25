@@ -1,78 +1,42 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
-import { jwtDecode } from "jwt-decode";
-import type { User } from "@/types/User"; // Adjust this import path as needed
-
-interface UserState extends Partial<User> {
-  token: string | null;
-  isAuthenticated: boolean;
-}
+// userSlice.ts
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { UserState } from "@/types/User";
 
 const initialState: UserState = {
-  id: undefined,
-  email: undefined,
-  fullName: undefined,
+  id: "",
+  fullName: "",
   username: "",
+  email: "",
+  token: "",
   authProvider: "local",
-  birthday: null,
-  avatar: { url: "", public_id: "" },
-  location: { country: "", city: "" },
+  birthday: undefined,
+  location: { country: undefined, city: undefined },
+  avatar: { url: "", public_id: undefined },
   interests: [],
-  friends: [],
-  blockedUsers: [],
-  lastSeen: "",
-  bio: "",
-  emailVerified: false,
-  friendRequests: [],
   language: "en",
-  isOnline: false,
-  lastLogin: null,
-  loginAttempts: 0,
-  lockUntil: null,
-  createdAt: "",
-  updatedAt: "",
-  token: localStorage.getItem("token"),
-  isAuthenticated: !!localStorage.getItem("token"),
+  isAuthenticated: false,
 };
 
-function loadInitialUserData(state: UserState) {
-  try {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decoded: User = jwtDecode(token);
-      Object.assign(state, decoded); // Populate user fields
-      state.token = token;
-      state.isAuthenticated = true;
-    }
-  } catch (error) {
-    console.error("JWT decode error:", error);
-  }
+const savedUser = localStorage.getItem("user");
+if (savedUser) {
+  Object.assign(initialState, JSON.parse(savedUser));
 }
-
-loadInitialUserData(initialState);
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (
-      state,
-      action: PayloadAction<{ user: User; token: string }>
-    ) => {
-      const { user, token } = action.payload;
-      Object.assign(state, user);
-      state.token = token;
+    loginSuccess: (state, action: PayloadAction<UserState>) => {
+      Object.assign(state, action.payload);
       state.isAuthenticated = true;
-      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify({ ...state }));
     },
     logoutUser: (state) => {
       Object.assign(state, initialState);
-      state.token = null;
-      state.isAuthenticated = false;
-      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     },
   },
 });
 
-export const { setUser, logoutUser } = userSlice.actions;
+export const { loginSuccess, logoutUser } = userSlice.actions;
 export default userSlice.reducer;
