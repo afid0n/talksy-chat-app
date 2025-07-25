@@ -3,7 +3,10 @@ const userService = require('../services/userService');
 const { generateToken } = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/mailService');
 const { SERVER_URL, CLIENT_URL } = require('../config/config');
+const User = require('../models/userModel');
 const { get } = require('../schemas/userSchema');
+const { verifyAccessToken } = require('../utils/genetareJWT');
+
 
 
 const registerUser = async (req, res, next) => {
@@ -167,10 +170,10 @@ const login = async (req, res, next) => {
 
     res.cookie("refreshToken", response.refreshToken, {
       httpOnly: true,
-      secure: true, // in production (possible BUG)
+      secure: true, 
       sameSite: "strict",
       path: "/auth/refresh",
-      maxAge: 7 * 24 * 60 * 60 * 1000, //7days
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
     });
 
     res.status(200).json({
@@ -202,7 +205,31 @@ const changePassword = async (req, res) => {
   }
 };
 
-const User = require('../models/userModel');
+
+const resetPassword = async (req, res, next) => {
+  try {
+    const { newPassword, token } = req.body;
+
+    console.log("Token:", token);
+    const decoded = verifyAccessToken(token);
+
+    if (!decoded || !decoded.email) {
+      throw new Error("Invalid or expired token");
+    }
+
+    const email = decoded.email;
+
+    await userService.resetPass(newPassword, email);
+
+    res.status(200).json({
+      message: "Password reset successfully!",
+    });
+  } catch (error) {
+    console.error("Error in resetPassword:", error);
+    next(error);
+  }
+};
+
 const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -226,10 +253,26 @@ const getCurrentUser = async (req, res) => {
   } catch (error) {
     console.error("Get current user error:", error);
     res.status(500).json({ message: "Server error" });
+
   }
 };
 
 
+
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    await userService.forgotPassword(email);
+    res.status(200).json({
+      message: "reset password email was sent!",
+    });
+  } catch (error) {
+    console.error("Forgot Password Error:", error); // bunu əlavə et
+    res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
 
 
 module.exports = {
@@ -242,6 +285,9 @@ module.exports = {
   updateUser,
   deleteUser,
   resendVerificationEmail,
-  changePassword
-  , getCurrentUser
+  changePassword,
+  resetPassword,
+  forgotPassword,
+  changePassword,
+   getCurrentUser
 };

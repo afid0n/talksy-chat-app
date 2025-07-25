@@ -37,4 +37,9 @@ router.delete('/:id', userController.deleteUser);
 // Get user by ID 
 router.get('/:id', userController.getUserById);
 
+// Forgot password  
+router.post('/forgot-password', userController.forgotPassword);
+// Reset password   
+router.post('/reset-password', userController.resetPassword);
+
 module.exports = router;

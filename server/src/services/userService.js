@@ -5,7 +5,11 @@ const { verifyToken, generateToken } = require("../utils/jwt");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { registerSchema } = require('../validations/registerValidate');
-
+const {
+  sendUnlockAccountEmail,
+  sendForgotPasswordEmail,
+} = require("../utils/mailService");
+const { CLIENT_URL } = require('../config/config');
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 10 * 60 * 1000; //10 minutes
 
@@ -237,6 +241,39 @@ const changePassword = async (userId, currentPassword, newPassword) => {
 };
 
 
+const resetPass = async (newPassword, email) => {
+  const user = await User.findOne({ email: email });
+  if (!user) throw new Error("user not found!");
+
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+  console.log("inside service: ", newPassword);
+  user.password = hashedPassword;
+  await user.save();
+  return user;
+};
+
+const forgotPassword = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("email does not exist!");
+  }
+
+  const token = generateAccessToken(
+    {
+      id: user._id,
+      email: user.email,
+    },
+    "30m"
+  );
+
+  const resetPasswordLink = `${CLIENT_URL}/auth/reset-password?token=${token}`;
+  console.log("Reset link:", resetPasswordLink); // əlavə et
+
+  // Əgər bu funksiyada xəta varsa, 500 verəcək:
+  await sendForgotPasswordEmail(email, resetPasswordLink);
+};
+
 module.exports = {
   getUserById,
   getUserByEmail,
@@ -247,4 +284,6 @@ module.exports = {
   deleteUser,
   getAllUsers,
   changePassword,
+  resetPass,
+  forgotPassword,
 };

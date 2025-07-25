@@ -55,6 +55,57 @@ const sendVerificationEmail = async (toEmail, userFullName, verificationLink) =>
   }
 };
 
+const sendForgotPasswordEmail = async (toEmail, resetPasswordLink) => {
+  try {
+    await transporter.sendMail({
+      from: `"Talksy" <${process.env.GMAIL_USER}>`,
+      to: toEmail,
+      subject: "Reset Your Talksy Password",
+      html: `
+      <div style="font-family: Arial, sans-serif; background-color: #fefce8; padding: 40px;">
+        <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          
+          <div style="background-color: #facc15; padding: 20px; color: #111827; text-align: center;">
+            <h2 style="margin: 0; font-size: 24px;">Reset Your Password</h2>
+          </div>
+
+          <div style="padding: 30px; color: #333;">
+            <p style="font-size: 16px;">Hi there,</p>
+            <p style="font-size: 16px;">
+              We received a request to reset the password for your <strong>Talksy</strong> account.
+            </p>
+            <p style="font-size: 16px;">
+              Click the button below to reset your password. This link is valid for the next <strong>30 minutes</strong>:
+            </p>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetPasswordLink}" target="_blank" 
+                style="background-color: #facc15; color: #1f2937; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                Reset Password
+              </a>
+            </div>
+
+            <p style="font-size: 14px; color: #666;">
+              If you didn’t request a password reset, you can safely ignore this email.
+              <br/>
+              For further assistance, please contact our support team.
+            </p>
+          </div>
+
+          <div style="background-color: #fef9c3; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+            &copy; ${new Date().getFullYear()} Talksy. All rights reserved.
+          </div>
+        </div>
+      </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Error sending forgot password email:", error);
+  }
+};
+
+
 module.exports = {
   sendVerificationEmail,
+  sendForgotPasswordEmail,
 };
