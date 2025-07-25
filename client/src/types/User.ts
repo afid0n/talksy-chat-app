@@ -29,3 +29,24 @@ export interface User {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface UserState {
+  id: string;
+  fullName: string;
+  username: string;
+  email: string;
+  token: string;
+  authProvider: "google" | "github" | "local";
+  birthday?: string | null;
+  location: {
+    country?: string;
+    city?: string;
+  };
+  avatar: {
+    url: string;
+    public_id?: string;
+  };
+  interests: string[];
+  language: string;
+  isAuthenticated: boolean;
+}

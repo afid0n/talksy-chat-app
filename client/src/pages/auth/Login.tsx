@@ -7,7 +7,7 @@ import { loginUser } from '@/services/userService';
 import { loginValidationSchema } from '@/validations/authValidation';
 import { useDispatch } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
-import { setUser } from '@/features/userSlice';
+import { loginSuccess } from '@/features/userSlice'; 
 import type { User } from '@/types/User';
 
 export default function LoginForm() {
@@ -21,36 +21,55 @@ export default function LoginForm() {
       password: '',
     },
     validationSchema: loginValidationSchema,
-    onSubmit: async (values) => {
-      setLoading(true);
-      try {
-        const response = await loginUser(values);
+   onSubmit: async (values) => {
+  setLoading(true);
+  try {
+    const response = await loginUser(values);
 
-        if (response.token) {
-          enqueueSnackbar(response.message, { variant: "success" });
+    if (response.token) {
+      enqueueSnackbar(response.message, { variant: "success" });
 
-          const decoded = jwtDecode<User>(response.token);
+      const decoded = jwtDecode<User>(response.token);
 
-          dispatch(setUser({ user: decoded, token: response.token }));
+      const extras = {
+        birthday: "",
+        interests: [],
+        language: "en",
+        avatar: { url: "", public_id: "" },
+        location: { country: "", city: "" },
+        username: "",
+        ...JSON.parse(localStorage.getItem("userExtras") || "{}"),
+      };
 
-          navigate("/feed");
-        } else {
-          enqueueSnackbar(response.message, { variant: "error" });
-        }
-      } catch (error: any) {
-        const message = error.response?.data?.message || 'Login failed';
-        enqueueSnackbar(message, {
-          autoHideDuration: 2000,
-          anchorOrigin: {
-            vertical: "bottom",
-            horizontal: "right",
-          },
-          variant: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
+      const fullUser = {
+        ...decoded,
+        ...extras,
+        token: response.token,
+        isAuthenticated: true,
+      };
+
+      dispatch(loginSuccess(fullUser));
+      localStorage.removeItem("userExtras");
+
+      navigate("/feed");
+    } else {
+      enqueueSnackbar(response.message, { variant: "error" });
+    }
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Login failed';
+    enqueueSnackbar(message, {
+      autoHideDuration: 2000,
+      anchorOrigin: {
+        vertical: "bottom",
+        horizontal: "right",
+      },
+      variant: "error",
+    });
+  } finally {
+    setLoading(false);
+  }
+}
+
   });
 
   return (
@@ -64,7 +83,6 @@ export default function LoginForm() {
           Welcome back to your conversations
         </p>
       </div>
-
       <form
         onSubmit={formik.handleSubmit}
         className="bg-white dark:bg-zinc-900 shadow-md rounded-lg p-8 w-full max-w-md border border-gray-200 dark:border-zinc-700"
@@ -83,6 +101,7 @@ export default function LoginForm() {
           <span className="border-t border-gray-300 dark:border-zinc-600 flex-grow" />
         </div>
 
+        {/* EMAIL FIELD */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Email or Username
@@ -104,6 +123,7 @@ export default function LoginForm() {
           )}
         </div>
 
+        {/* PASSWORD FIELD */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Password
@@ -126,9 +146,6 @@ export default function LoginForm() {
         </div>
 
         <div className="flex items-center justify-between text-sm mb-4">
-          <label className="flex items-center text-gray-700 dark:text-gray-300">
-            <input type="checkbox" className="mr-1" /> Remember me
-          </label>
           <Link to="/auth/forgot-password" className="text-yellow-600 hover:underline">
             Forgot password?
           </Link>

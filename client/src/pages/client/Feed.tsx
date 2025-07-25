@@ -20,7 +20,6 @@ import { useSelector } from "react-redux";
 
 const Feed = () => {
   const user = useSelector((state: RootState) => state.user);
-  const [location, setLocation] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [tempSelectedCountries, setTempSelectedCountries] = useState<string[]>([]);
@@ -42,17 +41,7 @@ const Feed = () => {
     };
     fetchUsers();
   }, []);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("location");
-
-    if (user?.location?.country) {
-      localStorage.setItem("location", user.location.country);
-      setLocation(user.location.country);
-    } else if (stored) {
-      setLocation(stored);
-    }
-  }, [user]);
+ console.log("redux user",user)
 
   const toggleFilters = () => setShowFilters(!showFilters);
 
@@ -146,8 +135,16 @@ const Feed = () => {
           <TabsContent value="nearby">
             {loading ? (
               <div>Loading users...</div>
-            ) : location ? (
-              <Cards users={users} city={location} searchQuery={searchQuery} countriesFilter={appliedCountries} />
+            ) : user?.location?.country ? (
+              <Cards
+                users={users.filter(
+                  (u) =>
+                    u.location?.country?.toLowerCase() === user.location?.country?.toLowerCase()
+                )}
+                city={user.location.country}
+                searchQuery={searchQuery}
+                countriesFilter={appliedCountries}
+              />
             ) : (
               <div>Detecting location...</div>
             )}
