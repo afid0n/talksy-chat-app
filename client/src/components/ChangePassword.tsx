@@ -3,18 +3,19 @@ import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 import { changePassword } from "@/services/profileService";
 import type { ChangePasswordPayload } from "@/services/profileService";
+import type { RootState } from "../store/store"
+import { useSelector } from "react-redux";
 
 export default function ChangePassword() {
   const [showPassword, setShowPassword] = useState(false);
-  const userId = "6880b7cd8696aad839edf500";
-
+  const userSate = useSelector((state: RootState) => state.user);
   const toggleVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
   const formik = useFormik({
     initialValues: {
-      currentPassword: "",
+      currentPassword: userSate.password || "",
       newPassword: "",
       confirmPassword: "",
     },
@@ -37,7 +38,7 @@ export default function ChangePassword() {
       };
 
       try {
-        const response = await changePassword(userId, payload);
+        const response = await changePassword(userSate.id, payload);
 
         enqueueSnackbar(response.message || "Password updated successfully!", {
           variant: "success",
