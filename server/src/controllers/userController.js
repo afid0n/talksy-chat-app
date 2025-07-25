@@ -3,6 +3,7 @@ const userService = require('../services/userService');
 const { generateToken } = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/mailService');
 const { SERVER_URL, CLIENT_URL } = require('../config/config');
+const { get } = require('../schemas/userSchema');
 
 
 const registerUser = async (req, res, next) => {
@@ -201,6 +202,35 @@ const changePassword = async (req, res) => {
   }
 };
 
+const User = require('../models/userModel');
+const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({
+      id: user._id,
+      fullName: user.fullName,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      location: user.location,
+      interests: user.interests,
+      birthday: user.birthday,
+      avatar: user.avatar,
+      authProvider: user.authProvider,
+      language: user.language || "en",
+    });
+  } catch (error) {
+    console.error("Get current user error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+
 module.exports = {
   getUserById,
   getUserByEmail,
@@ -212,4 +242,5 @@ module.exports = {
   deleteUser,
   resendVerificationEmail,
   changePassword
+  , getCurrentUser
 };
