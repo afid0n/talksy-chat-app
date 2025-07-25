@@ -248,8 +248,7 @@ const getCurrentUser = async (req, res) => {
       authProvider: user.authProvider,
       language: user.language || "en",
       bio: user.bio,
-      emailVerified: user.emailVerified,  
-      
+      emailVerified: user.emailVerified,
     });
   } catch (error) {
     console.error("Get current user error:", error);

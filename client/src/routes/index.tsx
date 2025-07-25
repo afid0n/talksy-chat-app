@@ -1,3 +1,4 @@
+import RequireAuth from "@/components/ProtectedAuth";
 import AuthLayout from "../layouts/AuthLayout";
 import ClientLayout from "../layouts/ClientLayout";
 import ForgotPassword from "../pages/auth/ForgotPassword";
@@ -12,58 +13,70 @@ import Profile from "../pages/client/Profile";
 import NotFound from "../pages/Common/NotFound";
 
 const ROUTES = [
-    {
-        path: "/",
-        element: <Home />
-    },
-    {
-        path: "/",
-        element: <ClientLayout />,
-        children: [
-            {
-                path: "chat",
-                element: <Chat />
-            },
-            {
-                path: "feed",
-                element: <Feed />
-            },
-            {
-                path: "profile",
-                element: <Profile />
-            },
-        ]
-    },
-    {
-        path: "/auth/",
-        element: <AuthLayout />,
-        children: [
-            {
-                path: "login",
-                element: <Login />,
-            },
-            {
-                path: "register",
-                element: <Register />,
-            },
-            {
-                path: "forgot-password",
-                element: <ForgotPassword />,
-            },
-            {
-                path: "reset-password",
-                element: <ResetPassword />,
-            },
-            {
-                path: "email-verified",
-                element: <VerifyEmail />,
-            }
-        ]
-    },
-    {
-        path: "*",
-        element: <NotFound />,
-    }
-]
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/",
+    element: <ClientLayout />,
+    children: [
+      {
+        path: "chat",
+        element: (
+          <RequireAuth>
+            <Chat />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "feed",
+        element: (
+          <RequireAuth>
+            <Feed />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <RequireAuth>
+            <Profile />
+          </RequireAuth>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/auth/",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "reset-password/:token", 
+        element: <ResetPassword />,
+      },
+      {
+        path: "email-verified",
+        element: <VerifyEmail />,
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
+  },
+];
 
-export default ROUTES
+export default ROUTES;
