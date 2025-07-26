@@ -400,6 +400,68 @@ const cancelFriendRequest = async (req, res, next) => {
 };
 
 
+const getFriends = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate({
+      path: "friends",
+      select: "_id username fullName avatar", // only what's needed for messages
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // You can shape the response if needed
+    const friendsList = user.friends.map(friend => ({
+      id: friend._id,
+      username: friend.username,
+      fullName: friend.fullName,
+      avatar: friend.avatar,
+    }));
+
+    res.status(200).json(friendsList);
+  } catch (error) {
+    console.error("Error fetching friends:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const removeFriend = async (req, res, next) => {
+  const userId = req.user.id;
+  const friendId = req.params.friendId;
+
+  if (userId === friendId) {
+    return res.status(400).json({ message: "You cannot remove yourself." });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    const friend = await User.findById(friendId);
+
+    if (!user || !friend) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Check if they are friends
+    if (!user.friends.includes(friendId)) {
+      return res.status(400).json({ message: "You are not friends." });
+    }
+
+    // Remove friendId from user's friends list
+    user.friends = user.friends.filter(id => id.toString() !== friendId.toString());
+    // Remove userId from friend's friends list
+    friend.friends = friend.friends.filter(id => id.toString() !== userId.toString());
+
+    await user.save();
+    await friend.save();
+
+    res.status(200).json({ message: "Friend removed successfully." });
+  } catch (error) {
+    console.error("Remove friend error:", error);
+    next(error);
+  }
+};
+
 
 
 
@@ -420,5 +482,7 @@ module.exports = {
   getCurrentUser,
   sendFriendRequest,
   acceptFriendRequest,
-  cancelFriendRequest
+  cancelFriendRequest,
+  getFriends
+  , removeFriend
 };
