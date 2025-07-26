@@ -9,6 +9,7 @@ import { loginValidationSchema } from '@/validations/authValidation';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '@/redux/userSlice';
 import type { UserState } from '@/types/User';
+import instance from '@/services/instance';
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -25,28 +26,22 @@ export default function LoginForm() {
       setLoading(true);
       try {
         // Step 1: login to get token
-        const response = await loginUser(values);
+        const response = await loginUser(values); // this sets cookies
 
-        if (!response?.token) {
+        if (response?.message !== "login successful") {
           enqueueSnackbar(response.message || "Invalid login response", { variant: "error" });
           return;
         }
 
-        const token = response.token;
-        console.log("Login token:", response.token);
-
-        // Step 2: get user with token
-        const userRes = await axios.get<UserState>("http://localhost:7070/users/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        // Now get user info from /users/me using credentials (cookies will be sent)
+        const userRes = await instance.get<UserState>("/users/me", {
+          withCredentials: true,
         });
 
         const user = userRes.data;
 
         const fullUser: UserState = {
           ...user,
-          token,
           isAuthenticated: true,
         };
 
@@ -109,8 +104,8 @@ export default function LoginForm() {
             name="email"
             placeholder="Enter email or username"
             className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.email && formik.touched.email
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
               }`}
             value={formik.values.email}
             onChange={formik.handleChange}
@@ -131,8 +126,8 @@ export default function LoginForm() {
             name="password"
             placeholder="Enter your password"
             className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.password && formik.touched.password
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
               }`}
             value={formik.values.password}
             onChange={formik.handleChange}

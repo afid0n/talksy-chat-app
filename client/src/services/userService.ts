@@ -1,6 +1,5 @@
 import type {
   LoginPayload,
-  LoginResponse,
   RegisterPayload,
   RegisterResponse
 } from "@/types/Auth";
@@ -25,15 +24,21 @@ export const registerUser = async (
 // Login user
 export const loginUser = async (
   credentials: LoginPayload
-): Promise<LoginResponse> => {
+): Promise<{ message: string }> => {
   try {
-    const response = await instance.post<LoginResponse>("/users/login", credentials);
+    const response = await instance.post<{ message: string }>(
+      "/users/login",
+      credentials,
+      { withCredentials: true }
+    );
+
     return response.data;
   } catch (error: unknown) {
     const err = error as AxiosError<{ message?: string }>;
     throw new Error(err.response?.data?.message || err.message || "Failed to login.");
   }
 };
+
 
 // Resend verification email
 export const resendVerificationEmail = async (email: string): Promise<{ success: boolean; message: string }> => {

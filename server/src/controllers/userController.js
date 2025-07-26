@@ -168,18 +168,17 @@ const login = async (req, res, next) => {
 
     console.log("RESPONSE ON SERVER: ", response);
 
-    res.cookie("refreshToken", response.refreshToken, {
+    res.cookie("token", response.accessToken, {
       httpOnly: true,
-      secure: true, 
-      sameSite: "strict",
-      path: "/auth/refresh",
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      secure: true,
+      sameSite: "Lax", // more frontend-friendly than "strict"
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
       message: response.message,
-      token: response.accessToken,
     });
+
   } catch (error) {
     res.json({
       message: error.message || "internal server error",
@@ -366,7 +365,7 @@ module.exports = {
   resetPassword,
   forgotPassword,
   changePassword,
-   getCurrentUser,
-   sendFriendRequest,
-   acceptFriendRequest,
+  getCurrentUser,
+  sendFriendRequest,
+  acceptFriendRequest,
 };
