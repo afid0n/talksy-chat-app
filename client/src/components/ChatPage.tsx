@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store/store";
 
 interface Message {
-  _id?: string;
+  _id: string;
   from: "me" | "other";
   text: string;
   time: string;
@@ -28,6 +28,7 @@ const ChatPage = () => {
   const currentUser = useSelector((state: RootState) => state.user);
   const currentUserId = currentUser?.id || "";
 
+  // Map API or socket raw message to our UI Message type
   const mapMessages = (apiMessages: any[]): Message[] =>
     apiMessages.map((msg) => {
       const senderId =
@@ -36,7 +37,7 @@ const ChatPage = () => {
           : msg.sender;
 
       return {
-        _id: msg._id || msg.id,
+        _id: msg._id || msg.id || `msg_${Math.random()}`, // fallback ID just in case
         from: String(senderId) === String(currentUserId) ? "me" : "other",
         text: msg.content || msg.text || "",
         time: msg.createdAt || msg.time || new Date().toISOString(),
@@ -45,6 +46,7 @@ const ChatPage = () => {
       };
     });
 
+  // Fetch messages from API when userId changes
   useEffect(() => {
     if (!userId) return;
     const fetchMessages = async () => {
@@ -58,26 +60,35 @@ const ChatPage = () => {
     fetchMessages();
   }, [userId]);
 
+  // Scroll to bottom on messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Join/leave room on userId change
   useEffect(() => {
+    if (!userId) return;
+
+    // Clear messages when switching chat
     setMessages([]);
-    if (userId) socket.emit("joinRoom", userId);
+
+    socket.emit("joinRoom", userId);
+
     return () => {
-      if (userId) socket.emit("leaveRoom", userId);
+      socket.emit("leaveRoom", userId);
     };
   }, [userId]);
 
+  // Handle incoming socket messages
   useEffect(() => {
-    const handleReceiveMessage = (msg: Message) => {
-      setMessages(prev => {
-        // Avoid duplicate messages by _id
-        if (prev.find(m => m._id === msg._id)) {
-          return prev; // message already exists, do nothing
-        }
-        return [...prev, msg];
+    const handleReceiveMessage = (msg: any) => {
+      // Map raw incoming message to UI Message
+      const mappedMsg = mapMessages([msg])[0];
+
+      setMessages((prev) => {
+        // Prevent duplicate messages by _id
+        if (prev.some((m) => m._id === mappedMsg._id)) return prev;
+        return [...prev, mappedMsg];
       });
     };
 
@@ -88,7 +99,7 @@ const ChatPage = () => {
     };
   }, [userId]);
 
-
+  // Send a message
   const sendMessage = async (text: string, isGif = false) => {
     if (!text.trim() || !userId) return;
 
@@ -109,6 +120,7 @@ const ChatPage = () => {
     setGifSearchTerm("");
 
     try {
+      // Save message to backend
       const savedMessageRes = await instance.post(`/chats/${userId}/messages`, {
         sender: currentUserId,
         content: text,
@@ -118,13 +130,13 @@ const ChatPage = () => {
       });
 
       const savedMessage = mapMessages([savedMessageRes.data])[0];
-      savedMessage.from = "me";
 
-      // Replace temp message with the saved message
+      // Replace temp message with saved message (with real ID)
       setMessages((prev) =>
         prev.map((msg) => (msg._id === tempId ? savedMessage : msg))
       );
 
+      // Notify others via socket
       socket.emit("sendMessage", {
         chatId: userId,
         senderId: currentUserId,
@@ -133,6 +145,7 @@ const ChatPage = () => {
       });
     } catch (error) {
       console.error("Failed to send message:", error);
+      // Remove temp message if failed to send
       setMessages((prev) => prev.filter((msg) => msg._id !== tempId));
     }
   };
@@ -172,11 +185,12 @@ const ChatPage = () => {
 
         {messages.map((msg, index) => (
           <div
-            key={msg._id ?? `${msg.time}-${index}`}
-            className={`max-w-xs p-2 rounded-lg text-sm ${msg.from === "me"
+            key={msg._id}
+            className={`max-w-xs p-2 rounded-lg text-sm ${
+              msg.from === "me"
                 ? "bg-green-500 text-white self-end"
                 : "bg-gray-200 dark:bg-zinc-700 text-black dark:text-white self-start"
-              }`}
+            }`}
           >
             {msg.isGif ? (
               <img
@@ -198,7 +212,6 @@ const ChatPage = () => {
             </span>
           </div>
         ))}
-
 
         <div ref={messagesEndRef} />
       </div>

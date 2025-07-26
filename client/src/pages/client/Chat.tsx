@@ -5,6 +5,7 @@ import Messages from "@/components/Messages";
 
 import type { Message } from "@/services/messageService";
 import { fetchMessagesForChat } from "@/services/messageService";
+import { getPrivateChat } from "@/services/chatService"; // Your service to get/create chat by friendId
 
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store/store";
@@ -21,31 +22,51 @@ type ChatPreview = {
     createdAt: string;
   };
   updatedAt?: string;
+  chatId?: string; // optional, you can add it if backend returns it
 };
 
-
 const ChatWrapper = () => {
+  const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<ChatPreview[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
 
   const currentUser = useSelector((state: RootState) => state.user);
 
-  // Load chat previews
+  // Load chat previews on mount
   useEffect(() => {
     getChatPreviewsForUser()
       .then(setConversations)
       .catch(console.error);
   }, []);
 
-  // Automatically select first chat if none selected
+  // When conversations load, select first friend (user id)
   useEffect(() => {
-    if (conversations.length > 0 && !selectedChatId) {
-      setSelectedChatId(conversations[0].friendId);
+    if (conversations.length > 0 && !selectedFriendId) {
+      const firstFriendId = conversations[0].friendId;
+      setSelectedFriendId(firstFriendId);
     }
-  }, [conversations, selectedChatId]);
+  }, [conversations, selectedFriendId]);
 
-  // Load messages and handle socket events when chat changes
+  // When selectedFriendId changes, get or create the private chat and set selectedChatId (chat._id)
+  useEffect(() => {
+    if (!selectedFriendId) {
+      setSelectedChatId(null);
+      setMessages([]);
+      return;
+    }
+
+    getPrivateChat(selectedFriendId)
+      .then((chat) => {
+        setSelectedChatId(chat._id);
+      })
+      .catch((err) => {
+        console.error("Failed to get private chat:", err);
+        setSelectedChatId(null);
+      });
+  }, [selectedFriendId]);
+
+  // Load messages & handle socket on selectedChatId change
   useEffect(() => {
     if (!selectedChatId) {
       setMessages([]);
@@ -78,18 +99,18 @@ const ChatWrapper = () => {
         });
       }
 
-      // Update conversations preview with new last message
+      // Update conversations preview last message based on friendId matching
       setConversations((prev) =>
         prev.map((chat) =>
-          chat.friendId === message.chat
+          chat.friendId === selectedFriendId
             ? {
-              ...chat,
-              lastMessage: {
-                content: message.content,
-                createdAt: new Date().toISOString(),
-              },
-              updatedAt: new Date().toISOString(),
-            }
+                ...chat,
+                lastMessage: {
+                  content: message.content,
+                  createdAt: new Date().toISOString(),
+                },
+                updatedAt: new Date().toISOString(),
+              }
             : chat
         )
       );
@@ -101,7 +122,7 @@ const ChatWrapper = () => {
       socket.emit("leaveRoom", selectedChatId);
       socket.off("receiveMessage", handleIncomingMessage);
     };
-  }, [selectedChatId, currentUser.id]);
+  }, [selectedChatId, currentUser.id, selectedFriendId]);
 
   return (
     <div className="flex min-h-screen w-full h-full">
@@ -110,7 +131,7 @@ const ChatWrapper = () => {
           id: chat.friendId,
           name: chat.fullName || "Unnamed Chat",
           username: chat.username,
-          avatarUrl: chat.avatar?.url || "",   // pass avatar url here
+          avatarUrl: chat.avatar?.url || "",
           lastMessage: chat.lastMessage?.content || "",
           lastMessageTime: chat.lastMessage?.createdAt
             ? new Date(chat.lastMessage.createdAt).toLocaleTimeString()
@@ -118,19 +139,18 @@ const ChatWrapper = () => {
           unreadCount: 0,
           initials: chat.fullName
             ? chat.fullName
-              .split(" ")
-              .map((word) => word[0])
-              .join("")
-              .toUpperCase()
+                .split(" ")
+                .map((word) => word[0])
+                .join("")
+                .toUpperCase()
             : "C",
           isGroup: chat.isGroup,
         }))}
-        selectedId={selectedChatId}
-        onSelect={setSelectedChatId}
+        selectedId={selectedFriendId}
+        onSelect={(friendId) => setSelectedFriendId(friendId)}
         searchQuery=""
-        onSearchChange={() => { }}
+        onSearchChange={() => {}}
       />
-
 
       <ChatPage
         selectedId={selectedChatId}
