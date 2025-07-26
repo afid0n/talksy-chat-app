@@ -34,6 +34,7 @@ import axios from "axios"
 import { enqueueSnackbar } from "notistack"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/redux/store/store"
+import { acceptFriendRequest, cancelFriendRequest } from "@/services/userService"
 
 
 const Profile = () => {
@@ -77,28 +78,43 @@ const Profile = () => {
 
   const handleAccept = async (requesterId: string) => {
     try {
-      const res = await axios.post(
-        `http://localhost:7070/users/accept-request/${requesterId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      enqueueSnackbar(res.data.message, { variant: "success" });
+      const res = await acceptFriendRequest(requesterId);
+      enqueueSnackbar(res.message || "Request accepted", { variant: "success" });
 
-      // Local state update
-      setUserr((prev) =>
+      // Remove accepted request locally
+      setUserr((prev: any) =>
         prev
           ? {
               ...prev,
-              friendRequests: prev.friendRequests.filter((u) => u._id !== requesterId),
+              friendRequests: prev.friendRequests.filter(
+                (u: any) => u.id !== requesterId && u._id !== requesterId
+              ),
             }
           : prev
       );
-    } catch  {
-        enqueueSnackbar( "Error", { variant: "error" });
+    } catch (error) {
+      enqueueSnackbar("Error accepting request", { variant: "error" });
+    }
+  };
+
+  const handleCancel = async (requesterId: string) => {
+    try {
+      const res = await cancelFriendRequest(requesterId);
+      enqueueSnackbar(res.message || "Request cancelled", { variant: "info" });
+
+      // Remove cancelled request locally
+      setUserr((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              friendRequests: prev.friendRequests.filter(
+                (u: any) => u.id !== requesterId && u._id !== requesterId
+              ),
+            }
+          : prev
+      );
+    } catch (error) {
+      enqueueSnackbar("Error cancelling request", { variant: "error" });
     }
   };
 
@@ -340,44 +356,45 @@ const Profile = () => {
         </TabsContent>
       </Tabs>
 
-      <div className="max-w-2xl mx-auto mt-6">
-  <h2 className="text-xl font-bold mb-4">Friend Requests</h2>
-  {!userr?.friendRequests || userr.friendRequests.length === 0 ? (
-    <p className="text-gray-500">You have no friend requests.</p>
-  ) : (
-    userr.friendRequests.map((req) => (
-      <div
-        key={req._id}
-        className="flex items-center justify-between bg-white dark:bg-zinc-800 p-4 mb-3 rounded shadow"
-      >
-        <div className="flex items-center gap-3">
-          <img
-            src={req.avatar?.url}
-            alt={req.username}
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <div>
-            <p className="font-semibold">{req.fullName}</p>
-            <p className="text-sm text-gray-500">@{req.username}</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button
-          onClick={() => handleAccept(req.id)}
-            className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            Accept
-          </button>
-          {/* <button
-            className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Reject
-          </button> */}
-        </div>
+ <div className="max-w-2xl mx-auto mt-6">
+        <h2 className="text-xl font-bold mb-4">Friend Requests</h2>
+        {!userr?.friendRequests || userr.friendRequests.length === 0 ? (
+          <p className="text-gray-500">You have no friend requests.</p>
+        ) : (
+          userr.friendRequests.map((req: any) => (
+            <div
+              key={req.id || req._id}
+              className="flex items-center justify-between bg-white dark:bg-zinc-800 p-4 mb-3 rounded shadow"
+            >
+              <div className="flex items-center gap-3">
+                <img
+                  src={req.avatar?.url || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+                  alt={req.username}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div>
+                  <p className="font-semibold">{req.fullName}</p>
+                  <p className="text-sm text-gray-500">@{req.username}</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleAccept(req.id || req._id)}
+                  className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => handleCancel(req.id || req._id)}
+                  className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
     </div>
   )
 }

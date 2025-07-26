@@ -44,5 +44,6 @@ router.post('/reset-password', userController.resetPassword);
 
 router.post('/send-request/:targetId', verifyAccessToken, userController.sendFriendRequest);
 router.post('/accept-request/:requesterId', verifyAccessToken, userController.acceptFriendRequest);
+router.post("/cancel-request/:targetId", verifyAccessToken, userController.cancelFriendRequest);
 
 module.exports = router;

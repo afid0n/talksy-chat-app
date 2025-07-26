@@ -231,9 +231,13 @@ const resetPassword = async (req, res, next) => {
 
 const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id)
+      .select('-password') // don't send password
+      .populate('friends', '_id username fullName avatar'); // optional: populate friend info
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     res.json({
       id: user._id,
@@ -249,13 +253,14 @@ const getCurrentUser = async (req, res) => {
       language: user.language || "en",
       bio: user.bio,
       emailVerified: user.emailVerified,
+      friends: user.friends?.map(friend => friend._id), // send only IDs
     });
   } catch (error) {
     console.error("Get current user error:", error);
     res.status(500).json({ message: "Server error" });
-
   }
 };
+
 
 
 
@@ -280,27 +285,35 @@ const sendFriendRequest = async (req, res, next) => {
   const targetId = req.params.targetId;
 
   if (senderId === targetId) {
-    return res.status(400).json({ message: "You cannot send request to yourself." });
+    return res.status(400).json({ message: "You cannot send a request to yourself." });
   }
 
   try {
-    const targetUser = await User.findById(targetId);
-    const senderUser = await User.findById(senderId);
+    const [targetUser, senderUser] = await Promise.all([
+      User.findById(targetId),
+      User.findById(senderId),
+    ]);
 
     if (!targetUser || !senderUser) {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // artıq dostdurlarsa
+    // ✅ Check if already friends
     if (targetUser.friends.includes(senderId)) {
       return res.status(400).json({ message: "You are already friends." });
     }
 
-    // artıq sorğu göndərilibsə
+    // ✅ Check if request already sent
     if (targetUser.friendRequests.includes(senderId)) {
       return res.status(400).json({ message: "Friend request already sent." });
     }
 
+    // ✅ Check if the target user has sent you a request (reverse)
+    if (senderUser.friendRequests.includes(targetId)) {
+      return res.status(400).json({ message: "This user has already sent you a friend request." });
+    }
+
+    // ✅ All good: push request
     targetUser.friendRequests.push(senderId);
     await targetUser.save();
 
@@ -309,6 +322,7 @@ const sendFriendRequest = async (req, res, next) => {
     next(err);
   }
 };
+
 
 const acceptFriendRequest = async (req, res, next) => {
   const receiverId = req.user.id;
@@ -349,6 +363,40 @@ const acceptFriendRequest = async (req, res, next) => {
   }
 };
 
+const cancelFriendRequest = async (req, res, next) => {
+  const senderId = req.user.id;
+  const targetId = req.params.targetId;
+
+  if (senderId === targetId) {
+    return res.status(400).json({ message: "You cannot cancel a request to yourself." });
+  }
+
+  try {
+    const targetUser = await User.findById(targetId);
+
+    if (!targetUser) {
+      return res.status(404).json({ message: "Target user not found." });
+    }
+
+    // Check if a request exists
+    const index = targetUser.friendRequests.indexOf(senderId);
+
+    if (index === -1) {
+      return res.status(400).json({ message: "No friend request to cancel." });
+    }
+
+    // Remove senderId from target's requests
+    targetUser.friendRequests.splice(index, 1);
+    await targetUser.save();
+
+    res.status(200).json({ message: "Friend request canceled successfully." });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
 
 
 module.exports = {
@@ -368,4 +416,5 @@ module.exports = {
   getCurrentUser,
   sendFriendRequest,
   acceptFriendRequest,
+  cancelFriendRequest
 };
