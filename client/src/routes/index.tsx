@@ -31,7 +31,7 @@ const ROUTES = [
         ),
       },
           {
-        path: "chat/:userId",
+        path: "chat/:chatId",
         element: (
           <RequireAuth>
             <ChatPage /> 
@@ -73,7 +73,7 @@ const ROUTES = [
         element: <ForgotPassword />,
       },
       {
-        path: "reset-password/:token", 
+        path: "reset-password", 
         element: <ResetPassword />,
       },
       {

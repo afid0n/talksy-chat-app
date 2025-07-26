@@ -1,12 +1,12 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { useTheme } from "@/components/theme-provider"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/theme-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Heart,
   Key,
@@ -17,27 +17,24 @@ import {
   Shield,
   Star,
   Sun,
-
   Users,
   X,
-} from "lucide-react"
-import { useEffect, useState } from "react"
-import NotificationsPanel from "@/components/NotificationsPanel"
-import PrivacySettings from "@/components/PrivacySettings"
-import PersonalInformation from "@/components/PersonalInformation"
-import ChangePassword from "@/components/ChangePassword"
-
-import moment from "moment"
-import { useAppSelector } from "@/redux/store/hooks"
-import type { UserState } from "@/types/User"
-import axios from "axios"
-import { enqueueSnackbar } from "notistack"
-import { useSelector } from "react-redux"
-import type { RootState } from "@/redux/store/store"
-import { acceptFriendRequest, cancelFriendRequest } from "@/services/userService"
-import { t } from "i18next"
-import i18n from "@/i18n/config"
-
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import NotificationsPanel from "@/components/NotificationsPanel";
+import PrivacySettings from "@/components/PrivacySettings";
+import PersonalInformation from "@/components/PersonalInformation";
+import ChangePassword from "@/components/ChangePassword";
+import moment from "moment";
+import { useAppSelector } from "@/redux/store/hooks";
+import type { UserState } from "@/types/User";
+import axios from "axios";
+import { enqueueSnackbar } from "notistack";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store/store";
+import { acceptFriendRequest, cancelFriendRequest } from "@/services/userService";
+import { t } from "i18next";
+import i18n from "@/i18n/config";
 
 const Profile = () => {
   const { setTheme } = useTheme();
@@ -45,23 +42,21 @@ const Profile = () => {
   const user = useAppSelector((state) => state.user) as UserState;
   const [language, setLanguage] = useState("en");
   const token = useSelector((state: RootState) => state.user.token);
+
   function formatDate(dateStr?: string | null): string {
     if (!dateStr) return "";
     return moment(dateStr).locale("az").format("LL, HH:mm");
   }
-  const changeLanguage = (langCode: string) => {
-  setLanguage(langCode);
-  i18n.changeLanguage(langCode);
-};
 
-  console.log(user);
+  const changeLanguage = (langCode: string) => {
+    setLanguage(langCode);
+    i18n.changeLanguage(langCode);
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:7070/users/${user.id}`
-        );
+        const res = await axios.get(`http://localhost:7070/users/${user.id}`);
         setUserr(res.data);
         console.log("User:", res.data);
       } catch (err) {
@@ -72,22 +67,17 @@ const Profile = () => {
     fetchUser();
   }, []);
 
-  console.log("userr:", userr);
-
   const handleThemeChange = (theme: "light" | "dark" | "system") => {
-    setTheme(theme)
-    localStorage.setItem("vite-ui-theme", theme)
-    window.dispatchEvent(new Event("vite-ui-theme-change"))
-  }
-
-
+    setTheme(theme);
+    localStorage.setItem("vite-ui-theme", theme);
+    window.dispatchEvent(new Event("vite-ui-theme-change"));
+  };
 
   const handleAccept = async (requesterId: string) => {
     try {
       const res = await acceptFriendRequest(requesterId);
       enqueueSnackbar(res.message || "Request accepted", { variant: "success" });
 
-      // Remove accepted request locally
       setUserr((prev: any) =>
         prev
           ? {
@@ -108,7 +98,6 @@ const Profile = () => {
       const res = await cancelFriendRequest(requesterId);
       enqueueSnackbar(res.message || "Request cancelled", { variant: "info" });
 
-      // Remove cancelled request locally
       setUserr((prev: any) =>
         prev
           ? {
@@ -124,7 +113,6 @@ const Profile = () => {
     }
   };
 
-
   return (
     <div className="px-2 sm:px-4 md:px-8 lg:px-20 py-8 sm:py-12 md:py-14">
       {/* Top Profile Card */}
@@ -133,10 +121,10 @@ const Profile = () => {
           <div className="w-20 h-20 bg-yellow-600 text-white font-bold text-2xl flex items-center justify-center rounded-full">
             {user?.fullName
               ? user.fullName
-                .split(" ")
-                .map(word => word[0])
-                .join("")
-                .toUpperCase()
+                  .split(" ")
+                  .map((word) => word[0])
+                  .join("")
+                  .toUpperCase()
               : ""}
           </div>
           <div className="absolute bottom-0 right-0 bg-white dark:bg-zinc-900 p-1 rounded-full shadow">
@@ -158,16 +146,14 @@ const Profile = () => {
         </div>
 
         <div className="flex-1 text-center md:text-left">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {user?.fullName}
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{user?.fullName}</h2>
           <p className="text-gray-600 dark:text-gray-400">{user?.email}</p>
           <p className="text-gray-700 dark:text-gray-300 mt-2 max-w-md mx-auto md:mx-0">
             {user?.bio}
           </p>
-          <div className="flex xs:flex-row items-center gap-2 xs:gap-4 mt-4 justify-center md:justify-start text-sm text-gray-600 dark:text-gray-400">
-            <span className="flex items-center gap-1">{user?.location?.country}</span>
-            <span className="flex items-center gap-1">📅 {formatDate(user?.createdAt)}</span>
+          <div className="flex items-center gap-4 mt-4 justify-center md:justify-start text-sm text-gray-600 dark:text-gray-400">
+            <span>{user?.location?.country}</span>
+            <span>📅 {formatDate(user?.createdAt)}</span>
           </div>
         </div>
 
@@ -201,7 +187,6 @@ const Profile = () => {
         {/* Overview */}
         <TabsContent value="overview">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
-            {/* Overview Cards */}
             {[
               {
                 count: 154,
@@ -222,7 +207,6 @@ const Profile = () => {
                 color: "purple",
               },
             ].map(({ count, label, icon: Icon, color }, idx) => (
-              <div>
               <div
                 key={idx}
                 className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm p-4 sm:p-6 flex items-center gap-4"
@@ -235,31 +219,48 @@ const Profile = () => {
                   <p className="text-gray-500 dark:text-gray-400 text-sm">{label}</p>
                 </div>
               </div>
-              </div>
             ))}
           </div>
 
-          {/* Quick Actions */}
-          <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-sm mt-8">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-              {t("quick_actions")}
-            </h3>
-            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4">
-              {[
-                { icon: MessageCircle, label: t("New_Chat"), color: "yellow" },
-                { icon: Users, label: t("friend_requests"), color: "blue" },
-                { icon: Settings, label: t("preferences"), color: "purple" },
-                { icon: Shield, label: t("Privacy"), color: "orange" },
-              ].map(({ icon: Icon, label, color }, idx) => (
+          {/* Friend Requests */}
+          <div className="max-w-2xl mx-auto mt-6">
+            <h2 className="text-xl font-bold mb-4">{t("friend_requests")}</h2>
+            {!userr?.friendRequests || userr.friendRequests.length === 0 ? (
+              <p className="text-gray-500">{t("no_friend_requests")}</p>
+            ) : (
+              userr.friendRequests.map((req: any) => (
                 <div
-                  key={idx}
-                  className={`flex flex-col items-center justify-center bg-${color}-50 dark:bg-${color}-900 hover:bg-${color}-100 dark:hover:bg-${color}-800 transition rounded-lg p-3 sm:p-4`}
+                  key={req.id || req._id}
+                  className="flex items-center justify-between bg-white dark:bg-zinc-800 p-4 mb-3 rounded shadow"
                 >
-                  <Icon className={`text-${color}-600 mb-2`} />
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{label}</p>
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={req.avatar?.url || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+                      alt={req.username}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-semibold">{req.fullName}</p>
+                      <p className="text-sm text-gray-500">@{req.username}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleAccept(req.id || req._id)}
+                      className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+                    >
+                      {t("accept")}
+                    </button>
+                    <button
+                      onClick={() => handleCancel(req.id || req._id)}
+                      className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      {t("cancel")}
+                    </button>
+                  </div>
                 </div>
-              ))}
-            </div>
+              ))
+            )}
           </div>
         </TabsContent>
 
@@ -279,10 +280,11 @@ const Profile = () => {
                 <button
                   key={lang.code}
                   onClick={() => changeLanguage(lang.code)}
-                  className={`flex items-center justify-center gap-2 border px-8 sm:px-12 py-3 sm:py-5 rounded-lg transition ${language === lang.code
-                    ? "bg-yellow-50 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200 border-yellow-500"
-                    : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800"
-                    }`}
+                  className={`flex items-center justify-center gap-2 border px-8 sm:px-12 py-3 sm:py-5 rounded-lg transition ${
+                    language === lang.code
+                      ? "bg-yellow-50 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200 border-yellow-500"
+                      : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800"
+                  }`}
                 >
                   <span className="text-xs font-medium">{lang.region}</span>
                   <span className="text-sm">{lang.label}</span>
@@ -302,7 +304,7 @@ const Profile = () => {
                 <div>
                   <p className="font-medium text-gray-800 dark:text-gray-100">
                     {t("dark_mode")}
-                    </p>
+                  </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {t("switch_theme")}
                   </p>
@@ -311,11 +313,8 @@ const Profile = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon">
-                    <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                    <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                    <span className="sr-only">
-                      {t("toggle_theme")}
-                      </span>
+                    <Sun className="h-[1.2rem] w-[1.2rem] transition dark:hidden" />
+                    <Moon className="h-[1.2rem] w-[1.2rem] hidden dark:inline-block" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -337,19 +336,13 @@ const Profile = () => {
 
         {/* Privacy */}
         <TabsContent value="privacy">
-          <div>
-            <PrivacySettings />
-          </div>
+          <PrivacySettings />
         </TabsContent>
 
         {/* Account */}
         <TabsContent className="flex flex-col justify-center gap-5" value="account">
-          <div>
-            <PersonalInformation userr={userr}/>
-          </div>
-          <div className="w-full">
-            <ChangePassword />
-          </div>
+          <PersonalInformation userr={userr} />
+          <ChangePassword />
           <div className="bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-400 rounded-xl p-4 sm:p-6 mt-6 space-y-4 shadow-sm">
             <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">{t("danger_zone")}</h3>
             <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3">
@@ -365,53 +358,8 @@ const Profile = () => {
           </div>
         </TabsContent>
       </Tabs>
-
- <div className="max-w-2xl mx-auto mt-6">
-        <h2 className="text-xl font-bold mb-4">
-          {t("friend_requests")}
-          </h2>
-        {!userr?.friendRequests || userr.friendRequests.length === 0 ? (
-          <p className="text-gray-500">
-            {t("no_friend_requests")}
-            </p>
-        ) : (
-          userr.friendRequests.map((req: any) => (
-            <div
-              key={req.id || req._id}
-              className="flex items-center justify-between bg-white dark:bg-zinc-800 p-4 mb-3 rounded shadow"
-            >
-              <div className="flex items-center gap-3">
-                <img
-                  src={req.avatar?.url || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
-                  alt={req.username}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-semibold">{req.fullName}</p>
-                  <p className="text-sm text-gray-500">@{req.username}</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleAccept(req.id || req._id)}
-                  className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
-                >
-                  {t("accept")}
-                  
-                </button>
-                <button
-                  onClick={() => handleCancel(req.id || req._id)}
-                  className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  {t("cancel")}
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

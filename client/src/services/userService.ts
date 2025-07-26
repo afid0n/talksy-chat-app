@@ -86,3 +86,14 @@ export const cancelFriendRequest = async (requesterId: string) => {
   const res = await instance.post(`/users/cancel-request/${requesterId}`, {}, );
   return res.data;
 };
+
+export const getChatPreviewsForUser = async () => {
+  const res = await instance.get("/users/chat-previews"); 
+ return res.data;
+ 
+
+};
+
+export const removeFriend = async (friendId: string): Promise<void> => {
+  await instance.delete(`/users/friends/${friendId}`);
+};

@@ -1,12 +1,17 @@
 const messageService = require('../services/messageSevice');
+const Message = require('../models/messageModel');
 
-const getMessageById = async (req, res, next) => {
-  try {
-    const message = await messageService.getMessageById(req.params.id);
-    if (!message) return res.status(404).json({ message: 'Message not found' });
-    res.json(message);
-  } catch (err) {
-    next(err);
+const getMessageById = async (req, res) => {
+   try {
+    const { chatId } = req.params;
+    const messages = await Message.find({ chat: chatId })
+      .populate("sender", "username fullName avatar")
+      .sort("createdAt");
+
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

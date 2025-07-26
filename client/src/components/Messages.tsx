@@ -13,19 +13,19 @@ interface Conversation {
 
 interface MessagesProps {
   conversations: Conversation[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  searchQuery: string;
+  onSearchChange: (val: string) => void;
 }
 
-const Messages: FC<MessagesProps> = ({ conversations }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
-  const { id: selectedId } = useParams<{ id: string }>();
-
-  const filteredConversations = conversations.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+const Messages: FC<MessagesProps> = ({
+  conversations,
+  selectedId,
+  onSelect,
+  searchQuery,
+  onSearchChange,
+}) => {
   return (
     <div className="border-r p-4 overflow-y-auto bg-white/70 dark:bg-zinc-700/70 dark:border-gray-700 min-h-screen w-80">
       <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
@@ -36,15 +36,15 @@ const Messages: FC<MessagesProps> = ({ conversations }) => {
         type="text"
         placeholder="Search conversations..."
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        onChange={(e) => onSearchChange(e.target.value)}
         className="w-full p-2 mb-4 border rounded dark:bg-zinc-800 dark:border-gray-600 dark:text-white"
       />
 
       <ul>
-        {filteredConversations.map((c) => (
+        {conversations.map((c) => (
           <li
             key={c.id}
-            onClick={() => navigate(`/chat/${c.id}`)}
+            onClick={() => onSelect(String(c.id))}
             className={`flex items-center justify-between p-3 mb-2 rounded-lg cursor-pointer transition-all ${
               selectedId === String(c.id)
                 ? "bg-yellow-100 dark:bg-yellow-800"
