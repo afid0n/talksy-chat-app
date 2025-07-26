@@ -5,8 +5,10 @@ const uploadMiddleware = require("../middlewares/uploadMiddleware");
 const  verifyAccessToken  = require('../middlewares/authToken');
 
 const verifyToken = require('../middlewares/authToken');
-const upload = uploadMiddleware("userImages");
+const upload = uploadMiddleware("users");
 
+console.log("📁 Type of upload:", typeof upload); // must be object
+console.log("🧾 Type of upload.single:", typeof upload.single); // must be function
 // Register user
 router.post('/register', userController.registerUser);
 
@@ -26,7 +28,7 @@ router.get('/', userController.getAllUsers);
 router.get("/me", verifyToken, userController.getCurrentUser);
 
 // Update user
-router.patch('/:id', userController.updateUser);
+router.patch('/:id',upload.single("profileImage"), userController.updateUser);
 // update password
 router.patch('/password/:id', userController.changePassword);
 

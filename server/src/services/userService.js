@@ -12,6 +12,7 @@ const {
 const { CLIENT_URL } = require('../config/config');
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME = 10 * 60 * 1000; //10 minutes
+const cloudinary = require('../config/cloudinaryConfig');
 
 const register = async (payload) => {
   try {
@@ -65,7 +66,6 @@ const getUserByEmail = async (email) => {
   const user = await User.findOne({ email });
   return user ? formatMongoData(user) : null;
 };
-
 
 
 const verifyEmailToken = async (token) => {
@@ -188,6 +188,14 @@ const updateUser = async (userId, updates) => {
     user.password = hashedPassword;
   }
 
+  if (updates.profileImage && updates.public_id) {
+    if (user.public_id) {
+      await cloudinary.uploader.destroy(user.public_id);
+    }
+    user.avatar = { url: updates.profileImage }; 
+    user.public_id = updates.public_id;
+  }
+
   // Digər sahələri update et (hər ehtimala qarşı manual)
   if (updates.fullName !== undefined) user.fullName = updates.fullName;
   if (updates.email !== undefined) user.email = updates.email;
@@ -207,7 +215,7 @@ const updateUser = async (userId, updates) => {
       phone: user.phone,
       location: user.location,
       bio: user.bio,
-      profileImage: user.profileImage,
+      avatar: user.avatar,
     },
   };
 };

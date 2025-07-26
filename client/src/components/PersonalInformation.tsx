@@ -3,8 +3,10 @@ import { FaInfo } from "react-icons/fa";
 import { useFormik } from "formik";
 import axios from "axios";
 import { enqueueSnackbar } from "notistack";
+import { useState } from "react";
 
 const PersonalInformation = ({ userr }) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -16,31 +18,57 @@ const PersonalInformation = ({ userr }) => {
         country: userr?.location?.country || "",
       },
       bio: userr.bio || "test bio",
+      profileImage: null,
     },
-    onSubmit: async (values) => {
-      try {
-        const response = await axios.patch(`http://localhost:7070/users/${userr.id}`, values);
-        console.log("User updated:", response.data);
-        enqueueSnackbar("Failed to update profile", {
-          variant: "success",
-          autoHideDuration: 2000,
-          anchorOrigin: {
-            vertical: "bottom",
-            horizontal: "right",
-          },
-        });
-      } catch (error) {
-        enqueueSnackbar("Failed to update profile", {
-          variant: "error",
-          autoHideDuration: 2000,
-          anchorOrigin: {
-            vertical: "bottom",
-            horizontal: "right",
-          },
-        });
-        console.error("Update failed:", error);
+onSubmit: async (values) => {
+  try {
+    const formData = new FormData();
+
+    formData.append("fullName", values.fullName);
+    formData.append("email", values.email);
+    formData.append("phone", values.phone);
+    formData.append("bio", values.bio);
+    formData.append("location[city]", values.location.city);
+    formData.append("location[country]", values.location.country);
+
+    // Şəkil varsa əlavə et
+    if (values.profileImage) {
+      formData.append("profileImage", values.profileImage);
+    }
+
+    const response = await axios.patch(
+      `http://localhost:7070/users/${userr.id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
-    },
+    );
+
+    console.log("User updated:", response.data);
+    enqueueSnackbar("Updated profile successfully", {
+      variant: "success",
+      autoHideDuration: 2000,
+      anchorOrigin: {
+        vertical: "bottom",
+        horizontal: "right",
+      },
+    });
+
+    // window.location.reload();
+  } catch (error) {
+    enqueueSnackbar("Failed to update profile", {
+      variant: "error",
+      autoHideDuration: 2000,
+      anchorOrigin: {
+        vertical: "bottom",
+        horizontal: "right",
+      },
+    });
+    console.error("Update failed:", error);
+  }
+}
   });
 
   return (
@@ -51,6 +79,17 @@ const PersonalInformation = ({ userr }) => {
       <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Personal Information</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <input
+  type="file"
+  accept="image/*"
+  onChange={(e) => {
+    if (e.currentTarget.files && e.currentTarget.files[0]) {
+      formik.setFieldValue("profileImage", e.currentTarget.files[0]);
+    }
+  }}
+  className="file-input"
+/>
         {/* Full Name */}
         <div className="space-y-1">
           <label className="text-sm font-medium flex items-center gap-1 text-gray-600 dark:text-gray-300">
