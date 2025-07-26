@@ -57,7 +57,7 @@ const register = async (payload) => {
 
 
 const getUserById = async (id) => {
-  const user = await User.findById(id);
+  const user = await User.findById(id).populate('friendRequests', 'id fullName username avatar bio').populate('friends', 'fullName username avatar bio id');
   return user ? formatMongoData(user) : null;
 };
 
@@ -218,7 +218,8 @@ const deleteUser = async (id) => {
 };
 
 const getAllUsers = async () => {
-  const users = await User.find();
+  const users = await User.find().populate('friendRequests', 'fullName username avatar bio')
+    .populate('friendRequests');
   return formatMongoData(users);
 };
 

@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const passport = require("passport");
-const { CLIENT_URL, JWT_SECRET } = require("../config/config");
 const jwt = require("jsonwebtoken");
+const { CLIENT_URL, JWT_SECRET } = require("../config/config");
 
 // Step 1: Redirect to Google
 router.get(
@@ -44,15 +44,12 @@ router.get(
       { expiresIn: "7d" }
     );
 
-
     res.cookie("token", accessToken, {
       httpOnly: true,
       secure: true,
       sameSite: "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-
-    //set refresh token to cookie
 
     res.redirect(`${CLIENT_URL}/feed`);
   }
