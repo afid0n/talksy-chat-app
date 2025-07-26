@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Cake,
   Heart,
   Key,
   LogOut,
@@ -30,27 +31,51 @@ import { useAppSelector } from "@/redux/store/hooks";
 import type { UserState } from "@/types/User";
 import axios from "axios";
 import { enqueueSnackbar } from "notistack";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store/store";
 import { acceptFriendRequest, cancelFriendRequest } from "@/services/userService";
 import { t } from "i18next";
 import i18n from "@/i18n/config";
+import { useNavigate } from "react-router-dom";
+import { logoutUser } from "@/redux/userSlice";
 
 const Profile = () => {
   const { setTheme } = useTheme();
   const [userr, setUserr] = useState<any>(null);
   const user = useAppSelector((state) => state.user) as UserState;
-  const [language, setLanguage] = useState("en");
+
+  // Initialize language from localStorage i18nextLng or default to 'en'
+  const [language, setLanguage] = useState(() => localStorage.getItem("i18nextLng") || "en");
   const token = useSelector((state: RootState) => state.user.token);
+
+  // State for likedUsers count (Favorites)
+  const [favoritesCount, setFavoritesCount] = useState(() => {
+    try {
+      const liked = JSON.parse(localStorage.getItem("likedUsers") || "[]");
+      return Array.isArray(liked) ? liked.length : 0;
+    } catch {
+      return 0;
+    }
+  });
 
   function formatDate(dateStr?: string | null): string {
     if (!dateStr) return "";
-    return moment(dateStr).locale("az").format("LL, HH:mm");
+    return moment(dateStr).locale("az").format("LL");
   }
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    enqueueSnackbar("Logged out successfully", { variant: "info" });
+    navigate("/auth/login");
+  };
 
   const changeLanguage = (langCode: string) => {
     setLanguage(langCode);
     i18n.changeLanguage(langCode);
+    localStorage.setItem("i18nextLng", langCode);
   };
 
   useEffect(() => {
@@ -65,33 +90,39 @@ const Profile = () => {
     };
 
     fetchUser();
-  }, []);
+  }, [user.id]);
 
-  const handleThemeChange = (theme: "light" | "dark" | "system") => {
+  const handleThemeChange = (theme: "light" | "dark") => {
     setTheme(theme);
     localStorage.setItem("vite-ui-theme", theme);
     window.dispatchEvent(new Event("vite-ui-theme-change"));
   };
 
-  const handleAccept = async (requesterId: string) => {
-    try {
-      const res = await acceptFriendRequest(requesterId);
-      enqueueSnackbar(res.message || "Request accepted", { variant: "success" });
+const handleAccept = async (requesterId: string) => {
+  try {
+    const res = await acceptFriendRequest(requesterId);
+    enqueueSnackbar(res.message || "Request accepted", { variant: "success" });
 
-      setUserr((prev: any) =>
-        prev
-          ? {
-              ...prev,
-              friendRequests: prev.friendRequests.filter(
-                (u: any) => u.id !== requesterId && u._id !== requesterId
-              ),
-            }
-          : prev
+    setUserr((prev: any) => {
+      if (!prev) return prev;
+
+      const acceptedUser = prev.friendRequests.find(
+        (u: any) => u.id === requesterId || u._id === requesterId
       );
-    } catch (error) {
-      enqueueSnackbar("Error accepting request", { variant: "error" });
-    }
-  };
+
+      return {
+        ...prev,
+        friendRequests: prev.friendRequests.filter(
+          (u: any) => u.id !== requesterId && u._id !== requesterId
+        ),
+        friends: acceptedUser ? [...(prev.friends || []), acceptedUser] : prev.friends
+      };
+    });
+  } catch (error) {
+    enqueueSnackbar("Error accepting request", { variant: "error" });
+  }
+};
+
 
   const handleCancel = async (requesterId: string) => {
     try {
@@ -118,14 +149,15 @@ const Profile = () => {
       {/* Top Profile Card */}
       <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-md p-4 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-6 w-full mb-6">
         <div className="relative flex-shrink-0">
-          <div className="w-20 h-20 bg-yellow-600 text-white font-bold text-2xl flex items-center justify-center rounded-full">
-            {user?.fullName
-              ? user.fullName
-                  .split(" ")
-                  .map((word) => word[0])
-                  .join("")
-                  .toUpperCase()
-              : ""}
+          <div className="w-20 h-20 bg-yellow-600 font-bold flex items-center justify-center rounded-full">
+            <img
+              src={
+                user.avatar?.url ||
+                "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+              }
+              alt={user.username}
+              className="w-20 h-20 rounded-full object-cover"
+            />
           </div>
           <div className="absolute bottom-0 right-0 bg-white dark:bg-zinc-900 p-1 rounded-full shadow">
             <svg
@@ -153,14 +185,10 @@ const Profile = () => {
           </p>
           <div className="flex items-center gap-4 mt-4 justify-center md:justify-start text-sm text-gray-600 dark:text-gray-400">
             <span>{user?.location?.country}</span>
-            <span>📅 {formatDate(user?.createdAt)}</span>
+            <span className="flex items-center gap-1">
+              <span><Cake size={17}/></span>
+               {formatDate(user?.birthday)}</span>
           </div>
-        </div>
-
-        <div className="self-start md:self-center w-full md:w-auto flex justify-center md:justify-end">
-          <button className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md text-sm font-semibold w-full md:w-auto">
-            ✏️ Edit Profile {t("edit_profile")}
-          </button>
         </div>
       </div>
 
@@ -201,7 +229,7 @@ const Profile = () => {
                 color: "blue",
               },
               {
-                count: 12,
+                count: favoritesCount, // <-- from localStorage
                 label: t("favorites"),
                 icon: Heart,
                 color: "purple",
@@ -223,7 +251,7 @@ const Profile = () => {
           </div>
 
           {/* Friend Requests */}
-          <div className="max-w-2xl mx-auto mt-6">
+          <div className=" mx-auto mt-6">
             <h2 className="text-xl font-bold mb-4">{t("friend_requests")}</h2>
             {!userr?.friendRequests || userr.friendRequests.length === 0 ? (
               <p className="text-gray-500">{t("no_friend_requests")}</p>
@@ -231,7 +259,7 @@ const Profile = () => {
               userr.friendRequests.map((req: any) => (
                 <div
                   key={req.id || req._id}
-                  className="flex items-center justify-between bg-white dark:bg-zinc-800 p-4 mb-3 rounded shadow"
+                  className="flex items-center justify-between bg-white dark:bg-zinc-900 p-4 mb-3 rounded-xl shadow"
                 >
                   <div className="flex items-center gap-3">
                     <img
@@ -346,7 +374,7 @@ const Profile = () => {
           <div className="bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-400 rounded-xl p-4 sm:p-6 mt-6 space-y-4 shadow-sm">
             <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">{t("danger_zone")}</h3>
             <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3">
-              <button className="flex items-center justify-center w-full gap-2 text-red-600 dark:text-red-200 bg-red-50 dark:bg-red-900 hover:bg-red-100 dark:hover:bg-red-800 border border-red-200 dark:border-red-400 font-medium py-2 px-4 rounded-md transition">
+              <button onClick={handleLogout} className="flex items-center justify-center w-full gap-2 text-red-600 dark:text-red-200 bg-red-50 dark:bg-red-900 hover:bg-red-100 dark:hover:bg-red-800 border border-red-200 dark:border-red-400 font-medium py-2 px-4 rounded-md transition">
                 <LogOut size={18} />
                 {t("sign_out")}
               </button>

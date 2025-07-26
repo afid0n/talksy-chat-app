@@ -131,7 +131,7 @@ export default function ChangePassword() {
       {/* Submit Button */}
       <button
         type="submit"
-        className="mt-4 bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded"
+        className="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded"
       >
         {t("update_password")}
         {/* Translated text for "Update Password" */}

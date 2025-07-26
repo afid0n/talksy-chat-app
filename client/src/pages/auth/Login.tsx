@@ -25,15 +25,16 @@ export default function LoginForm() {
     onSubmit: async (values) => {
       setLoading(true);
       try {
-        // Step 1: login to get token
-        const response = await loginUser(values); // this sets cookies
+        // Step 1: login to get token (cookies are set)
+        const response = await loginUser(values);
 
-        if (response?.message !== t("login_success")) {
-          enqueueSnackbar(response.message || "Invalid login response", { variant: "error" });
+        if (response?.message !== "login successful") {
+          enqueueSnackbar(response?.message || t("login_failed"), { variant: "error" });
           return;
         }
 
-        // Now get user info from /users/me using credentials (cookies will be sent)
+
+        // Step 2: Get user info
         const userRes = await instance.get<UserState>("/users/me", {
           withCredentials: true,
         });
@@ -49,8 +50,8 @@ export default function LoginForm() {
         dispatch(loginSuccess(fullUser));
 
         // Step 4: navigate
-        navigate("/feed");
         enqueueSnackbar(t("login_success"), { variant: "success" });
+        navigate("/feed");
 
       } catch (error: any) {
         const message = error.response?.data?.message || t("login_failed");
@@ -73,9 +74,10 @@ export default function LoginForm() {
           <span className="text-yellow-600">sy</span>
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mt-2">
-         {t("login_subtitle")}
+          {t("login_subtitle")}
         </p>
       </div>
+
       <form
         onSubmit={formik.handleSubmit}
         className="bg-white dark:bg-zinc-900 shadow-md rounded-lg p-8 w-full max-w-md border border-gray-200 dark:border-zinc-700"
@@ -85,12 +87,13 @@ export default function LoginForm() {
           onClick={() => window.location.href = `http://localhost:7070/auth/google`}
           className="flex items-center justify-center w-full py-2 mb-4 border border-gray-300 dark:border-zinc-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
         >
-          <FaGoogle className="mr-2" />{t("login_google")}
+          <FaGoogle className="mr-2" />
+          {t("login_google")}
         </button>
 
         <div className="flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm mb-4">
           <span className="border-t border-gray-300 dark:border-zinc-600 flex-grow" />
-          <span className="mx-3">{t("login_or_continue_with_email")} </span>
+          <span className="mx-3">{t("login_or_continue_with_email")}</span>
           <span className="border-t border-gray-300 dark:border-zinc-600 flex-grow" />
         </div>
 
@@ -119,11 +122,11 @@ export default function LoginForm() {
         {/* PASSWORD FIELD */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Password
+            {t("login_password_label")}
           </label>
           <input
             type="password"
-            name={t("login_password_label")}
+            name="password"
             placeholder={t("login_password_placeholder")}
             className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.password && formik.touched.password
               ? 'border-red-500 focus:ring-red-500'
@@ -140,7 +143,7 @@ export default function LoginForm() {
 
         <div className="flex items-center justify-between text-sm mb-4">
           <Link to="/auth/forgot-password" className="text-yellow-600 hover:underline">
-          {t("login_forgot_password")}
+            {t("login_forgot_password")}
           </Link>
         </div>
 
@@ -156,7 +159,7 @@ export default function LoginForm() {
         <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
           {t("login_no_account")}{" "}
           <Link to="/auth/register" className="text-yellow-600 font-medium hover:underline">
-          {t("login_create_account")}
+            {t("login_create_account")}
           </Link>
         </p>
       </form>
