@@ -295,7 +295,6 @@ const Profile = () => {
           <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
               {t("appearance")}
-              Appearance
             </h3>
             <div className="flex flex-col sm:flex-row items-center justify-between bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg gap-3">
               <div className="flex items-center gap-3">

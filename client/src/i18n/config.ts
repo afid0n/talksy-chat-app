@@ -5,11 +5,12 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import en from "./locales/en/translation.json";
 import ru from "./locales/ru/translation.json";
 import az from "./locales/az/translation.json";
-
+import tr from "./locales/tr/translation.json";
 const resources = {
   en: { translation: en },
   ru: { translation: ru },
   az: { translation: az },
+  tr: { translation: tr },
 };
 
 i18n

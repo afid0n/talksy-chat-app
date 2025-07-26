@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { post } from "@/services/commonRequest";
 import { endpoints } from "@/services/api";
 import { enqueueSnackbar } from "notistack";
+import { t } from "i18next";
 
 interface Props {
   onSubmit: (email: string) => void;
@@ -25,19 +26,19 @@ const ForgotPasswordCom: React.FC<Props> = ({ onSubmit }) => {
       });
 
       if (res.statusCode === 401) {
-        enqueueSnackbar(res.message || "Unauthorized request", {
+        enqueueSnackbar(res.message || t("forgot_password_unauthorized"), {
           variant: "error",
         });
         return;
       }
 
-      enqueueSnackbar("Reset password email was sent!", {
+      enqueueSnackbar(t("forgot_password_success"), {
         variant: "success",
       });
 
       onSubmit(email);
     } catch {
-      enqueueSnackbar("Something went wrong. Try again later.", {
+      enqueueSnackbar(t("forgot_password_error"), {
         variant: "error",
       });
     } finally {
@@ -52,16 +53,17 @@ const ForgotPasswordCom: React.FC<Props> = ({ onSubmit }) => {
           Talk<span className="text-yellow-500">sy</span>
         </h1>
         <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
-          Forgot your password?
+          {t("forgot_password_subtitle")}
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
             Email Address
+             {t("forgot_password_email_label")}
             <input
               type="email"
               className="mt-1 w-full p-3 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              placeholder="Enter your email"
+              placeholder= {t("forgot_password_email_placeholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -73,7 +75,7 @@ const ForgotPasswordCom: React.FC<Props> = ({ onSubmit }) => {
             disabled={loading}
             className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-md disabled:opacity-60"
           >
-            {loading ? "Sending..." : "Send Reset Link"}
+            {loading ? t("forgot_password_button_loading") : t("forgot_password_button")}
           </button>
         </form>
       </div>

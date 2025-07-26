@@ -1,18 +1,31 @@
 import { MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { t } from "i18next";
+import { useState } from "react";
+import i18n from "@/i18n/config";
 
 interface ChooseLangProps {
   onNext: () => void;
 }
 
+
+
 const ChooseLang: React.FC<ChooseLangProps> = ({ onNext }) => {
+  const [language, setLanguage] = useState<string>(i18n.language || "en");
+
   const languages = [
-    { code: "US", name: "English" },
-    { code: "AZ", name: "Azərbaycan" },
-    { code: "RU", name: "Русский" },
-    { code: "TR", name: "Türkçe" },
+    { code: "en", label: "US", name: t("english") },
+    { code: "az", label: "AZ", name: t("azerbaijani") },
+    { code: "ru", label: "RU", name: t("russian") },
+    { code: "tr", label: "TR", name: t("turkish") },
   ];
 
+  const changeLanguage = (langCode: string) => {
+    setLanguage(langCode);
+    i18n.changeLanguage(langCode);
+    localStorage.setItem("selectedLanguage", langCode);
+    onNext();
+  };
   return (
     <motion.div
       className="flex items-center justify-center flex-col min-h-screen  text-black dark:text-white transition-colors"
@@ -40,7 +53,7 @@ const ChooseLang: React.FC<ChooseLangProps> = ({ onNext }) => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        Choose your language
+        {t("choose_language")}
       </motion.p>
 
       <motion.div
@@ -56,7 +69,7 @@ const ChooseLang: React.FC<ChooseLangProps> = ({ onNext }) => {
             whileTap={{ scale: 0.97 }}
             className="flex items-center bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-lg w-lg px-3 gap-4 py-3 cursor-pointer shadow-sm
               hover:bg-yellow-100 dark:hover:bg-yellow-900 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors duration-300"
-            onClick={onNext}
+            onClick={() => changeLanguage(lang.code)}
           >
             <span className="text-2xl text-black dark:text-white">{lang.code}</span>
             <p className="text-lg text-black dark:text-white">{lang.name}</p>

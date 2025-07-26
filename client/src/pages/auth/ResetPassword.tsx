@@ -3,6 +3,7 @@ import { enqueueSnackbar } from "notistack";
 import { useSearchParams, Link } from "react-router-dom";
 import resetPasswordValidationSchema from "../../validations/resetPasswordValidation";
 import { post } from "../../services/commonRequest";
+import { t } from "i18next";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -25,13 +26,13 @@ const ResetPassword = () => {
         });
 
         if (res.statusCode === 400 || res.statusCode === 401) {
-          enqueueSnackbar(res.message || "Invalid or expired token", {
+          enqueueSnackbar(res.message || t("reset_password_invalid_token"), {
             autoHideDuration: 2500,
             anchorOrigin: { vertical: "bottom", horizontal: "right" },
             variant: "error",
           });
         } else {
-          enqueueSnackbar("Password reset successfully!", {
+          enqueueSnackbar(t("reset_password_success"), {
             autoHideDuration: 2500,
             anchorOrigin: { vertical: "bottom", horizontal: "right" },
             variant: "success",
@@ -40,7 +41,7 @@ const ResetPassword = () => {
 
         actions.resetForm();
       } catch {
-        enqueueSnackbar("Something went wrong. Try again later.", {
+        enqueueSnackbar(t("reset_password_error"), {
           autoHideDuration: 2500,
           anchorOrigin: { vertical: "bottom", horizontal: "right" },
           variant: "error",
@@ -53,11 +54,12 @@ const ResetPassword = () => {
     <div className="min-h-screen flex items-center justify-center px-4 transition-colors bg-gradient-to-br  ">
       <div className="w-full max-w-md bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-700 transition-colors">
         <h2 className="text-3xl font-bold text-center text-yellow-700 dark:text-yellow-400 mb-6">
-          Reset Password
+          {t("reset_password_title")}
         </h2>
 
         <p className="text-center text-gray-600 dark:text-gray-400 mb-6 text-sm">
-          Enter your new password below and confirm it to reset your account.
+          {t("reset_password_description")}
+
         </p>
 
         <form onSubmit={formik.handleSubmit} className="space-y-5 text-sm">
@@ -66,7 +68,7 @@ const ResetPassword = () => {
               htmlFor="newPassword"
               className="block font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              New Password
+              {t("reset_password_new_label")}
             </label>
             <input
               id="newPassword"
@@ -76,7 +78,7 @@ const ResetPassword = () => {
               name="newPassword"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              placeholder="New password"
+              placeholder={t("reset_password_new_placeholder")}
               className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-600 rounded-xl bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
             {formik.errors.newPassword && formik.touched.newPassword && (
@@ -91,6 +93,7 @@ const ResetPassword = () => {
               htmlFor="confirmNewPassword"
               className="block font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
+              {t("reset_password_confirm_label")}
               Confirm New Password
             </label>
             <input
@@ -101,7 +104,7 @@ const ResetPassword = () => {
               name="confirmNewPassword"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              placeholder="Confirm password"
+              placeholder={t("reset_password_confirm_placeholder")}
               className="w-full px-4 py-3 border border-gray-300 dark:border-zinc-600 rounded-xl bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
             {formik.errors.confirmNewPassword &&
@@ -121,17 +124,17 @@ const ResetPassword = () => {
             type="submit"
             className="w-full py-3 disabled:bg-yellow-400 disabled:cursor-not-allowed cursor-pointer bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl transition"
           >
-            Reset Password
+            {t("reset_password_button")}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-          Return to{" "}
+          {t("reset_password_return_login")}{" "}
           <Link
             to="/auth/login"
             className="text-yellow-600 dark:text-yellow-400 hover:underline"
           >
-            Login
+            {t("reset_password_login_link")}
           </Link>
         </p>
       </div>

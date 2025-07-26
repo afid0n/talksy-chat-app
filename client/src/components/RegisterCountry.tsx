@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import mockCountries from "@/data/mockCountries";
+import { t } from "i18next";
 
 interface LocalizedCountry {
   code: string;
@@ -58,22 +59,22 @@ const RegisterCountry = ({ onNext, setLocation }: { onNext: () => void; setLocat
       className="max-w-md mx-auto"
     >
       <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">
-        Where are you from?
+      {t("register_country_title")}
       </h2>
       <p className="mb-4 text-gray-500 dark:text-gray-400">
-        Help us connect you with people nearby
+       {t("register_country_subtitle")}
       </p>
 
       <input
         className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-3 rounded outline-none focus:ring-2 focus:ring-yellow-400"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search your city and country"
+        placeholder={t("register_country_placeholder")}
         autoComplete="off"
       />
 
       {loading && (
-        <p className="mt-2 text-gray-500 dark:text-gray-400">Loading countries...</p>
+        <p className="mt-2 text-gray-500 dark:text-gray-400">{t("register_country_loading")}</p>
       )}
 
       {!loading && query && (
@@ -91,7 +92,7 @@ const RegisterCountry = ({ onNext, setLocation }: { onNext: () => void; setLocat
               </li>
             ))
           ) : (
-            <li className="p-2 text-gray-500 dark:text-gray-400">No matches found</li>
+            <li className="p-2 text-gray-500 dark:text-gray-400">{t("register_country_no_matches")}</li>
           )}
         </ul>
       )}

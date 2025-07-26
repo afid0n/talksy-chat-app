@@ -6,6 +6,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { useEffect, useState, useRef } from "react";
 import { enqueueSnackbar } from "notistack";
 import { FaGoogle } from "react-icons/fa";
+import { t } from "i18next";
 
 interface RegisterFormProps {
   onBack: () => void;
@@ -39,15 +40,15 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
 
   const validationSchema = Yup.object({
     username: Yup.string()
-      .min(3, "At least 3 characters")
-      .required("Username is required"),
+      .min(3, t("register_username_min"))
+      .required(t("register_username_required")),
     fullName: Yup.string()
-      .min(3, "At least 3 characters")
-      .required("Full name is required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
+      .min(3, t("register_fullname_min"))
+      .required(t("register_fullname_required")),
+    email: Yup.string().email(t("register_email_invalid")).required(t("register_email_required")),
     password: Yup.string()
-      .min(6, "At least 6 characters")
-      .required("Password is required"),
+      .min(6, t("register_password_min"))
+      .required(t("register_password_required")),
   });
 
   const handleCaptchaChange = (value: string | null) => {
@@ -56,7 +57,7 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
 
   const handleFormSubmit = async (values: typeof initialValues) => {
     if (!captchaVerified) {
-      enqueueSnackbar("Please complete the reCAPTCHA verification", {
+      enqueueSnackbar(t("register_recaptcha_error"), {
         variant: "error",
       });
       return;
@@ -72,7 +73,7 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
       }
 
       enqueueSnackbar(
-        error?.message || "Registration failed. Please try again.",
+        error?.message || t("register_failed"),
         { variant: "error" }
       );
     }
@@ -95,10 +96,10 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
         onClick={() => window.location.href = `http://localhost:7070/auth/google?${params.toString()}`}
         className="flex items-center justify-center w-full py-2 mb-4 border border-gray-300 dark:border-zinc-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
       >
-        <FaGoogle className="mr-2" /> Continue with Google
+        <FaGoogle className="mr-2" />{t("register_google_button")}
       </button>
       <h2 className="text-xl font-semibold text-center text-gray-800 dark:text-white mb-4">
-        Create your account
+        {t("register_title")}
       </h2>
 
       <Formik
@@ -111,27 +112,27 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
             {[
               {
                 name: "username",
-                label: "Username",
+                label: t("register_username_label"),
                 type: "text",
-                placeholder: "Choose a username",
+                placeholder: t("register_username_placeholder"),
               },
               {
                 name: "fullName",
-                label: "Full Name",
+                label: t("register_fullname_label"),
                 type: "text",
-                placeholder: "Enter your full name",
+                placeholder: t("register_fullname_placeholder"),
               },
               {
                 name: "email",
-                label: "Email",
+                label: t("register_email_label"),
                 type: "email",
-                placeholder: "Enter your email",
+                placeholder: t("register_email_placeholder"),
               },
               {
                 name: "password",
-                label: "Password",
+                label: t("register_password_label"),
                 type: "password",
-                placeholder: "Create a password",
+                placeholder: t("register_password_placeholder"),
               },
             ].map(({ name, label, type, placeholder }) => (
               <div key={name}>
@@ -171,24 +172,24 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
                 onClick={onBack}
                 className="w-1/2 bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-200 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 transition"
               >
-                <ChevronLeft className="inline-block mr-1" /> Back
+                <ChevronLeft className="inline-block mr-1" /> {t("register_back_button")}
               </button>
               <button
                 type="submit"
                 disabled={loading || isSubmitting || !captchaVerified}
                 className="w-1/2 bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Creating..." : "Create Account"}
+                {loading ? t("register_submit_loading") : t("register_submit_button")}
               </button>
             </div>
 
             <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
-              Already have an account?{" "}
+              {t("register_login_prompt")}{" "}
               <Link
                 to="/auth/Login"
                 className="text-yellow-600 font-medium hover:underline"
               >
-                Sign In
+                {t("register_login_link")}
               </Link>
             </p>
           </Form>
