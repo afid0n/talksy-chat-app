@@ -1,44 +1,54 @@
-import type { FC } from "react";
+import { useState, type FC } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-const conversations = [
-  { id: 1, name: "Alex Chen", message: "Hey! How’s the project going?", time: "2 min", unread: 3, initials: "AC" },
-  { id: 2, name: "Design Team", message: "Meeting at 3 PM tomorrow", time: "5 min", unread: 0, initials: "DT", group: true },
-  { id: 3, name: "Maria Garcia", message: "Thanks for the help yesterday!", time: "1 hour", unread: 1, initials: "MG" },
-  { id: 4, name: "Dev Squad", message: "New feature is ready for review", time: "3 hours", unread: 0, initials: "DS", group: true },
-  { id: 5, name: "Yuki Tanaka", message: "Let’s catch up soon 😊", time: "1 day", unread: 0, initials: "YT" },
-];
-
-interface Message {
-  from: string;
-  text: string;
-  time: string;
-  isGif?: boolean;
+interface Conversation {
+  id: string | number;
+  name: string;
+  lastMessage: string;
+  lastMessageTime: string;
+  unreadCount: number;
+  initials: string;
+  isGroup?: boolean;
 }
 
 interface MessagesProps {
-  selectedId: number | null;
-  onSelect: (id: number) => void;
-  messages?: Message[]; // optional prop for messages
+  conversations: Conversation[];
 }
 
-const Messages: FC<MessagesProps> = ({ selectedId, onSelect, messages = [] }) => {
+const Messages: FC<MessagesProps> = ({ conversations }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const { id: selectedId } = useParams<{ id: string }>();
+
+  const filteredConversations = conversations.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="border-r p-4 overflow-y-auto bg-white/70 dark:bg-zinc-700/70 dark:border-gray-700 min-h-screen w-80">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Messages</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+        Messages
+      </h2>
 
       <input
         type="text"
         placeholder="Search conversations..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
         className="w-full p-2 mb-4 border rounded dark:bg-zinc-800 dark:border-gray-600 dark:text-white"
       />
 
       <ul>
-        {conversations.map((c) => (
+        {filteredConversations.map((c) => (
           <li
             key={c.id}
-            onClick={() => onSelect(c.id)}
+            onClick={() => navigate(`/chat/${c.id}`)}
             className={`flex items-center justify-between p-3 mb-2 rounded-lg cursor-pointer transition-all ${
-              selectedId === c.id ? "bg-yellow-100 dark:bg-yellow-800" : "hover:bg-gray-100 dark:hover:bg-zinc-800"
+              selectedId === String(c.id)
+                ? "bg-yellow-100 dark:bg-yellow-800"
+                : "hover:bg-gray-100 dark:hover:bg-zinc-800"
             }`}
           >
             <div className="flex items-center gap-3">
@@ -49,25 +59,25 @@ const Messages: FC<MessagesProps> = ({ selectedId, onSelect, messages = [] }) =>
               <div className="w-40">
                 <h4 className="font-medium text-gray-800 dark:text-white flex items-center">
                   {c.name}
-                  {c.group && <span className="ml-1 text-sm">👥</span>}
+                  {c.isGroup && <span className="ml-1 text-sm">👥</span>}
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{c.message}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                  {c.lastMessage}
+                </p>
               </div>
             </div>
 
             <div className="text-right text-xs text-gray-500 dark:text-gray-400">
-              <p>{c.time}</p>
-              {c.unread > 0 && (
+              <p>{c.lastMessageTime}</p>
+              {c.unreadCount > 0 && (
                 <span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-xs inline-block mt-1">
-                  {c.unread}
+                  {c.unreadCount}
                 </span>
               )}
             </div>
           </li>
         ))}
       </ul>
-
-   
     </div>
   );
 };

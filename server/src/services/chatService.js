@@ -13,7 +13,12 @@ const getChatsForUser = async (userId) => {
   const chats = await Chat.find({ participants: userId })
     .populate('participants', '-password')
     .populate('admin', '-password')
-    .populate('lastMessage');
+    .populate('lastMessage')
+    .populate({
+      path: 'lastMessage',
+      populate: { path: 'sender', select: 'fullName email' }
+    })
+    .sort({ updatedAt: -1 });
   return formatMongoData(chats);
 };
 
@@ -32,23 +37,10 @@ const deleteChat = async (id) => {
   return chat ? formatMongoData(chat) : null;
 };
 
-const getAllChats = async (currentUserId) => {
-  return await Chat.find({ participants: currentUserId })
-    .populate('participants', '-password')
-    .populate('latestMessage')
-    .populate({
-      path: 'latestMessage',
-      populate: { path: 'sender', select: 'name email' }
-    })
-    .sort({ updatedAt: -1 });
-    
-};
-
 module.exports = {
   getChatById,
   getChatsForUser,
   createChat,
   updateChat,
   deleteChat,
-  getAllChats
 };

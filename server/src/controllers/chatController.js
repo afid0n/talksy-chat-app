@@ -10,9 +10,11 @@ const getChatById = async (req, res, next) => {
   }
 };
 
+// Usually get chats for logged in user, so req.user._id, not param
 const getChatsForUser = async (req, res, next) => {
   try {
-    const chats = await chatService.getChatsForUser(req.params.userId);
+    const userId = req.user._id;
+    const chats = await chatService.getChatsForUser(userId);
     res.json(chats);
   } catch (err) {
     next(err);
@@ -47,19 +49,62 @@ const deleteChat = async (req, res, next) => {
     next(err);
   }
 };
-const getAllChats = async (req, res, next) => {
+
+// Example using async/await and Mongoose-like models
+
+const Message = require('../models/messageModel');
+const Chat = require('../models/chatModel');
+
+const getMessagesByChat = async (req, res) => {
+  const { chatId } = req.params;
+
   try {
-    const chats = await chatService.getAllChats(req.user._id);
-    res.status(200).json(chats);
-  } catch (error) {
-    next(error);
+    // Fetch messages for this chat, sorted by time ascending
+    const messages = await Message.find({ chat: chatId })
+      .sort({ time: 1 })
+      .populate("from", "_id fullName avatarUrl"); // Adjust fields as needed
+
+    res.json(messages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch messages" });
   }
 };
+
+const createMessage = async (req, res) => {
+  const { chatId } = req.params;
+  const { from, text, time, isGif } = req.body;
+
+  try {
+    // Optionally check chat exists
+    const chatExists = await Chat.findById(chatId);
+    if (!chatExists) {
+      return res.status(404).json({ message: "Chat not found" });
+    }
+
+    const message = new Message({
+      chat: chatId,
+      from,
+      text,
+      time,
+      isGif: isGif || false,
+    });
+
+    const savedMessage = await message.save();
+    res.status(201).json(savedMessage);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to save message" });
+  }
+};
+
+
 module.exports = {
   getChatById,
   getChatsForUser,
   createChat,
   updateChat,
   deleteChat,
-  getAllChats
+  getMessagesByChat,
+  createMessage,
 };

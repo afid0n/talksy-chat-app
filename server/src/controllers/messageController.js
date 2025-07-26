@@ -13,9 +13,10 @@ const getMessageById = async (req, res, next) => {
 const getMessagesForChat = async (req, res, next) => {
   try {
     const messages = await messageService.getMessagesForChat(req.params.chatId);
-    res.json({
-      message: messages ? 'Messages retrieved successfully' : 'No messages found for this chat',
-    });
+    if (!messages || messages.length === 0) {
+      return res.status(404).json({ message: 'No messages found for this chat' });
+    }
+    res.json(messages);
   } catch (err) {
     next(err);
   }
@@ -65,5 +66,5 @@ module.exports = {
   createMessage,
   updateMessage,
   deleteMessage,
-  getMessages
+  getMessages,
 };
