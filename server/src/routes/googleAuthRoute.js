@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const passport = require("passport");
-const { CLIENT_URL } = require("../config/config");
+const { CLIENT_URL, JWT_SECRET } = require("../config/config");
+const jwt = require("jsonwebtoken");
 
 // Step 1: Redirect to Google
 router.get(
@@ -29,15 +30,20 @@ router.get(
     session: false,
   }),
   (req, res) => {
-    const accessToken = jwt.generateAccessToken({
-      id: req.user._id,
-      email: req.user.email,
-      fullName: req.user.fullName,
-      role: req.user.role,
-      location: req.user.location,
-      interests: req.user.interests,
-      avatar: req.user.avatar?.url || "",
-    });
+    const accessToken = jwt.sign(
+      {
+        id: req.user._id,
+        email: req.user.email,
+        fullName: req.user.fullName,
+        role: req.user.role,
+        location: req.user.location,
+        interests: req.user.interests,
+        avatar: req.user.avatar?.url || "",
+      },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
 
     res.cookie("token", accessToken, {
       httpOnly: true,
@@ -48,7 +54,7 @@ router.get(
 
     //set refresh token to cookie
 
-    res.redirect(`${CLIENT_URL}/auth/success/${accessToken}`);
+    res.redirect(`${CLIENT_URL}/feed`);
   }
 );
 
