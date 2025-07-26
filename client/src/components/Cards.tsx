@@ -23,7 +23,7 @@ const Cards = ({
   const [requestedIds, setRequestedIds] = useState<string[]>([]);
   const [loadingIds, setLoadingIds] = useState<string[]>([]);
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedLikes = JSON.parse(localStorage.getItem("likedUsers") || "[]");
