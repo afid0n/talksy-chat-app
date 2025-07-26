@@ -20,15 +20,11 @@ export interface Message {
 }
 
 // Get all messages for a chat
-export const fetchMessagesForChat = async (chatId: string): Promise<Message[]> => {
-  try {
-    const res = await instance.get<Message[]>(`/messages/${chatId}`);
-    return res.data;
-  } catch (error: unknown) {
-    const err = error as AxiosError<{ message?: string }>;
-    throw new Error(err.response?.data?.message || err.message || "Failed to fetch messages");
-  }
+export const fetchMessagesForChat = async (chatId: string) => {
+  const res = await instance.get(`/messages/${chatId}`);
+  return res.data;
 };
+
 
 // Send a new message
 export const sendMessage = async (messageData: Partial<Message>): Promise<Message> => {

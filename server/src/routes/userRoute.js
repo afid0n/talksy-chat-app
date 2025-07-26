@@ -2,48 +2,30 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 const uploadMiddleware = require("../middlewares/uploadMiddleware");
-const  verifyAccessToken  = require('../middlewares/authToken');
-
+const verifyAccessToken = require('../middlewares/authToken');
+const getMessagePreviews = require('../controllers/getChatPreviews');
 const verifyToken = require('../middlewares/authToken');
 const upload = uploadMiddleware("userImages");
 
-// Register user
 router.post('/register', userController.registerUser);
-
-// Login user
 router.post('/login', userController.login);
-
-// Verify email
 router.get('/verify-email', userController.verifyEmail);
-router.post("/resend-verification-email", userController.resendVerificationEmail);
-
-// Get user by email
+router.post('/resend-verification-email', userController.resendVerificationEmail);
 router.get('/email/:email', userController.getUserByEmail);
-
-// Get all users
 router.get('/', userController.getAllUsers);
-
-router.get("/me", verifyToken, userController.getCurrentUser);
-
-// Update user
-router.patch('/:id', userController.updateUser);
-// update password
-router.patch('/password/:id', userController.changePassword);
-
-
-// Delete user
-router.delete('/:id', userController.deleteUser);
-
-// Get user by ID 
-router.get('/:id', userController.getUserById);
-
-// Forgot password  
-router.post('/forgot-password', userController.forgotPassword);
-// Reset password   
-router.post('/reset-password', userController.resetPassword);
-
+router.get('/me', verifyToken, userController.getCurrentUser);
+router.get('/friends', verifyToken, userController.getFriends);
+router.get('/chat-previews', verifyToken, getMessagePreviews);
 router.post('/send-request/:targetId', verifyAccessToken, userController.sendFriendRequest);
 router.post('/accept-request/:requesterId', verifyAccessToken, userController.acceptFriendRequest);
-router.post("/cancel-request/:targetId", verifyAccessToken, userController.cancelFriendRequest);
+router.post('/cancel-request/:targetId', verifyAccessToken, userController.cancelFriendRequest);
+router.post('/forgot-password', userController.forgotPassword);
+router.post('/reset-password', userController.resetPassword);
+router.patch('/password/:id', userController.changePassword);
+router.patch('/:id', userController.updateUser);
+router.delete('/:id', userController.deleteUser);
+router.delete("/friends/:friendId", verifyToken, userController.removeFriend);
+
+router.get('/:id', userController.getUserById);
 
 module.exports = router;

@@ -98,6 +98,33 @@ const createMessage = async (req, res) => {
   }
 };
 
+const getOrCreateChatWithUser = async (req, res, next) => {
+  const currentUserId = req.user._id;
+  const targetUserId = req.params.userId;
+
+  try {
+    // Check for existing non-group chat between both users
+    let chat = await Chat.findOne({
+      isGroup: false,
+      participants: { $all: [currentUserId, targetUserId], $size: 2 }
+    });
+
+    if (!chat) {
+      // Create new chat
+      chat = new Chat({
+        isGroup: false,
+        participants: [currentUserId, targetUserId]
+      });
+      await chat.save();
+    }
+
+    res.json({ chatId: chat._id });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 
 module.exports = {
   getChatById,
@@ -107,4 +134,5 @@ module.exports = {
   deleteChat,
   getMessagesByChat,
   createMessage,
+  getOrCreateChatWithUser
 };
