@@ -137,7 +137,11 @@ const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
     const updates = req.body;
-
+// Əgər Cloudinary-ə yeni şəkil yüklənibsə
+   if (req.file && req.file.path) {
+      updates.profileImage = req.file.path;         
+      updates.public_id = req.file.filename;
+    }
     const result = await userService.updateUser(userId, updates);
 
     res.status(200).json(result);
