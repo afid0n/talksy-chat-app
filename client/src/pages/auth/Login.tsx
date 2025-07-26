@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { enqueueSnackbar } from "notistack";
 import { useState } from 'react';
-import axios from "axios";
 import { loginUser } from '@/services/userService';
 import { loginValidationSchema } from '@/validations/authValidation';
 import { useDispatch } from 'react-redux';

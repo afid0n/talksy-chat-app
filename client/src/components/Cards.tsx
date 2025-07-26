@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { UserRoundPlus, MessageCircle } from "lucide-react";
-import type { User } from "@/types/User";
-import { useSelector } from "react-redux";
-import { sendFriendRequest } from "@/services/commonRequest";
 import { enqueueSnackbar } from "notistack";
-import type { RootState } from "@/redux/store/store";
+import type { User } from "@/types/User";
+import { sendFriendRequest } from "@/services/userService";
 
 interface CardsProps {
   city?: string;
@@ -21,6 +19,8 @@ const Cards = ({
   currentUserId,
 }: CardsProps) => {
   const [likedIds, setLikedIds] = useState<string[]>([]);
+  const [requestedIds, setRequestedIds] = useState<string[]>([]);
+  const [loadingIds, setLoadingIds] = useState<string[]>([]);
 
   useEffect(() => {
     const storedLikes = JSON.parse(localStorage.getItem("likedUsers") || "[]");
@@ -35,6 +35,21 @@ const Cards = ({
     localStorage.setItem("likedUsers", JSON.stringify(updatedLikes));
   };
 
+  const handleSendRequest = async (targetId: string) => {
+    if (loadingIds.includes(targetId) || requestedIds.includes(targetId)) return;
+    setLoadingIds((prev) => [...prev, targetId]);
+    try {
+      const res = await sendFriendRequest(targetId);
+      enqueueSnackbar(res.message || "Request sent", { variant: "success" });
+      setRequestedIds((prev) => [...prev, targetId]);
+    } catch (err: any) {
+      console.error(err);
+      enqueueSnackbar("Failed to send friend request", { variant: "error" });
+    } finally {
+      setLoadingIds((prev) => prev.filter((id) => id !== targetId));
+    }
+  };
+
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,35 +57,35 @@ const Cards = ({
 
     const matchesCountry =
       countriesFilter.length === 0 ||
-      (user.location?.country !== undefined && countriesFilter.includes(user.location.country));
+      (user.location?.country !== undefined &&
+        countriesFilter.includes(user.location.country));
 
     return matchesSearch && matchesCountry;
   });
-
 
   const sortedUsers = [...filteredUsers].sort((a, b) => {
     if (a.id === currentUserId) return -1;
     if (b.id === currentUserId) return 1;
     return 0;
   });
-  const token = useSelector((state: RootState) => state.user.token);
-  const [requestedIds, setRequestedIds] = useState<string[]>([]);
 
-  const handleSendRequest = async (targetId: string) => {
-    try {
-      const res = await sendFriendRequest(targetId, token);
-      enqueueSnackbar(res.message || "Request sent", { variant: "success" });
-      setRequestedIds((prev) => [...prev, targetId]);
-    } catch (err: any) {
-      console.error(err);
-      enqueueSnackbar("Failed to send friend request", { variant: "error" });
-    }
-  };
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
       {sortedUsers.map((user) => {
         const liked = likedIds.includes(user.id);
         const isCurrentUser = user.id === currentUserId;
+        const isRequested = requestedIds.includes(user.id);
+        const isLoading = loadingIds.includes(user.id);
+
+        const isFriend = Array.isArray(user.friends)
+          ? user.friends.some((friend) => {
+            if (typeof friend === "string") return friend === currentUserId;
+            // Tell TS friend is an object with possible _id or id
+            const f = friend as { _id?: string; id?: string };
+            return f._id === currentUserId || f.id === currentUserId;
+          })
+          : false;
+
 
         return (
           <div
@@ -115,19 +130,46 @@ const Cards = ({
 
             {!isCurrentUser && (
               <div className="flex justify-between mt-4">
+                {/* Like button */}
                 <button
-                  className="text-sm flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 transition px-4 py-1.5 rounded-md"
+                  className={`text-sm flex items-center gap-1 px-4 py-1.5 rounded-md transition ${liked
+                      ? "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700"
+                      : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800"
+                    }`}
                   onClick={() => handleLike(user.id)}
                 >
-                  <UserRoundPlus size={13}
-                    onClick={() => handleSendRequest(user.id)}
-                  />
-                  {liked ? "Liked" : "Connect"}
+                  <UserRoundPlus size={13} />
+                  {liked ? "Liked" : "Like"}
                 </button>
+
+                {/* Friendship button */}
+                {isFriend ? (
+                  <span className="text-sm flex items-center gap-1 px-4 py-1.5 rounded-md bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 cursor-default">
+                    <UserRoundPlus size={13} />
+                    Connected
+                  </span>
+                ) : (
+                  <button
+                    className={`text-sm flex items-center gap-1 px-4 py-1.5 rounded-md transition ${isRequested
+                        ? "bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
+                        : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 cursor-pointer"
+                      }`}
+                    onClick={() => handleSendRequest(user.id)}
+                    disabled={isRequested || isLoading}
+                  >
+                    <UserRoundPlus size={13} />
+                    {isLoading
+                      ? "Sending..."
+                      : isRequested
+                        ? "Requested"
+                        : "Connect"}
+                  </button>
+                )}
+
+                {/* Message button */}
                 <button
                   className="text-sm flex items-center gap-1 bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 transition px-4 py-1.5 rounded-md"
                 >
-
                   <MessageCircle size={13} /> Message
                 </button>
               </div>

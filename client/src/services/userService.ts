@@ -61,3 +61,28 @@ export const getCurrentUser = async (): Promise<User> => {
     throw new Error(error?.response?.data?.message || "Failed to fetch current user");
   }
 };
+
+export const sendFriendRequest = async (targetId: string) => {
+  const res = await instance.post(`/users/send-request/${targetId}`, {});
+  return res.data;
+};
+
+export const acceptFriendRequest = async (requesterId: string) => {
+  const res = await instance.post(`/users/accept-request/${requesterId}`, {});
+  return res.data;
+};
+
+export const fetchAllUsers = async () => {
+  const response = await instance.get('/users');
+  return response.data; // all users
+};
+
+export const getUserById = async (id: string) => {
+  const res = await instance.get(`/users/${id}`);
+  return res.data;
+};
+
+export const cancelFriendRequest = async (requesterId: string) => {
+  const res = await instance.post(`/users/cancel-request/${requesterId}`, {}, );
+  return res.data;
+};

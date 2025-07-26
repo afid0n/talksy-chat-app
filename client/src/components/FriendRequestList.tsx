@@ -1,8 +1,6 @@
 import { enqueueSnackbar } from "notistack";
-import { useSelector } from "react-redux";
 import type { User } from "@/types/User";
-import type { RootState } from "@/redux/store/store";
-import { acceptFriendRequest } from "@/services/commonRequest";
+import { acceptFriendRequest, cancelFriendRequest } from "@/services/userService";
 
 interface FriendRequestListProps {
   requests: User[];
@@ -10,14 +8,10 @@ interface FriendRequestListProps {
 }
 
 const FriendRequestList = ({ requests, onRefresh }: FriendRequestListProps) => {
-  const token = useSelector((state: RootState) => state.user.token);
-  if (!token) {
-    return <p className="text-red-500">You need to log in to see friend requests.</p>;
-  }
 
   const handleAccept = async (requesterId: string) => {
     try {
-      const res = await acceptFriendRequest(requesterId, token);
+      const res = await acceptFriendRequest(requesterId);
       enqueueSnackbar(res.message, { variant: "success" });
       onRefresh();
     } catch (err: any) {
@@ -27,8 +21,8 @@ const FriendRequestList = ({ requests, onRefresh }: FriendRequestListProps) => {
 
   const handleCancel = async (requesterId: string) => {
     try {
-      // TODO: implement cancelFriendRequest(requesterId, token)
-      enqueueSnackbar("Request cancelled (not implemented)", { variant: "info" });
+      const res = await cancelFriendRequest(requesterId);
+      enqueueSnackbar(res.message || "Request cancelled", { variant: "info" });
       onRefresh();
     } catch (err: any) {
       enqueueSnackbar("Error cancelling request", { variant: "error" });
