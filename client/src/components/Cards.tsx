@@ -3,6 +3,7 @@ import { UserRoundPlus, MessageCircle } from "lucide-react";
 import { enqueueSnackbar } from "notistack";
 import type { User } from "@/types/User";
 import { sendFriendRequest } from "@/services/userService";
+import { useNavigate } from "react-router-dom";
 
 interface CardsProps {
   city?: string;
@@ -21,6 +22,8 @@ const Cards = ({
   const [likedIds, setLikedIds] = useState<string[]>([]);
   const [requestedIds, setRequestedIds] = useState<string[]>([]);
   const [loadingIds, setLoadingIds] = useState<string[]>([]);
+
+    const navigate = useNavigate();
 
   useEffect(() => {
     const storedLikes = JSON.parse(localStorage.getItem("likedUsers") || "[]");
@@ -133,8 +136,8 @@ const Cards = ({
                 {/* Like button */}
                 <button
                   className={`text-sm flex items-center gap-1 px-4 py-1.5 rounded-md transition ${liked
-                      ? "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700"
-                      : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800"
+                    ? "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700"
+                    : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800"
                     }`}
                   onClick={() => handleLike(user.id)}
                 >
@@ -151,8 +154,8 @@ const Cards = ({
                 ) : (
                   <button
                     className={`text-sm flex items-center gap-1 px-4 py-1.5 rounded-md transition ${isRequested
-                        ? "bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
-                        : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 cursor-pointer"
+                      ? "bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
+                      : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 cursor-pointer"
                       }`}
                     onClick={() => handleSendRequest(user.id)}
                     disabled={isRequested || isLoading}
@@ -168,9 +171,11 @@ const Cards = ({
 
                 {/* Message button */}
                 <button
-                  className="text-sm flex items-center gap-1 bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 transition px-4 py-1.5 rounded-md"
+                  className="mt-2 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 px-3 py-1 rounded-md flex items-center gap-1"
+                  onClick={() => navigate(`/chat/${user.id}`)}
                 >
-                  <MessageCircle size={13} /> Message
+                  <MessageCircle size={14} />
+                  Message
                 </button>
               </div>
             )}
