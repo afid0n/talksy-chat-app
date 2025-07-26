@@ -45,6 +45,7 @@ const Cards = ({
   const navigate = useNavigate();
   const currentUser = useSelector((state: RootState) => state.user);
 
+
   // Load likes and local requested friend requests from localStorage on mount
   useEffect(() => {
     const storedLikes = JSON.parse(localStorage.getItem("likedUsers") || "[]");

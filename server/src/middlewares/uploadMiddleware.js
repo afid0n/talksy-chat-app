@@ -4,13 +4,14 @@ const cloudinary = require("../config/cloudinaryConfig");
 const path = require("path");
 
 function uploadMiddleware(folderName) {
+    console.log("📦 uploadMiddleware called with folder:", folderName); // ✅ BAX
   const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: (_, file) => {
       const folderPath = folderName.trim();
       const fileExtension = path.extname(file.originalname).substring(1);
       const publicId = `${file.fieldname}-${Date.now()}`; //set to cloudinary
-
+ console.log("🖼️ Uploading file to folder:", folderPath); // ✅ BAX
       return {
         folder: folderPath,
         public_id: publicId,
