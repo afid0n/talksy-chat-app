@@ -1,3 +1,4 @@
+import { t } from "i18next";
 import { Eye, MessageSquare } from "lucide-react";
 import { useState } from "react";
 
@@ -7,15 +8,20 @@ const PrivacySettings = () => {
 
     return (
         <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-6 rounded-xl shadow-sm space-y-6">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Privacy Settings</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("privacy_settings")}</h3>
 
             {/* Profile Visibility */}
             <div className="flex items-center justify-between bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-100 dark:border-zinc-700 rounded-xl p-4 transition">
                 <div className="flex items-start gap-3">
                     <Eye className="mt-1 text-gray-500 dark:text-gray-300" />
                     <div>
-                        <p className="text-sm font-medium text-gray-800 dark:text-white">Profile Visibility</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Control who can see your profile</p>
+                        <p className="text-sm font-medium text-gray-800 dark:text-white">
+                            {t("profile_visibility")}
+
+                            </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {t("profile_visibility_description")}
+                            </p>
                     </div>
                 </div>
                 <select
@@ -23,9 +29,9 @@ const PrivacySettings = () => {
                     value={profileVisibility}
                     onChange={(e) => setProfileVisibility(e.target.value)}
                 >
-                    <option value="Public">Public</option>
-                    <option value="Friends">Friends</option>
-                    <option value="Only Me">Only Me</option>
+                    <option value="Public">{t("public")}</option>
+                    <option value="Friends">{t("friends")}</option>
+                    <option value="Only Me">{t("only_me")}</option>
                 </select>
             </div>
 
@@ -34,8 +40,8 @@ const PrivacySettings = () => {
                 <div className="flex items-start gap-3">
                     <MessageSquare className="mt-1 text-gray-500 dark:text-gray-300" />
                     <div>
-                        <p className="text-sm font-medium text-gray-800 dark:text-white">Message Privacy</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Control who can send you messages</p>
+                        <p className="text-sm font-medium text-gray-800 dark:text-white">{t("message_privacy")}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("message_privacy_desc")}</p>
                     </div>
                 </div>
                 <select
@@ -43,9 +49,9 @@ const PrivacySettings = () => {
                     value={messagePrivacy}
                     onChange={(e) => setMessagePrivacy(e.target.value)}
                 >
-                    <option value="Everyone">Everyone</option>
-                    <option value="Friends">Friends Only</option>
-                    <option value="No One">No One</option>
+                    <option value="Everyone">{t("everyone")}</option>
+                    <option value="Friends">{t("friends_only")}</option>
+                    <option value="No One">{t("no_one")}</option>
                 </select>
             </div>
         </div>

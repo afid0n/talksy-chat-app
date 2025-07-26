@@ -35,6 +35,8 @@ import { enqueueSnackbar } from "notistack"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/redux/store/store"
 import { acceptFriendRequest, cancelFriendRequest } from "@/services/userService"
+import { t } from "i18next"
+import i18n from "@/i18n/config"
 
 
 const Profile = () => {
@@ -47,6 +49,10 @@ const Profile = () => {
     if (!dateStr) return "";
     return moment(dateStr).locale("az").format("LL, HH:mm");
   }
+  const changeLanguage = (langCode: string) => {
+  setLanguage(langCode);
+  i18n.changeLanguage(langCode);
+};
 
   console.log(user);
 
@@ -167,7 +173,7 @@ const Profile = () => {
 
         <div className="self-start md:self-center w-full md:w-auto flex justify-center md:justify-end">
           <button className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md text-sm font-semibold w-full md:w-auto">
-            ✏️ Edit Profile
+            ✏️ Edit Profile {t("edit_profile")}
           </button>
         </div>
       </div>
@@ -176,10 +182,10 @@ const Profile = () => {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="w-full bg-white dark:bg-zinc-900 p-1 rounded-xl shadow-sm flex flex-col sm:flex-row justify-between h-auto gap-2 sm:gap-0">
           {[
-            { value: "overview", icon: Star, label: "Overview" },
-            { value: "settings", icon: Settings, label: "Settings" },
-            { value: "privacy", icon: Shield, label: "Privacy" },
-            { value: "account", icon: Key, label: "Account" },
+            { value: "overview", icon: Star, label: t("overview") },
+            { value: "settings", icon: Settings, label: t("settings") },
+            { value: "privacy", icon: Shield, label: t("privacy") },
+            { value: "account", icon: Key, label: t("account") },
           ].map(({ value, icon: Icon, label }) => (
             <TabsTrigger
               key={value}
@@ -199,19 +205,19 @@ const Profile = () => {
             {[
               {
                 count: 154,
-                label: "Total Messages",
+                label: t("total_messages"),
                 icon: MessageCircle,
                 color: "yellow",
               },
               {
                 count: userr?.friends?.length || 0,
-                label: "Connections",
+                label: t("connections"),
                 icon: Users,
                 color: "blue",
               },
               {
                 count: 12,
-                label: "Favorites",
+                label: t("favorites"),
                 icon: Heart,
                 color: "purple",
               },
@@ -236,14 +242,14 @@ const Profile = () => {
           {/* Quick Actions */}
           <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-sm mt-8">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-              Quick Actions
+              {t("quick_actions")}
             </h3>
             <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4">
               {[
-                { icon: MessageCircle, label: "New Chat", color: "yellow" },
-                { icon: Users, label: "Find Friends", color: "blue" },
-                { icon: Settings, label: "Preferences", color: "purple" },
-                { icon: Shield, label: "Privacy", color: "orange" },
+                { icon: MessageCircle, label: t("New_Chat"), color: "yellow" },
+                { icon: Users, label: t("friend_requests"), color: "blue" },
+                { icon: Settings, label: t("preferences"), color: "purple" },
+                { icon: Shield, label: t("Privacy"), color: "orange" },
               ].map(({ icon: Icon, label, color }, idx) => (
                 <div
                   key={idx}
@@ -261,7 +267,7 @@ const Profile = () => {
         <TabsContent className="flex flex-col gap-5" value="settings">
           <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-              Language & Region
+              {t("language_region")}
             </h3>
             <div className="flex justify-between items-center">
               {[
@@ -272,7 +278,7 @@ const Profile = () => {
               ].map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() => setLanguage(lang.code)}
+                  onClick={() => changeLanguage(lang.code)}
                   className={`flex items-center justify-center gap-2 border px-8 sm:px-12 py-3 sm:py-5 rounded-lg transition ${language === lang.code
                     ? "bg-yellow-50 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200 border-yellow-500"
                     : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800"
@@ -288,15 +294,18 @@ const Profile = () => {
           {/* Appearance Theme Toggle */}
           <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+              {t("appearance")}
               Appearance
             </h3>
             <div className="flex flex-col sm:flex-row items-center justify-between bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg gap-3">
               <div className="flex items-center gap-3">
                 <Sun className="text-gray-500 dark:text-gray-300" />
                 <div>
-                  <p className="font-medium text-gray-800 dark:text-gray-100">Dark Mode</p>
+                  <p className="font-medium text-gray-800 dark:text-gray-100">
+                    {t("dark_mode")}
+                    </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Switch between light and dark themes
+                    {t("switch_theme")}
                   </p>
                 </div>
               </div>
@@ -305,15 +314,17 @@ const Profile = () => {
                   <Button variant="outline" size="icon">
                     <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                     <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                    <span className="sr-only">Toggle theme</span>
+                    <span className="sr-only">
+                      {t("toggle_theme")}
+                      </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleThemeChange("light")}>
-                    Light
+                    {t("light_mode")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleThemeChange("dark")}>
-                    Dark
+                    {t("dark_mode")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -341,15 +352,15 @@ const Profile = () => {
             <ChangePassword />
           </div>
           <div className="bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-400 rounded-xl p-4 sm:p-6 mt-6 space-y-4 shadow-sm">
-            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">Danger Zone</h3>
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">{t("danger_zone")}</h3>
             <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3">
               <button className="flex items-center justify-center w-full gap-2 text-red-600 dark:text-red-200 bg-red-50 dark:bg-red-900 hover:bg-red-100 dark:hover:bg-red-800 border border-red-200 dark:border-red-400 font-medium py-2 px-4 rounded-md transition">
                 <LogOut size={18} />
-                Sign Out
+                {t("sign_out")}
               </button>
               <button className="flex items-center justify-center w-full gap-2 text-red-700 dark:text-red-200 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 border border-red-300 dark:border-red-400 font-semibold py-2 px-4 rounded-md transition">
                 <X size={18} />
-                Delete Account
+                {t("delete_account")}
               </button>
             </div>
           </div>
@@ -357,9 +368,13 @@ const Profile = () => {
       </Tabs>
 
  <div className="max-w-2xl mx-auto mt-6">
-        <h2 className="text-xl font-bold mb-4">Friend Requests</h2>
+        <h2 className="text-xl font-bold mb-4">
+          {t("friend_requests")}
+          </h2>
         {!userr?.friendRequests || userr.friendRequests.length === 0 ? (
-          <p className="text-gray-500">You have no friend requests.</p>
+          <p className="text-gray-500">
+            {t("no_friend_requests")}
+            </p>
         ) : (
           userr.friendRequests.map((req: any) => (
             <div
@@ -382,13 +397,14 @@ const Profile = () => {
                   onClick={() => handleAccept(req.id || req._id)}
                   className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
                 >
-                  Accept
+                  {t("accept")}
+                  
                 </button>
                 <button
                   onClick={() => handleCancel(req.id || req._id)}
                   className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
               </div>
             </div>

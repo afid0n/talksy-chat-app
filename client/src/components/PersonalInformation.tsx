@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import axios from "axios";
 import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
+import { t } from "i18next";
 
 const PersonalInformation = ({ userr }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -20,55 +21,55 @@ const PersonalInformation = ({ userr }) => {
       bio: userr.bio || "test bio",
       profileImage: null,
     },
-onSubmit: async (values) => {
-  try {
-    const formData = new FormData();
+    onSubmit: async (values) => {
+      try {
+        const formData = new FormData();
 
-    formData.append("fullName", values.fullName);
-    formData.append("email", values.email);
-    formData.append("phone", values.phone);
-    formData.append("bio", values.bio);
-    formData.append("location[city]", values.location.city);
-    formData.append("location[country]", values.location.country);
+        formData.append("fullName", values.fullName);
+        formData.append("email", values.email);
+        formData.append("phone", values.phone);
+        formData.append("bio", values.bio);
+        formData.append("location[city]", values.location.city);
+        formData.append("location[country]", values.location.country);
 
-    // Şəkil varsa əlavə et
-    if (values.profileImage) {
-      formData.append("profileImage", values.profileImage);
-    }
+        // Şəkil varsa əlavə et
+        if (values.profileImage) {
+          formData.append("profileImage", values.profileImage);
+        }
 
-    const response = await axios.patch(
-      `http://localhost:7070/users/${userr.id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        const response = await axios.patch(
+          `http://localhost:7070/users/${userr.id}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        console.log("User updated:", response.data);
+        enqueueSnackbar("Updated profile successfully", {
+          variant: "success",
+          autoHideDuration: 2000,
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "right",
+          },
+        });
+
+        // window.location.reload();
+      } catch (error) {
+        enqueueSnackbar("Failed to update profile", {
+          variant: "error",
+          autoHideDuration: 2000,
+          anchorOrigin: {
+            vertical: "bottom",
+            horizontal: "right",
+          },
+        });
+        console.error("Update failed:", error);
       }
-    );
-
-    console.log("User updated:", response.data);
-    enqueueSnackbar("Updated profile successfully", {
-      variant: "success",
-      autoHideDuration: 2000,
-      anchorOrigin: {
-        vertical: "bottom",
-        horizontal: "right",
-      },
-    });
-
-    // window.location.reload();
-  } catch (error) {
-    enqueueSnackbar("Failed to update profile", {
-      variant: "error",
-      autoHideDuration: 2000,
-      anchorOrigin: {
-        vertical: "bottom",
-        horizontal: "right",
-      },
-    });
-    console.error("Update failed:", error);
-  }
-}
+    }
   });
 
   return (
@@ -76,24 +77,24 @@ onSubmit: async (values) => {
       onSubmit={formik.handleSubmit}
       className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-sm space-y-6 border border-gray-200 dark:border-zinc-700"
     >
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Personal Information</h3>
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("personal_information")}</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
         <input
-  type="file"
-  accept="image/*"
-  onChange={(e) => {
-    if (e.currentTarget.files && e.currentTarget.files[0]) {
-      formik.setFieldValue("profileImage", e.currentTarget.files[0]);
-    }
-  }}
-  className="file-input"
-/>
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            if (e.currentTarget.files && e.currentTarget.files[0]) {
+              formik.setFieldValue("profileImage", e.currentTarget.files[0]);
+            }
+          }}
+          className="file-input"
+        />
         {/* Full Name */}
         <div className="space-y-1">
           <label className="text-sm font-medium flex items-center gap-1 text-gray-600 dark:text-gray-300">
-            <User size={16} className="text-gray-500 dark:text-gray-400" /> Full Name
+            <User size={16} className="text-gray-500 dark:text-gray-400" /> {t("full_name")}
           </label>
           <input
             name="fullName"
@@ -107,7 +108,7 @@ onSubmit: async (values) => {
         {/* Email */}
         <div className="space-y-1">
           <label className="text-sm font-medium flex items-center gap-1 text-gray-600 dark:text-gray-300">
-            <Mail size={16} className="text-gray-500 dark:text-gray-400" /> Email Address
+            <Mail size={16} className="text-gray-500 dark:text-gray-400" /> {t("email_address")}
           </label>
           <input
             name="email"
@@ -121,7 +122,7 @@ onSubmit: async (values) => {
         {/* Phone */}
         <div className="space-y-1">
           <label className="text-sm font-medium flex items-center gap-1 text-gray-600 dark:text-gray-300">
-            <Phone size={16} className="text-gray-500 dark:text-gray-400" /> Phone Number
+            <Phone size={16} className="text-gray-500 dark:text-gray-400" /> {t("phone_number")}
           </label>
           <input
             name="phone"
@@ -135,7 +136,7 @@ onSubmit: async (values) => {
         {/* City */}
         <div className="space-y-1">
           <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
-            City
+            {t("city")}
           </label>
           <input
             name="location.city"
@@ -149,7 +150,7 @@ onSubmit: async (values) => {
         {/* Country */}
         <div className="space-y-1">
           <label className="text-sm font-medium text-gray-600 dark:text-gray-300">
-            Country
+            {t("country")}
           </label>
           <input
             name="location.country"
@@ -163,7 +164,7 @@ onSubmit: async (values) => {
         {/* Bio */}
         <div className="space-y-1 md:col-span-2">
           <label className="text-sm font-medium flex items-center gap-1 text-gray-600 dark:text-gray-300">
-            <FaInfo size={16} className="text-gray-500 dark:text-gray-400" /> Bio
+            <FaInfo size={16} className="text-gray-500 dark:text-gray-400" /> {t("bio")}
           </label>
           <input
             name="bio"
@@ -180,7 +181,7 @@ onSubmit: async (values) => {
         type="submit"
         className="mt-4 bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded"
       >
-        Update Info
+        {t("update_info")}
       </button>
     </form>
   );
