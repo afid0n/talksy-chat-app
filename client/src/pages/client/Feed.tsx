@@ -167,7 +167,7 @@ const Feed = () => {
                 const userCountry = user.location.country;
                 const nearbyUsers = users.filter(
                   (u) =>
-                    u.id !== user.id && // 👈 Exclude self
+                    u.id !== user.id && 
                     u.location?.country?.toLowerCase() === userCountry.toLowerCase()
                 );
 
