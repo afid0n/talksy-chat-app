@@ -6,6 +6,7 @@ import {
   MessageCircle,
   MessageCircleMore,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface HomeIntroSliderProps {
   onNext: () => void;
@@ -13,26 +14,27 @@ interface HomeIntroSliderProps {
 
 const slides = [
   {
-    title: "Connect globally",
-    desc: "Meet new people around the world.",
+    titleKey: "home_slider_connect",
+    descKey: "home_slider_connect_desc",
     color: "text-green-500",
     icon: <Globe className="text-green-500" />,
   },
   {
-    title: "Real-time messaging",
-    desc: "Chat instantly with friends and colleagues.",
+    titleKey: "home_slider_messaging",
+    descKey: "home_slider_messaging_desc",
     color: "text-blue-500",
     icon: <MessageCircleMore className="text-blue-500" />,
   },
   {
-    title: "Share media securely",
-    desc: "Send images and videos with privacy.",
+    titleKey: "home_slider_share",
+    descKey: "home_slider_share_desc",
     color: "text-purple-500",
     icon: <Image className="text-purple-500" />,
   },
 ];
 
 const HomeIntroSlider: React.FC<HomeIntroSliderProps> = ({ onNext }) => {
+  const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [typing, setTyping] = useState(true);
@@ -42,7 +44,7 @@ const HomeIntroSlider: React.FC<HomeIntroSliderProps> = ({ onNext }) => {
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
-    const fullText = slides[index].title;
+    const fullText = t(slides[index].titleKey) || "";
 
     if (done) return;
 
@@ -70,24 +72,24 @@ const HomeIntroSlider: React.FC<HomeIntroSliderProps> = ({ onNext }) => {
     }
 
     return () => clearTimeout(timeout);
-  }, [displayText, typing, index, isLastSlide, done]);
+  }, [displayText, typing, index, isLastSlide, done, t]);
 
   const skip = () => {
     const last = slides.length - 1;
     setIndex(last);
-    setDisplayText(slides[last].title);
+    setDisplayText(t(slides[last].titleKey) || "");
     setTyping(false);
     setDone(true);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 text-center  text-black dark:text-white transition-colors">
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 text-center text-black dark:text-white transition-colors">
       {!done && (
         <button
           onClick={skip}
           className="absolute top-5 right-5 bg-white dark:bg-zinc-800 px-4 py-1 border border-gray-200 dark:border-zinc-600 rounded-3xl text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white transition"
         >
-          Skip
+          {t("home_slider_skip")}
         </button>
       )}
 
@@ -132,7 +134,9 @@ const HomeIntroSlider: React.FC<HomeIntroSliderProps> = ({ onNext }) => {
             <span className="border-r-2 border-black dark:border-white ml-1 animate-pulse" />
           </h2>
 
-          <p className="text-gray-600 dark:text-gray-300 text-base">{slides[index].desc}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-base">
+            {t(slides[index].descKey)}
+          </p>
         </motion.div>
       </AnimatePresence>
 
@@ -155,7 +159,7 @@ const HomeIntroSlider: React.FC<HomeIntroSliderProps> = ({ onNext }) => {
           onClick={onNext}
           className="mt-10 bg-yellow-600 text-white px-6 py-2 rounded-full hover:bg-yellow-700 transition"
         >
-          Next
+          {t("home_slider_next")}
         </motion.button>
       )}
     </div>

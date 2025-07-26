@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { t } from "i18next";
 
 const allInterests = [
-  "Travel", "Reading", "Fitness", "Coding", "Music", "Dogs", "Cats", "Gaming", "Netflix",
-  "Photography", "Art", "Fashion", "Cooking", "Dancing", "Movies", "Hiking",
-  "Writing", "Tech", "Sports", "Basketball", "Football", "Cycling", "Skateboarding",
-  "Swimming", "DIY", "Makeup", "Foodie", "Gardening", "Astrology", 
-  "Startups", "Blogging", "Languages", "Puzzles", "Board Games", "Podcasts", "History",
-  "Science", "Architecture", "Theater"
+ "travel", "reading", "fitness", "coding", "music", "dogs", "cats", "gaming", "netflix",
+  "photography", "art", "fashion", "cooking", "dancing", "movies", "hiking",
+  "writing", "tech", "sports", "basketball", "football", "cycling", "skateboarding",
+  "swimming", "diy", "makeup", "foodie", "gardening", "astrology",
+  "startups", "blogging", "languages", "puzzles", "board_games", "podcasts", "history",
+  "science", "architecture", "theater"
 ];
 
 interface RegisterInterestsProps {
@@ -45,9 +46,9 @@ const RegisterInterests = ({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -50 }}
     >
-      <h2 className="text-2xl font-bold mb-2 dark:text-white">What are your interests?</h2>
+      <h2 className="text-2xl font-bold mb-2 dark:text-white">{t("register_interests_title")}</h2>
       <p className="mb-4 text-gray-500 dark:text-gray-400">
-        Select 3-5 interests to personalize your experience
+        {t("register_interests_subtitle")}
       </p>
 
       <div className="grid grid-cols-3 gap-3">
@@ -62,17 +63,16 @@ const RegisterInterests = ({
               disabled={isDisabled}
               className={`
                 p-2 rounded border text-sm transition
-                ${
-                  isSelected
-                    ? "bg-yellow-400 text-white"
-                    : isDisabled
+                ${isSelected
+                  ? "bg-yellow-400 text-white"
+                  : isDisabled
                     ? "bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
                     : "bg-gray-100 hover:bg-gray-200 cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
                 }
               `}
               type="button"
             >
-              {interest}
+              {t(`register_interests_${interest}`)}
             </button>
           );
         })}
@@ -84,7 +84,7 @@ const RegisterInterests = ({
           className="text-sm underline text-gray-600 dark:text-gray-300"
           type="button"
         >
-          ← Back
+          {t("register_interests_back")}
         </button>
         <button
           onClick={onNext}
@@ -92,7 +92,7 @@ const RegisterInterests = ({
           className="bg-yellow-500 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
           type="button"
         >
-          Continue →
+          {t("register_interests_continue")}
         </button>
       </div>
     </motion.div>

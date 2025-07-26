@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { loginSuccess } from '@/redux/userSlice';
 import type { UserState } from '@/types/User';
 import instance from '@/services/instance';
+import { t } from 'i18next';
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -27,7 +28,7 @@ export default function LoginForm() {
         // Step 1: login to get token
         const response = await loginUser(values); // this sets cookies
 
-        if (response?.message !== "login successful") {
+        if (response?.message !== t("login_success")) {
           enqueueSnackbar(response.message || "Invalid login response", { variant: "error" });
           return;
         }
@@ -49,10 +50,10 @@ export default function LoginForm() {
 
         // Step 4: navigate
         navigate("/feed");
-        enqueueSnackbar("Login successful!", { variant: "success" });
+        enqueueSnackbar(t("login_success"), { variant: "success" });
 
       } catch (error: any) {
-        const message = error.response?.data?.message || 'Login failed';
+        const message = error.response?.data?.message || t("login_failed");
         enqueueSnackbar(message, {
           autoHideDuration: 2000,
           anchorOrigin: { vertical: "bottom", horizontal: "right" },
@@ -72,7 +73,7 @@ export default function LoginForm() {
           <span className="text-yellow-600">sy</span>
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mt-2">
-          Welcome back to your conversations
+         {t("login_subtitle")}
         </p>
       </div>
       <form
@@ -84,24 +85,24 @@ export default function LoginForm() {
           onClick={() => window.location.href = `http://localhost:7070/auth/google`}
           className="flex items-center justify-center w-full py-2 mb-4 border border-gray-300 dark:border-zinc-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
         >
-          <FaGoogle className="mr-2" /> Continue with Google
+          <FaGoogle className="mr-2" />{t("login_google")}
         </button>
 
         <div className="flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm mb-4">
           <span className="border-t border-gray-300 dark:border-zinc-600 flex-grow" />
-          <span className="mx-3">Or continue with email</span>
+          <span className="mx-3">{t("login_or_continue_with_email")} </span>
           <span className="border-t border-gray-300 dark:border-zinc-600 flex-grow" />
         </div>
 
         {/* EMAIL FIELD */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Email or Username
+            {t("login_email_label")}
           </label>
           <input
             type="text"
             name="email"
-            placeholder="Enter email or username"
+            placeholder={t("login_email_placeholder")}
             className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.email && formik.touched.email
               ? 'border-red-500 focus:ring-red-500'
               : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
@@ -122,8 +123,8 @@ export default function LoginForm() {
           </label>
           <input
             type="password"
-            name="password"
-            placeholder="Enter your password"
+            name={t("login_password_label")}
+            placeholder={t("login_password_placeholder")}
             className={`mt-1 w-full px-3 py-2 border rounded-md bg-white dark:bg-zinc-800 text-black dark:text-white focus:outline-none focus:ring-2 ${formik.errors.password && formik.touched.password
               ? 'border-red-500 focus:ring-red-500'
               : 'border-gray-300 dark:border-zinc-600 focus:ring-yellow-500'
@@ -139,7 +140,7 @@ export default function LoginForm() {
 
         <div className="flex items-center justify-between text-sm mb-4">
           <Link to="/auth/forgot-password" className="text-yellow-600 hover:underline">
-            Forgot password?
+          {t("login_forgot_password")}
           </Link>
         </div>
 
@@ -149,13 +150,13 @@ export default function LoginForm() {
           className={`w-full bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
         >
-          {loading ? 'Signing in...' : 'Sign In'}
+          {loading ? t("login_button_loading") : t("login_button")}
         </button>
 
         <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
-          Don’t have an account?{" "}
+          {t("login_no_account")}{" "}
           <Link to="/auth/register" className="text-yellow-600 font-medium hover:underline">
-            Create one now
+          {t("login_create_account")}
           </Link>
         </p>
       </form>

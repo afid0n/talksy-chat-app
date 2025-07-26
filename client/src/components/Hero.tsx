@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { t } from "i18next";
 
 interface HeroProps {
   onNext: () => void;
@@ -21,7 +22,7 @@ const Hero: React.FC<HeroProps> = ({ onNext }) => {
           animate={{ scale: 1 }}
           transition={{ delay: 0.3 }}
         >
-          Connect. Chat. Grow.
+           {t("hero_title")}
         </motion.h1>
 
         <motion.p
@@ -30,7 +31,7 @@ const Hero: React.FC<HeroProps> = ({ onNext }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          Meet people who share your passions – from around the world 🌍
+          {t("hero_description")}
         </motion.p>
 
         <motion.button
@@ -38,7 +39,7 @@ const Hero: React.FC<HeroProps> = ({ onNext }) => {
           whileTap={{ scale: 0.95 }}
           onClick={onNext}
         >
-          🚀 Start Chatting Now
+          {t("hero_button")}
         </motion.button>
       </motion.div>
     </section>

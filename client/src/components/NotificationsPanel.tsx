@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Bell } from "lucide-react";
+import { t } from "i18next";
 
 const NotificationToggle = ({
   title,
@@ -44,23 +45,23 @@ const NotificationsPanel = () => {
 
   return (
     <div className="space-y-6 bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Notifications</h3>
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("notifications")}</h3>
 
       <NotificationToggle
-        title="Message Notifications"
-        description="Get notified when you receive new messages"
+        title={t("message_notifications")}
+        description={t("message_notifications_description")}
         checked={messageNotif}
         onChange={() => setMessageNotif(!messageNotif)}
       />
       <NotificationToggle
-        title="Connection Requests"
-        description="Get notified when someone wants to connect"
+        title={t("connection_notifications")}
+        description={t("connection_requests_desc")}
         checked={connectionNotif}
         onChange={() => setConnectionNotif(!connectionNotif)}
       />
       <NotificationToggle
-        title="App Updates"
-        description="Get notified about new features and updates"
+        title={t("app_updates")}
+        description={t("app_updates_description")}
         checked={appUpdatesNotif}
         onChange={() => setAppUpdatesNotif(!appUpdatesNotif)}
       />

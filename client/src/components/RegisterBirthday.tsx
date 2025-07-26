@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
 import { Cake } from "lucide-react";
+import { t } from "i18next";
 
 interface RegisterBirthdayProps {
   onNext: () => void;
@@ -52,7 +53,7 @@ const RegisterBirthday = ({
       exit={{ opacity: 0, x: -50 }}
       className="text-gray-800 dark:text-gray-100"
     >
-      <h2 className="text-2xl font-bold mb-4 text-center">Select your birthday</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center"> {t("register_birthday_title")}</h2>
 
       {!showCalendar && (
         <button
@@ -60,7 +61,7 @@ const RegisterBirthday = ({
           className="bg-yellow-400 dark:bg-yellow-500 flex items-center gap-2 w-full justify-center text-lg text-white px-6 py-2 rounded mb-4 hover:bg-yellow-500 dark:hover:bg-yellow-600 transition-all"
           type="button"
         >
-          <p>Click to select birthday</p>
+          <p>{t("register_birthday_click")}</p>
           <Cake />
         </button>
       )}
@@ -80,10 +81,12 @@ const RegisterBirthday = ({
       {date && (
         <div className="mt-2 mb-4 text-center text-gray-700 dark:text-gray-300">
           <p>
-            🎂 Your birthday is <strong>{format(date, "MMMM d, yyyy")}</strong>
+             🎂 {t("register_birthday_is")}{" "}
+            <strong>{format(date, "MMMM d, yyyy")}</strong>
           </p>
           <p>
-            🎉 You are <strong>{calculateAge(date)}</strong> years old
+           🎉 {t("register_birthday_age")}{" "}
+            <strong>{calculateAge(date)}</strong> years old
           </p>
         </div>
       )}
@@ -94,7 +97,7 @@ const RegisterBirthday = ({
           className="text-sm underline text-gray-600 dark:text-gray-400"
           type="button"
         >
-          ← Back
+          {t("register_back")}
         </button>
         <button
           onClick={onNext}
@@ -102,7 +105,7 @@ const RegisterBirthday = ({
           className="bg-yellow-500 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-yellow-600 dark:hover:bg-yellow-600"
           type="button"
         >
-          Continue →
+          {t("register_continue")}
         </button>
       </div>
     </motion.div>

@@ -5,6 +5,7 @@ import { changePassword } from "@/services/profileService";
 import type { ChangePasswordPayload } from "@/services/profileService";
 import type { RootState } from "../redux/store/store"
 import { useSelector } from "react-redux";
+import { t } from "i18next";
 
 export default function ChangePassword() {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,7 +22,7 @@ export default function ChangePassword() {
     },
     onSubmit: async (values) => {
       if (values.newPassword !== values.confirmPassword) {
-        enqueueSnackbar("New password and confirmation do not match.", {
+        enqueueSnackbar(t("password_mismatch_warning"), {
           variant: "warning",
           autoHideDuration: 2000,
           anchorOrigin: {
@@ -40,7 +41,7 @@ export default function ChangePassword() {
       try {
         const response = await changePassword(userSate.id, payload);
 
-        enqueueSnackbar(response.message || "Password updated successfully!", {
+        enqueueSnackbar(response.message || t("password_update_success"), {
           variant: "success",
           autoHideDuration: 2000,
           anchorOrigin: {
@@ -51,7 +52,7 @@ export default function ChangePassword() {
 
         formik.resetForm();
       } catch (error) {
-        enqueueSnackbar((error as Error).message || "Failed to update password", {
+        enqueueSnackbar((error as Error).message || t("password_update_fail"), {
           variant: "error",
           autoHideDuration: 2000,
           anchorOrigin: {
@@ -70,13 +71,13 @@ export default function ChangePassword() {
       className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-sm space-y-6 border border-gray-200 dark:border-zinc-700"
     >
       <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
-        Change Password
+        {t("change_password")}
       </h2>
 
       {/* Current Password */}
       <div>
         <label className="block mb-1 text-gray-700 dark:text-gray-300">
-          Current Password
+          {t("current_password")}
         </label>
         <div className="relative">
           <input
@@ -100,7 +101,7 @@ export default function ChangePassword() {
       {/* New Password */}
       <div>
         <label className="block mb-1 text-gray-700 dark:text-gray-300">
-          New Password
+          {(t("new_password"))}
         </label>
         <input
           name="newPassword"
@@ -115,7 +116,7 @@ export default function ChangePassword() {
       {/* Confirm New Password */}
       <div>
         <label className="block mb-1 text-gray-700 dark:text-gray-300">
-          Confirm New Password
+          {t("confirm_new_password")}
         </label>
         <input
           name="confirmPassword"
@@ -132,7 +133,8 @@ export default function ChangePassword() {
         type="submit"
         className="mt-4 bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded"
       >
-        Update Password
+        {t("update_password")}
+        {/* Translated text for "Update Password" */}
       </button>
     </form>
   );
