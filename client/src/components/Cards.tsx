@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { UserRoundPlus, MessageCircle } from "lucide-react";
 import { enqueueSnackbar } from "notistack";
 import type { User } from "@/types/User";
-import { sendFriendRequest, removeFriend } from "@/services/userService"; 
+import { sendFriendRequest, removeFriend } from "@/services/userService";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store/store";
+import { useTranslation } from "react-i18next";
 
 import {
   Dialog,
@@ -16,7 +17,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-import { Button } from "@/components/ui/button"; 
+import { Button } from "@/components/ui/button";
 
 interface CardsProps {
   city?: string;
@@ -24,7 +25,7 @@ interface CardsProps {
   countriesFilter?: string[];
   users: User[];
   currentUserId: string;
-  highlightInterests?: string[]; // New prop for highlighting shared interests
+  highlightInterests?: string[];
 }
 
 const Cards = ({
@@ -34,12 +35,12 @@ const Cards = ({
   currentUserId,
   highlightInterests = [],
 }: CardsProps) => {
+  const { t } = useTranslation();
   const [likedIds, setLikedIds] = useState<string[]>([]);
   const [loadingIds, setLoadingIds] = useState<string[]>([]);
   const [localRequestedIds, setLocalRequestedIds] = useState<string[]>([]);
   const [localFriends, setLocalFriends] = useState<{ [userId: string]: boolean }>({});
 
-  // Dialog state
   const [openDialog, setOpenDialog] = useState(false);
   const [friendToRemove, setFriendToRemove] = useState<string | null>(null);
 
@@ -73,7 +74,7 @@ const Cards = ({
     setLoadingIds((prev) => [...prev, targetId]);
     try {
       const res = await sendFriendRequest(targetId);
-      enqueueSnackbar(res.message || "Request sent", { variant: "success" });
+      enqueueSnackbar(res.message || t("cards.requestSent"), { variant: "success" });
 
       setLocalRequestedIds((prev) => {
         const updated = [...prev, targetId];
@@ -82,7 +83,7 @@ const Cards = ({
       });
     } catch (err: any) {
       console.error(err);
-      enqueueSnackbar("Failed to send friend request", { variant: "error" });
+      enqueueSnackbar(t("cards.requestFailed"), { variant: "error" });
     } finally {
       setLoadingIds((prev) => prev.filter((id) => id !== targetId));
     }
@@ -98,7 +99,7 @@ const Cards = ({
     setLoadingIds((prev) => [...prev, friendToRemove]);
     try {
       await removeFriend(friendToRemove);
-      enqueueSnackbar("Friend removed successfully", { variant: "success" });
+      enqueueSnackbar(t("cards.friendRemoved"), { variant: "success" });
 
       setLocalFriends((prev) => {
         const copy = { ...prev };
@@ -116,7 +117,7 @@ const Cards = ({
       setFriendToRemove(null);
     } catch (err: any) {
       console.error(err);
-      enqueueSnackbar("Failed to remove friend", { variant: "error" });
+      enqueueSnackbar(t("cards.removeFailed"), { variant: "error" });
     } finally {
       setLoadingIds((prev) => prev.filter((id) => id !== friendToRemove));
     }
@@ -149,10 +150,10 @@ const Cards = ({
     <>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {sortedUsers.map((user) => {
-          // Highlight shared interests
-          const sharedInterests = highlightInterests && user.interests
-            ? user.interests.filter(i => highlightInterests.includes(i))
-            : [];
+          const sharedInterests =
+            highlightInterests && user.interests
+              ? user.interests.filter((i) => highlightInterests.includes(i))
+              : [];
 
           const liked = likedIds.includes(user.id);
           const isCurrentUser = user.id === currentUserId;
@@ -185,7 +186,7 @@ const Cards = ({
                   </p>
                   {isCurrentUser && (
                     <span className="text-xs text-yellow-600 dark:text-yellow-300 font-semibold">
-                      That's you
+                      {t("cards.thatsYou")}
                     </span>
                   )}
                 </div>
@@ -193,16 +194,15 @@ const Cards = ({
 
               <div className="mt-4">
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>Country:</strong> {user.location?.country || "N/A"}
+                  <strong>{t("cards.country")}:</strong> {user.location?.country || t("cards.na")}
                 </p>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>City:</strong> {user.location?.city || "N/A"}
+                  <strong>{t("cards.city")}:</strong> {user.location?.city || t("cards.na")}
                 </p>
                 <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 line-clamp-3">
-                  {user.bio || "This user has no bio yet."}
+                  {user.bio || t("cards.noBio")}
                 </p>
 
-                {/* Interests with highlight */}
                 <div className="mt-2 flex flex-wrap gap-1">
                   {user.interests?.map((interest) => {
                     const isShared = sharedInterests.includes(interest);
@@ -223,88 +223,83 @@ const Cards = ({
               </div>
 
               {!isCurrentUser && (
-                <div className="flex justify-between mt-4 items-center">
-                  {/* Like button */}
-                  <button
-                    className={`text-sm flex items-center gap-1 px-4 py-1.5 rounded-md transition ${
-                      liked
-                        ? "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700"
-                        : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800"
-                    }`}
-                    onClick={() => handleLike(user.id)}
-                  >
-                    <UserRoundPlus size={13} />
-                    {liked ? "Liked" : "Like"}
-                  </button>
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mt-4 items-center">
+  <button
+    className={`w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md transition ${
+      liked
+        ? "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700"
+        : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800"
+    }`}
+    onClick={() => handleLike(user.id)}
+  >
+    <UserRoundPlus size={13} />
+    {liked ? t("cards.liked") : t("cards.like")}
+  </button>
 
-                  {/* Friend Request or Connected */}
-                  {isFriend ? (
-                    <button
-                      onClick={() => confirmRemoveFriend(user.id)}
-                      disabled={isLoading}
-                      className="text-sm flex items-center gap-1 px-4 py-1.5 rounded-md bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700 cursor-pointer"
-                      title="Click to unconnect"
-                    >
-                      <UserRoundPlus size={13} />
-                      Connected
-                    </button>
-                  ) : isRequested ? (
-                    <span className="text-sm flex items-center gap-1 px-4 py-1.5 rounded-md bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed">
-                      <UserRoundPlus size={13} />
-                      Requested
-                    </span>
-                  ) : hasReceivedRequest ? (
-                    <span className="text-sm flex items-center gap-1 px-4 py-1.5 rounded-md bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 cursor-default">
-                      <UserRoundPlus size={13} />
-                      Request Received
-                    </span>
-                  ) : (
-                    <button
-                      className="text-sm flex items-center gap-1 px-4 py-1.5 rounded-md bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 cursor-pointer"
-                      onClick={() => handleSendRequest(user.id)}
-                      disabled={isLoading}
-                    >
-                      <UserRoundPlus size={13} />
-                      Connect
-                    </button>
-                  )}
+  {isFriend ? (
+    <button
+      onClick={() => confirmRemoveFriend(user.id)}
+      disabled={isLoading}
+      className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700 cursor-pointer"
+      title={t("cards.unconnectTooltip")}
+    >
+      <UserRoundPlus size={13} />
+      {t("cards.connected")}
+    </button>
+  ) : isRequested ? (
+    <span className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed">
+      <UserRoundPlus size={13} />
+      {t("cards.requested")}
+    </span>
+  ) : hasReceivedRequest ? (
+    <span className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 cursor-default">
+      <UserRoundPlus size={13} />
+      {t("cards.requestReceived")}
+    </span>
+  ) : (
+    <button
+      className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 cursor-pointer"
+      onClick={() => handleSendRequest(user.id)}
+      disabled={isLoading}
+    >
+      <UserRoundPlus size={13} />
+      {t("cards.connect")}
+    </button>
+  )}
 
-                  {/* Show Message button only if connected */}
-                  {isFriend && (
-                    <button
-                      className="ml-2 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 px-3 py-1 rounded-md flex items-center gap-1"
-                      onClick={handleStartChat}
-                    >
-                      <MessageCircle size={14} />
-                      Message
-                    </button>
-                  )}
-                </div>
+  {isFriend && (
+    <button
+      className="w-full sm:w-auto bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 px-3 py-1 rounded-md flex items-center justify-center gap-1"
+      onClick={handleStartChat}
+    >
+      <MessageCircle size={14} />
+      {t("cards.message")}
+    </button>
+  )}
+</div>
+
               )}
             </div>
           );
         })}
       </div>
 
-      {/* Dialog for removing friend */}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Unconnect</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to remove this friend? This action cannot be undone.
-            </DialogDescription>
+            <DialogTitle>{t("cards.dialogTitle")}</DialogTitle>
+            <DialogDescription>{t("cards.dialogDescription")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpenDialog(false)}>
-              Cancel
+              {t("cards.cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={handleUnconnect}
               disabled={!friendToRemove || loadingIds.includes(friendToRemove)}
             >
-              Yes, Remove
+              {t("cards.confirmRemove")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -196,5 +196,58 @@
   "register_email_invalid": "Неверный формат электронной почты",
   "register_password_required": "Пароль обязателен",
   "register_password_min": "Не менее 6 символов",
-  "register_failed": "Регистрация не удалась. Попробуйте снова."
+  "register_failed": "Регистрация не удалась. Попробуйте снова.",
+
+  "feed": {
+    "heading": "Откройте людей",
+    "subheading": "Найдите и свяжитесь с другими пользователями",
+    "tabs": {
+      "discover": "Открыть",
+      "nearby": "Рядом",
+      "sharedInterests": "Общие интересы"
+    },
+    "searchPlaceholder": "Поиск пользователей...",
+    "moreFilters": "Больше фильтров",
+    "loading": "Загрузка пользователей...",
+    "noNearby": "Вблизи {{country}} людей не найдено.",
+    "detectingLocation": "Определение местоположения...",
+    "noSharedInterests": "Пользователи с такими интересами не найдены.",
+    "filters": {
+      "title": "Фильтры",
+      "countries": "Страны",
+      "reset": "Сбросить",
+      "apply": "Применить фильтры"
+    }
+  },
+  "cards": {
+    "like": "Нравится",
+    "liked": "Понравилось",
+    "connect": "Подключиться",
+    "connected": "Подключено",
+    "requested": "Запрошено",
+    "requestReceived": "Запрос получен",
+    "message": "Сообщение",
+    "country": "Страна",
+    "city": "Город",
+    "na": "Н/Д",
+    "noBio": "У этого пользователя пока нет описания.",
+    "thatsYou": "Это вы",
+    "unconnectTooltip": "Нажмите, чтобы разорвать связь",
+    "dialogTitle": "Подтвердите разрыв связи",
+    "dialogDescription": "Вы уверены, что хотите удалить этого друга? Это действие необратимо.",
+    "cancel": "Отмена",
+    "confirmRemove": "Да, удалить",
+    "requestSent": "Запрос отправлен",
+    "requestFailed": "Не удалось отправить запрос в друзья",
+    "friendRemoved": "Друг успешно удалён",
+    "removeFailed": "Не удалось удалить друга"
+  },
+  "sidebar": {
+    "title": "Talksy",
+    "feed": "Лента",
+    "chat": "Чат",
+    "profile": "Профиль",
+    "logout": "Выйти",
+    "logout_success": "Успешный выход из системы."
+  }
 }

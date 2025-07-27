@@ -1,3 +1,4 @@
+"use client";
 import Cards from "@/components/Cards";
 import {
   Tabs,
@@ -19,8 +20,10 @@ import {
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import instance from "@/services/instance";
+import { useTranslation } from "react-i18next";
 
 const Feed = () => {
+  const { t } = useTranslation();
   const user = useSelector((state: RootState) => state.user);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,7 +60,6 @@ const Feed = () => {
     fetchUsers();
   }, []);
 
-  // Shared interests users filtered from all users except current user
   const sharedInterestUsers = useMemo(() => {
     if (!user.interests?.length) return [];
     return users.filter(u => {
@@ -96,9 +98,9 @@ const Feed = () => {
   ];
 
   const tabs = [
-    { value: "discover", icon: Globe, label: "Discover" },
-    { value: "nearby", icon: MapPin, label: "Nearby" },
-    { value: "interests", icon: Filter, label: "Shared Interests" },
+    { value: "discover", icon: Globe, label: t("feed.tabs.discover") },
+    { value: "nearby", icon: MapPin, label: t("feed.tabs.nearby") },
+    { value: "interests", icon: Filter, label: t("feed.tabs.sharedInterests") },
   ];
 
   return (
@@ -112,8 +114,10 @@ const Feed = () => {
       )}
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Discover People</h1>
-        <p className="mt-3">Find and connect with other users</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          {t("feed.heading")}
+        </h1>
+        <p className="mt-3">{t("feed.subheading")}</p>
 
         <Tabs defaultValue="discover" className="w-full flex flex-col gap-5 mt-5">
           <div className="w-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
@@ -135,13 +139,10 @@ const Feed = () => {
 
           <div className="w-full flex items-center justify-between gap-2">
             <div className="relative flex-1">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={18}
-              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
-                placeholder="Search for users..."
+                placeholder={t("feed.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 rounded-md bg-white dark:bg-zinc-900
@@ -156,14 +157,13 @@ const Feed = () => {
                 dark:hover:bg-yellow-800 dark:bg-yellow-900 transition flex items-center justify-center gap-2"
             >
               <Filter className="w-5 h-5" />
-              <span>More Filters</span>
+              <span>{t("feed.moreFilters")}</span>
             </button>
           </div>
 
-          {/* Discover Tab */}
           <TabsContent value="discover">
             {loading ? (
-              <div>Loading users...</div>
+              <div>{t("feed.loading")}</div>
             ) : user?.id ? (
               <Cards
                 users={users}
@@ -174,10 +174,9 @@ const Feed = () => {
             ) : null}
           </TabsContent>
 
-          {/* Nearby Tab */}
           <TabsContent value="nearby">
             {loading ? (
-              <div>Loading users...</div>
+              <div>{t("feed.loading")}</div>
             ) : user?.id && user?.location?.country ? (
               (() => {
                 const userCountry = user.location.country;
@@ -196,18 +195,17 @@ const Feed = () => {
                     currentUserId={user.id}
                   />
                 ) : (
-                  <div>No nearby people found in {userCountry}.</div>
+                  <div>{t("feed.noNearby", { country: userCountry })}</div>
                 );
               })()
             ) : (
-              <div>Detecting location...</div>
+              <div>{t("feed.detectingLocation")}</div>
             )}
           </TabsContent>
 
-          {/* Shared Interests Tab */}
           <TabsContent value="interests">
             {loading ? (
-              <div>Loading users...</div>
+              <div>{t("feed.loading")}</div>
             ) : user?.id && sharedInterestUsers.length > 0 ? (
               <Cards
                 users={sharedInterestUsers}
@@ -217,12 +215,11 @@ const Feed = () => {
                 highlightInterests={user.interests}
               />
             ) : (
-              <div>No users share your interests yet.</div>
+              <div>{t("feed.noSharedInterests")}</div>
             )}
           </TabsContent>
         </Tabs>
 
-        {/* Filters Sidebar */}
         <div
           className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white dark:bg-zinc-900
             text-gray-900 dark:text-gray-100 z-50 shadow-xl transform transition-transform duration-300
@@ -230,7 +227,7 @@ const Feed = () => {
         >
           <div className="px-6 py-8 h-full overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold">Filters</h2>
+              <h2 className="text-2xl font-semibold">{t("feed.filters.title")}</h2>
               <button
                 onClick={toggleFilters}
                 className="text-gray-600 dark:text-gray-400 hover:text-yellow-500"
@@ -240,7 +237,9 @@ const Feed = () => {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Countries</h3>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                {t("feed.filters.countries")}
+              </h3>
               <div className="grid grid-cols-2 gap-2 text-gray-700 dark:text-gray-300 text-sm">
                 {countries.map((item) => (
                   <label key={item} className="flex items-center gap-2">
@@ -262,14 +261,14 @@ const Feed = () => {
                 className="bg-yellow-500 hover:bg-yellow-400 dark:hover:bg-yellow-800
                   dark:bg-yellow-900 transition text-white px-4 py-2 rounded"
               >
-                Reset
+                {t("feed.filters.reset")}
               </button>
               <button
                 onClick={handleApply}
                 className="bg-yellow-500 hover:bg-yellow-400 dark:hover:bg-yellow-800
                   dark:bg-yellow-900 transition text-white px-4 py-2 rounded"
               >
-                Apply Filters
+                {t("feed.filters.apply")}
               </button>
             </div>
           </div>

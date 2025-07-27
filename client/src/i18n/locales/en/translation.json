@@ -196,5 +196,58 @@
   "register_email_invalid": "Invalid email",
   "register_password_required": "Password is required",
   "register_password_min": "At least 6 characters",
-  "register_failed": "Registration failed. Please try again."
+  "register_failed": "Registration failed. Please try again.",
+  "feed":{
+    "heading": "Discover People",
+    "subheading": "Find and connect with other users",
+    "tabs": {
+      "discover": "Discover",
+      "nearby": "Nearby",
+      "sharedInterests": "Shared Interests"
+    },
+    "searchPlaceholder": "Search for users...",
+    "moreFilters": "More Filters",
+    "loading": "Loading users...",
+    "noNearby": "No nearby people found in {{country}}.",
+    "detectingLocation": "Detecting location...",
+    "noSharedInterests": "No users share your interests yet.",
+    "filters": {
+      "title": "Filters",
+      "countries": "Countries",
+      "reset": "Reset",
+      "apply": "Apply Filters"
+    }
+
+  },
+   "cards": {
+    "like": "Like",
+    "liked": "Liked",
+    "connect": "Connect",
+    "connected": "Connected",
+    "requested": "Requested",
+    "requestReceived": "Request Received",
+    "message": "Message",
+    "country": "Country",
+    "city": "City",
+    "na": "N/A",
+    "noBio": "This user has no bio yet.",
+    "thatsYou": "That's you",
+    "unconnectTooltip": "Click to unconnect",
+    "dialogTitle": "Confirm Unconnect",
+    "dialogDescription": "Are you sure you want to remove this friend? This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirmRemove": "Yes, Remove",
+    "requestSent": "Request sent",
+    "requestFailed": "Failed to send friend request",
+    "friendRemoved": "Friend removed successfully",
+    "removeFailed": "Failed to remove friend"
+  },
+    "sidebar": {
+    "title": "Talksy",
+    "feed": "Feed",
+    "chat": "Chat",
+    "profile": "Profile",
+    "logout": "Log Out",
+    "logout_success": "Logged out successfully."
+  }
 }

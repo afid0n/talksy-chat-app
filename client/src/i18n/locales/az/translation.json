@@ -196,5 +196,57 @@
   "register_email_invalid": "Yanlış e-poçt formatı",
   "register_password_required": "Şifrə vacibdir",
   "register_password_min": "Ən azı 6 simvol",
-  "register_failed": "Qeydiyyat uğursuz oldu. Zəhmət olmasa yenidən cəhd edin."
-}
+  "register_failed": "Qeydiyyat uğursuz oldu. Zəhmət olmasa yenidən cəhd edin.",
+    "feed": {
+      "heading": "İnsanları Kəşf Et",
+      "subheading": "Digər istifadəçiləri tapın və əlaqə qurun",
+      "tabs": {
+        "discover": "Kəşf Et",
+        "nearby": "Yaxınlıqda",
+        "sharedInterests": "Ortaq Maraqlar"
+      },
+      "searchPlaceholder": "İstifadəçiləri axtar...",
+      "moreFilters": "Daha çox filter",
+      "loading": "İstifadəçilər yüklənir...",
+      "noNearby": "{{country}} ölkəsində yaxınlıqda insan tapılmadı.",
+      "detectingLocation": "Yeriniz aşkar edilir...",
+      "noSharedInterests": "Heç bir istifadəçi maraqlarınızı paylaşmır.",
+      "filters": {
+        "title": "Filterlər",
+        "countries": "Ölkələr",
+        "reset": "Sıfırla",
+        "apply": "Filterləri tətbiq et"
+      }
+    },
+    "cards": {
+      "like": "Bəyən",
+      "liked": "Bəyənildi",
+      "connect": "Əlaqə qur",
+      "connected": "Əlaqəlidir",
+      "requested": "Tələb göndərildi",
+      "requestReceived": "Tələb alındı",
+      "message": "Mesaj",
+      "country": "Ölkə",
+      "city": "Şəhər",
+      "na": "Mövcud deyil",
+      "noBio": "Bu istifadəçinin hələ bio-su yoxdur.",
+      "thatsYou": "Bu sənəsən",
+      "unconnectTooltip": "Əlaqəni kəsmək üçün kliklə",
+      "dialogTitle": "Əlaqəni kəsməyi təsdiqlə",
+      "dialogDescription": "Bu dostu silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz.",
+      "cancel": "Ləğv et",
+      "confirmRemove": "Bəli, Sil",
+      "requestSent": "Tələb göndərildi",
+      "requestFailed": "Dostluq tələbi göndərilə bilmədi",
+      "friendRemoved": "Dost uğurla silindi",
+      "removeFailed": "Dostu silmək mümkün olmadı"
+    },
+    "sidebar": {
+      "title": "Talksy",
+      "feed": "İstifadəçiləri Kəşf Et",
+      "chat": "Söhbət",
+      "profile": "Profil",
+      "logout": "Çıxış",
+      "logout_success": "Uğurla çıxış edildi."
+    }
+  }
