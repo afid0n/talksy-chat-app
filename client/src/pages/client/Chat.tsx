@@ -21,7 +21,7 @@ type ChatPreview = {
     createdAt: string;
   };
   updatedAt?: string;
-  chatId?: string; // Note: might be undefined here
+  chatId?: string; // Might be undefined here
 };
 
 const ChatWrapper = () => {
@@ -32,24 +32,50 @@ const ChatWrapper = () => {
 
   const currentUser = useSelector((state: RootState) => state.user);
 
+  // Debug log currentUser
+  useEffect(() => {
+    console.log("Current user from Redux:", currentUser);
+  }, [currentUser]);
+
   // Load all conversations for sidebar
   useEffect(() => {
     getChatPreviewsForUser()
-      .then(setConversations)
-      .catch(console.error);
+      .then((data) => {
+        console.log("Fetched chat previews:", data);
+        setConversations(data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch chat previews:", err);
+      });
   }, []);
+
+  // Debug conversations update
+  useEffect(() => {
+    console.log("Updated conversations state:", conversations);
+  }, [conversations]);
 
   // Handle socket join and message fetch on selectedChatId change
   useEffect(() => {
-    if (!selectedChatId) return;
+    if (!selectedChatId) {
+      console.log("No selectedChatId yet, skipping socket join and fetch");
+      return;
+    }
 
+    console.log(`Joining socket room: ${selectedChatId}`);
     socket.emit("joinRoom", selectedChatId);
 
     fetchMessagesForChat(selectedChatId)
-      .then(setMessages)
-      .catch(console.error);
+      .then((msgs) => {
+        console.log(`Fetched messages for chat ${selectedChatId}:`, msgs);
+        setMessages(msgs);
+      })
+      .catch((err) => {
+        console.error(`Failed to fetch messages for chat ${selectedChatId}:`, err);
+      });
 
     const handleIncomingMessage = (message: Message & { chat: string }) => {
+      console.log("Received socket message:", message);
+
       if (message.chat === selectedChatId) {
         if (!message.sender) {
           message.sender = {
@@ -88,10 +114,17 @@ const ChatWrapper = () => {
     socket.on("receiveMessage", handleIncomingMessage);
 
     return () => {
+      console.log(`Leaving socket room: ${selectedChatId}`);
       socket.emit("leaveRoom", selectedChatId);
       socket.off("receiveMessage", handleIncomingMessage);
     };
   }, [selectedChatId, currentUser.id, selectedFriendId]);
+
+  // Debug selectedFriendId and selectedChatId changes
+  useEffect(() => {
+    console.log("Selected friend ID:", selectedFriendId);
+    console.log("Selected chat ID:", selectedChatId);
+  }, [selectedFriendId, selectedChatId]);
 
   return (
     <div className="flex min-h-screen w-full h-full">
@@ -99,7 +132,7 @@ const ChatWrapper = () => {
       <Messages
         conversations={conversations.map((chat) => ({
           id: chat.friendId,
-          chatId: chat.chatId || undefined, // chatId might be undefined in previews
+          chatId: chat.chatId || undefined,
           fullName: chat.fullName || "Unnamed Chat",
           avatar: chat.avatar?.url || "",
           lastMessage: chat.lastMessage?.content || "",
@@ -118,16 +151,26 @@ const ChatWrapper = () => {
         }))}
         selectedId={selectedFriendId}
         onSelect={async (friendId, chatId) => {
+          console.log("Messages onSelect called with:", { friendId, chatId });
+
           setSelectedFriendId(friendId);
 
           try {
             let chat;
 
             if (chatId) {
+              console.log("Using existing chatId:", chatId);
               chat = { _id: chatId };
             } else {
-              // Fetch or create chat with friend to get chatId
+              console.log("No chatId, calling getOrCreateChatWithUser for friendId:", friendId);
               chat = await getOrCreateChatWithUser(friendId);
+              console.log("getOrCreateChatWithUser returned chat:", chat);
+            }
+
+            if (!chat || !chat._id) {
+              console.error("Invalid chat returned:", chat);
+              setSelectedChatId(null);
+              return;
             }
 
             setSelectedChatId(chat._id);

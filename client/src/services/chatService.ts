@@ -44,6 +44,14 @@ export const getPrivateChat = async (userId: string) => {
 
 // chatService.ts
 export const getOrCreateChatWithUser = async (friendId: string) => {
-  const response = await instance.post(`/chats/${friendId}`);
-  return response.data; 
+  try {
+    const response = await instance.post('/chats/with-user', { friendId });
+    console.log("API response from getOrCreateChatWithUser:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("API error in getOrCreateChatWithUser:", error);
+    throw error;
+  }
 };
+
+

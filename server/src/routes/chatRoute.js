@@ -5,7 +5,8 @@ const verifyToken = require('../middlewares/authToken');
 const messageRouter = require('../routes/messageRoute');
 
 // ✅ 1. Specific route first to avoid conflict
-router.get('/with/:userId', verifyToken, chatController.getOrCreateChatWithUser);
+router.post('/with-user', verifyToken, chatController.getOrCreateChatWithUser);
+
 
 // ✅ 2. Get all chats for the user
 router.get('/', verifyToken, chatController.getChatsForUser);

@@ -100,13 +100,15 @@ const createMessage = async (req, res) => {
 
 
 const getOrCreateChatWithUser = async (req, res) => {
-  const currentUserId = req.user?._id;
+  console.log("Received /chats/with-user request");
+  console.log("req.user:", req.user);
+  console.log("req.body:", req.body);
 
-  // Get friendId from the correct place:
-  // For POST, likely from req.body.friendId
+  const currentUserId = req.user?.id;
   const friendId = req.body.friendId;
 
   if (!currentUserId || !friendId) {
+    console.log("Missing currentUserId or friendId!");
     return res.status(400).json({ message: "Missing user or friendId" });
   }
 
@@ -125,20 +127,13 @@ const getOrCreateChatWithUser = async (req, res) => {
       chat = await chat.populate("participants", "_id fullName avatar");
     }
 
+    console.log("Returning chat:", chat);
     res.json(chat);
   } catch (err) {
-    console.error(err);
+    console.error("Server error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
-module.exports = { getOrCreateChatWithUser };
-
-
-
-
-
 
 module.exports = {
   getChatById,
