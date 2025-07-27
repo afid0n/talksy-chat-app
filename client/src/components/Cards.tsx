@@ -4,7 +4,6 @@ import { enqueueSnackbar } from "notistack";
 import type { User } from "@/types/User";
 import { sendFriendRequest, removeFriend } from "@/services/userService"; 
 import { useNavigate } from "react-router-dom";
-import { getPrivateChat } from "@/services/chatService";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store/store";
 
@@ -17,7 +16,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-import { Button } from "@/components/ui/button"; // adjust import if needed
+import { Button } from "@/components/ui/button"; 
 
 interface CardsProps {
   city?: string;
@@ -25,6 +24,7 @@ interface CardsProps {
   countriesFilter?: string[];
   users: User[];
   currentUserId: string;
+  highlightInterests?: string[]; // New prop for highlighting shared interests
 }
 
 const Cards = ({
@@ -32,6 +32,7 @@ const Cards = ({
   searchQuery = "",
   countriesFilter = [],
   currentUserId,
+  highlightInterests = [],
 }: CardsProps) => {
   const [likedIds, setLikedIds] = useState<string[]>([]);
   const [loadingIds, setLoadingIds] = useState<string[]>([]);
@@ -45,8 +46,6 @@ const Cards = ({
   const navigate = useNavigate();
   const currentUser = useSelector((state: RootState) => state.user);
 
-
-  // Load likes and local requested friend requests from localStorage on mount
   useEffect(() => {
     const storedLikes = JSON.parse(localStorage.getItem("likedUsers") || "[]");
     setLikedIds(storedLikes);
@@ -54,7 +53,6 @@ const Cards = ({
     const storedRequests = JSON.parse(localStorage.getItem("localRequestedIds") || "[]");
     setLocalRequestedIds(storedRequests);
 
-    // Build local friends map for quick lookup
     const friendsMap: { [userId: string]: boolean } = {};
     currentUser.friends?.forEach((fId) => {
       friendsMap[fId] = true;
@@ -124,20 +122,8 @@ const Cards = ({
     }
   };
 
-  const handleStartChat = async (targetUserId: string) => {
-    try {
-      const chat = await getPrivateChat(targetUserId);
-      if (chat && chat.chatId) {
-        navigate(`/chat/${chat.chatId}`);
-      } else {
-        enqueueSnackbar("Failed to open chat.", { variant: "error" });
-      }
-    } catch (error) {
-      console.error("Failed to open chat:", error);
-      enqueueSnackbar("Something went wrong while starting the chat.", {
-        variant: "error",
-      });
-    }
+  const handleStartChat = () => {
+    navigate("/chat");
   };
 
   const filteredUsers = users.filter((user) => {
@@ -163,6 +149,11 @@ const Cards = ({
     <>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {sortedUsers.map((user) => {
+          // Highlight shared interests
+          const sharedInterests = highlightInterests && user.interests
+            ? user.interests.filter(i => highlightInterests.includes(i))
+            : [];
+
           const liked = likedIds.includes(user.id);
           const isCurrentUser = user.id === currentUserId;
           const isFriend = !!localFriends[user.id];
@@ -210,6 +201,25 @@ const Cards = ({
                 <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 line-clamp-3">
                   {user.bio || "This user has no bio yet."}
                 </p>
+
+                {/* Interests with highlight */}
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {user.interests?.map((interest) => {
+                    const isShared = sharedInterests.includes(interest);
+                    return (
+                      <span
+                        key={interest}
+                        className={`text-xs px-2 py-0.5 rounded-full border ${
+                          isShared
+                            ? "bg-yellow-400 text-black border-yellow-600 font-semibold"
+                            : "bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-gray-300 border-gray-300 dark:border-zinc-600"
+                        }`}
+                      >
+                        {interest}
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
 
               {!isCurrentUser && (
@@ -263,7 +273,7 @@ const Cards = ({
                   {isFriend && (
                     <button
                       className="ml-2 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 px-3 py-1 rounded-md flex items-center gap-1"
-                      onClick={() => handleStartChat(user.id)}
+                      onClick={handleStartChat}
                     >
                       <MessageCircle size={14} />
                       Message
@@ -276,7 +286,7 @@ const Cards = ({
         })}
       </div>
 
-      {/* Shadcn UI dialog for remove friend */}
+      {/* Dialog for removing friend */}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>

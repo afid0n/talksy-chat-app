@@ -1,6 +1,8 @@
 const Message = require('../models/messageModel');
 const User = require('../models/userModel');
 
+const Chat = require('../models/chatModel');
+
 const getMessagePreviews = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -18,6 +20,7 @@ const getMessagePreviews = async (req, res) => {
 
     const previews = await Promise.all(
       friendIds.map(async (friendId) => {
+        // Find last message as before
         const lastMessage = await Message.findOne({
           $or: [
             { sender: userId, receiver: friendId },
@@ -26,6 +29,19 @@ const getMessagePreviews = async (req, res) => {
         })
           .sort({ createdAt: -1 })
           .limit(1);
+
+        // Count unread messages
+        const unreadCount = await Message.countDocuments({
+          sender: friendId,
+          receiver: userId,
+          isRead: false,
+        });
+
+        // Find chat document ID between these two participants
+        const chat = await Chat.findOne({
+          isGroup: false,
+          participants: { $all: [userId, friendId], $size: 2 }
+        });
 
         const friend = user.friends.find(f => f._id.toString() === friendId.toString());
 
@@ -36,6 +52,8 @@ const getMessagePreviews = async (req, res) => {
           avatar: friend.avatar,
           lastMessage: lastMessage?.content || null,
           lastMessageTime: lastMessage?.createdAt || null,
+          unreadCount,
+          chatId: chat ? chat._id : null,  // Add chatId here
         };
       })
     );
@@ -46,5 +64,6 @@ const getMessagePreviews = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 module.exports = getMessagePreviews;

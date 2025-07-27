@@ -16,7 +16,7 @@ import {
   MapPin,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import instance from "@/services/instance";
 
@@ -40,11 +40,8 @@ const Feed = () => {
         console.log("Not logged in", error);
       }
     };
-
     fetchUser();
   }, []);
-
-  console.log("current user", user);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -60,7 +57,14 @@ const Feed = () => {
     fetchUsers();
   }, []);
 
-  console.log("redux user", user)
+  // Shared interests users filtered from all users except current user
+  const sharedInterestUsers = useMemo(() => {
+    if (!user.interests?.length) return [];
+    return users.filter(u => {
+      if (u.id === user.id) return false;
+      return u.interests?.some(interest => user.interests?.includes(interest));
+    });
+  }, [users, user.interests]);
 
   const toggleFilters = () => setShowFilters(!showFilters);
 
@@ -91,6 +95,12 @@ const Feed = () => {
     "Czech Republic", "Hungary", "Romania", "Greece", "Bulgaria"
   ];
 
+  const tabs = [
+    { value: "discover", icon: Globe, label: "Discover" },
+    { value: "nearby", icon: MapPin, label: "Nearby" },
+    { value: "interests", icon: Filter, label: "Shared Interests" },
+  ];
+
   return (
     <div className="relative px-2 sm:px-4 md:px-8 lg:px-20 py-8 sm:py-12 md:py-14">
       {showFilters && (
@@ -98,22 +108,23 @@ const Feed = () => {
           style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           className="fixed inset-0 z-40"
           onClick={toggleFilters}
-        ></div>
+        />
       )}
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Discover People</h1>
-        <p>Find and connect with other users</p>
-        <button>Create Group</button>
+        <p className="mt-3">Find and connect with other users</p>
 
         <Tabs defaultValue="discover" className="w-full flex flex-col gap-5 mt-5">
           <div className="w-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm">
             <TabsList className="bg-white dark:bg-zinc-900 flex gap-2">
-              {[{ value: "discover", icon: Globe, label: "Discover" }, { value: "nearby", icon: MapPin, label: "Nearby" }].map(({ value, icon: Icon, label }) => (
+              {tabs.map(({ value, icon: Icon, label }) => (
                 <TabsTrigger
                   key={value}
                   value={value}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg data-[state=active]:bg-yellow-500 data-[state=active]:text-white text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 transition"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg
+                    data-[state=active]:bg-yellow-500 data-[state=active]:text-white
+                    text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 transition"
                 >
                   <Icon size={16} />
                   {label}
@@ -124,41 +135,46 @@ const Feed = () => {
 
           <div className="w-full flex items-center justify-between gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={18}
+              />
               <input
                 type="text"
                 placeholder="Search for users..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-md bg-white dark:bg-zinc-900 text-gray-800 dark:text-white border border-gray-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="w-full pl-10 pr-4 py-2 rounded-md bg-white dark:bg-zinc-900
+                  text-gray-800 dark:text-white border border-gray-300 dark:border-zinc-700
+                  focus:outline-none focus:ring-2 focus:ring-yellow-500"
               />
             </div>
 
             <button
               onClick={toggleFilters}
-              className="bg-yellow-500 text-white px-4 py-3 rounded-lg hover:bg-yellow-400 dark:hover:bg-yellow-800 dark:bg-yellow-900 transition flex items-center justify-center gap-2"
+              className="bg-yellow-500 text-white px-4 py-3 rounded-lg hover:bg-yellow-400
+                dark:hover:bg-yellow-800 dark:bg-yellow-900 transition flex items-center justify-center gap-2"
             >
               <Filter className="w-5 h-5" />
               <span>More Filters</span>
             </button>
           </div>
 
+          {/* Discover Tab */}
           <TabsContent value="discover">
             {loading ? (
               <div>Loading users...</div>
-            ) :
-              user?.id && (
-                <Cards
-                  users={users}
-                  searchQuery={searchQuery}
-                  countriesFilter={appliedCountries}
-                  currentUserId={user.id}
-                />
-              )}
-
-
+            ) : user?.id ? (
+              <Cards
+                users={users}
+                searchQuery={searchQuery}
+                countriesFilter={appliedCountries}
+                currentUserId={user.id}
+              />
+            ) : null}
           </TabsContent>
 
+          {/* Nearby Tab */}
           <TabsContent value="nearby">
             {loading ? (
               <div>Loading users...</div>
@@ -167,7 +183,7 @@ const Feed = () => {
                 const userCountry = user.location.country;
                 const nearbyUsers = users.filter(
                   (u) =>
-                    u.id !== user.id && 
+                    u.id !== user.id &&
                     u.location?.country?.toLowerCase() === userCountry.toLowerCase()
                 );
 
@@ -188,14 +204,29 @@ const Feed = () => {
             )}
           </TabsContent>
 
-
-
+          {/* Shared Interests Tab */}
+          <TabsContent value="interests">
+            {loading ? (
+              <div>Loading users...</div>
+            ) : user?.id && sharedInterestUsers.length > 0 ? (
+              <Cards
+                users={sharedInterestUsers}
+                searchQuery={searchQuery}
+                countriesFilter={appliedCountries}
+                currentUserId={user.id}
+                highlightInterests={user.interests}
+              />
+            ) : (
+              <div>No users share your interests yet.</div>
+            )}
+          </TabsContent>
         </Tabs>
 
         {/* Filters Sidebar */}
         <div
-          className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 z-50 shadow-xl transform transition-transform duration-300 ${showFilters ? 'translate-x-0' : 'translate-x-full'
-            }`}
+          className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white dark:bg-zinc-900
+            text-gray-900 dark:text-gray-100 z-50 shadow-xl transform transition-transform duration-300
+            ${showFilters ? "translate-x-0" : "translate-x-full"}`}
         >
           <div className="px-6 py-8 h-full overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
@@ -228,13 +259,15 @@ const Feed = () => {
             <div className="flex justify-between mt-10">
               <button
                 onClick={handleReset}
-                className="bg-yellow-500 hover:bg-yellow-400 dark:hover:bg-yellow-800 dark:bg-yellow-900 transition text-white px-4 py-2 rounded"
+                className="bg-yellow-500 hover:bg-yellow-400 dark:hover:bg-yellow-800
+                  dark:bg-yellow-900 transition text-white px-4 py-2 rounded"
               >
                 Reset
               </button>
               <button
                 onClick={handleApply}
-                className="bg-yellow-500 hover:bg-yellow-400 dark:hover:bg-yellow-800 dark:bg-yellow-900 transition text-white px-4 py-2 rounded"
+                className="bg-yellow-500 hover:bg-yellow-400 dark:hover:bg-yellow-800
+                  dark:bg-yellow-900 transition text-white px-4 py-2 rounded"
               >
                 Apply Filters
               </button>

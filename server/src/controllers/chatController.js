@@ -98,31 +98,45 @@ const createMessage = async (req, res) => {
   }
 };
 
-const getOrCreateChatWithUser = async (req, res, next) => {
-  const currentUserId = req.user._id;
-  const targetUserId = req.params.userId;
+
+const getOrCreateChatWithUser = async (req, res) => {
+  const currentUserId = req.user?._id;
+
+  // Get friendId from the correct place:
+  // For POST, likely from req.body.friendId
+  const friendId = req.body.friendId;
+
+  if (!currentUserId || !friendId) {
+    return res.status(400).json({ message: "Missing user or friendId" });
+  }
 
   try {
-    // Check for existing non-group chat between both users
     let chat = await Chat.findOne({
       isGroup: false,
-      participants: { $all: [currentUserId, targetUserId], $size: 2 }
-    });
+      participants: { $all: [currentUserId, friendId], $size: 2 }
+    }).populate("participants", "_id fullName avatar");
 
     if (!chat) {
-      // Create new chat
       chat = new Chat({
         isGroup: false,
-        participants: [currentUserId, targetUserId]
+        participants: [currentUserId, friendId],
       });
       await chat.save();
+      chat = await chat.populate("participants", "_id fullName avatar");
     }
 
-    res.json({ chatId: chat._id });
+    res.json(chat);
   } catch (err) {
-    next(err);
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
+
+module.exports = { getOrCreateChatWithUser };
+
+
+
 
 
 

@@ -38,6 +38,7 @@ import { t } from "i18next";
 import i18n from "@/i18n/config";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "@/redux/userSlice";
+import instance from "@/services/instance";
 
 const Profile = () => {
   const { setTheme } = useTheme();
@@ -46,7 +47,7 @@ const Profile = () => {
 
   // Initialize language from localStorage i18nextLng or default to 'en'
   const [language, setLanguage] = useState(() => localStorage.getItem("i18nextLng") || "en");
-  const token = useSelector((state: RootState) => state.user.token);
+   const [messageCount, setMessageCount] = useState(0);
 
   // State for likedUsers count (Favorites)
   const [favoritesCount, setFavoritesCount] = useState(() => {
@@ -81,7 +82,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:7070/users/${user.id}`);
+        const res = await instance.get(`/users/${user.id}`);
         setUserr(res.data);
         console.log("User:", res.data);
       } catch (err) {
@@ -91,6 +92,24 @@ const Profile = () => {
 
     fetchUser();
   }, [user.id]);
+
+useEffect(() => {
+  const fetchMessages = async () => {
+    try {
+      if (!user.id) return;
+      const res = await instance.get(`/messages`);
+      console.log(res.data, "Messages for user:", user.id);
+      const userMessages = res.data.filter((msg: any) => msg.sender === user.id);
+      console.log(userMessages)
+      setMessageCount(userMessages.length);
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+    }
+  };
+
+  fetchMessages();
+}, [user.id]);
+
 
   const handleThemeChange = (theme: "light" | "dark") => {
     setTheme(theme);
@@ -217,7 +236,7 @@ const handleAccept = async (requesterId: string) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
             {[
               {
-                count: 154,
+                count: messageCount,
                 label: t("total_messages"),
                 icon: MessageCircle,
                 color: "yellow",
