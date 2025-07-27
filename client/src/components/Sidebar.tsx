@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 import {
   Menu,
@@ -12,12 +13,6 @@ import {
 import { enqueueSnackbar } from 'notistack';
 import { logoutUser } from '@/redux/userSlice';
 
-const navItems = [
-  { label: 'Feed', icon: Users, path: '/feed' },
-  { label: 'Chat', icon: MessageCircle, path: '/chat' },
-  { label: 'Profile', icon: User, path: '/profile' },
-];
-
 const Sidebar = ({
   isOpen,
   toggleSidebar,
@@ -28,10 +23,17 @@ const Sidebar = ({
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const navItems = [
+    { label: t('sidebar.feed'), icon: Users, path: '/feed' },
+    { label: t('sidebar.chat'), icon: MessageCircle, path: '/chat' },
+    { label: t('sidebar.profile'), icon: User, path: '/profile' },
+  ];
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    enqueueSnackbar('Logged out successfully.', { variant: 'success' });
+    enqueueSnackbar(t('sidebar.logout_success'), { variant: 'success' });
     navigate('/auth/login');
   };
 
@@ -52,7 +54,7 @@ const Sidebar = ({
         </button>
         {isOpen && (
           <h1 className="text-lg font-bold ml-2 whitespace-nowrap">
-            Talksy: Chat App
+            {t('sidebar.title')}
           </h1>
         )}
       </div>
@@ -103,7 +105,7 @@ const Sidebar = ({
               ${isOpen ? 'opacity-100 ml-3 translate-x-0' : 'opacity-0 ml-0 -translate-x-2'}
             `}
           >
-            Log Out
+            {t('sidebar.logout')}
           </span>
         </button>
       </div>

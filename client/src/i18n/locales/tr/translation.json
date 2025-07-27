@@ -196,5 +196,57 @@
   "register_email_invalid": "Geçersiz e-posta",
   "register_password_required": "Şifre gereklidir",
   "register_password_min": "En az 6 karakter",
-  "register_failed": "Kayıt başarısız. Lütfen tekrar deneyin."
+  "register_failed": "Kayıt başarısız. Lütfen tekrar deneyin.",
+  "feed": {
+    "heading": "İnsanları Keşfet",
+    "subheading": "Diğer kullanıcıları bulun ve bağlantı kurun",
+    "tabs": {
+      "discover": "Keşfet",
+      "nearby": "Yakında",
+      "sharedInterests": "Ortak İlgi Alanları"
+    },
+    "searchPlaceholder": "Kullanıcı ara...",
+    "moreFilters": "Daha Fazla Filtre",
+    "loading": "Kullanıcılar yükleniyor...",
+    "noNearby": "{{country}} civarında kimse bulunamadı.",
+    "detectingLocation": "Konum tespit ediliyor...",
+    "noSharedInterests": "Henüz ilgi alanlarınızı paylaşan kullanıcı yok.",
+    "filters": {
+      "title": "Filtreler",
+      "countries": "Ülkeler",
+      "reset": "Sıfırla",
+      "apply": "Filtreleri Uygula"
+    }
+  },
+  "cards": {
+    "like": "Beğen",
+    "liked": "Beğenildi",
+    "connect": "Bağlan",
+    "connected": "Bağlandı",
+    "requested": "İstek Gönderildi",
+    "requestReceived": "İstek Alındı",
+    "message": "Mesaj",
+    "country": "Ülke",
+    "city": "Şehir",
+    "na": "Yok",
+    "noBio": "Bu kullanıcının henüz biyografisi yok.",
+    "thatsYou": "Bu sen",
+    "unconnectTooltip": "Bağlantıyı kesmek için tıklayın",
+    "dialogTitle": "Bağlantıyı Kesme Onayı",
+    "dialogDescription": "Bu arkadaşı kaldırmak istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+    "cancel": "İptal",
+    "confirmRemove": "Evet, Kaldır",
+    "requestSent": "İstek gönderildi",
+    "requestFailed": "Arkadaşlık isteği gönderilemedi",
+    "friendRemoved": "Arkadaş başarıyla kaldırıldı",
+    "removeFailed": "Arkadaş kaldırılamadı"
+  },
+  "sidebar": {
+    "title": "Talksy",
+    "feed": "Akış",
+    "chat": "Sohbet",
+    "profile": "Profil",
+    "logout": "Çıkış Yap",
+    "logout_success": "Başarıyla çıkış yapıldı."
+  }
 }
