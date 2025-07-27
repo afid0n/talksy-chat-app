@@ -34,28 +34,16 @@ export const deleteChat = async (id: string): Promise<{ message: string }> => {
 
 export const getPrivateChat = async (userId: string) => {
   try {
-    const res = await instance.get(`/chats/private/${userId}`, {
-      withCredentials: true,
-    });
-    return res.data; // existing chat
-  } catch (error: any) {
-    if (error.response?.status === 404) {
-      // Optionally: create chat if not found
-      try {
-        const createRes = await instance.post(
-          `/chats/private`,
-          { receiverId: userId },
-          { withCredentials: true }
-        );
-        return createRes.data;
-      } catch (createError) {
-        console.error("Failed to create new private chat:", createError);
-        throw createError;
-      }
-    }
-
+    const res = await instance.get(`/chats/with/${userId}`);
+    return res.data;
+  } catch (error) {
     console.error("Failed to get private chat:", error);
     throw error;
-    
   }
+};
+
+// chatService.ts
+export const getOrCreateChatWithUser = async (friendId: string) => {
+  const response = await instance.post(`/chats/${friendId}`);
+  return response.data; 
 };

@@ -29,12 +29,20 @@ const getMessagesForChat = async (req, res, next) => {
 
 const createMessage = async (req, res, next) => {
   try {
+    if (!req.body) {
+      return res.status(400).json({ error: "Request body is missing" });
+    }
+
     const message = await messageService.createMessage(req.body);
+
     res.status(201).json(message);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    console.error("Error creating message:", error);
+    next(error);
   }
 };
+
+
 
 const updateMessage = async (req, res, next) => {
   try {
@@ -65,6 +73,21 @@ const getMessages = async (req, res, next) => {
   }
 };
 
+
+const getMessagesByChatId = async (req, res, next) => {
+  const { chatId } = req.params;
+
+  try {
+    const messages = await Message.find({ chat: chatId })
+      .populate("sender", "_id fullName avatar")
+      .sort({ createdAt: 1 });
+
+    res.status(200).json(messages);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getMessageById,
   getMessagesForChat,
@@ -72,4 +95,5 @@ module.exports = {
   updateMessage,
   deleteMessage,
   getMessages,
+  getMessagesByChatId
 };

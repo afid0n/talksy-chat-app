@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const messageController = require('../controllers/messageController');
+const verifyToken = require('../middlewares/authToken');
+
+router.get('/chat/:chatId', verifyToken, messageController.getMessagesByChatId);
 
 router.get('/', messageController.getMessages);
 

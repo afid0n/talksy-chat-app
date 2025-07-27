@@ -4,25 +4,25 @@ const chatController = require('../controllers/chatController');
 const verifyToken = require('../middlewares/authToken');
 const messageRouter = require('../routes/messageRoute');
 
+// ✅ 1. Specific route first to avoid conflict
+router.get('/with/:userId', verifyToken, chatController.getOrCreateChatWithUser);
 
-router.get('/private/:userId', verifyToken, chatController.getOrCreateChatWithUser);
-
-// Get all chats for a user
+// ✅ 2. Get all chats for the user
 router.get('/', verifyToken, chatController.getChatsForUser);
 
-// Get chat by ID
+// ✅ 3. Get chat by ID
 router.get('/:id', verifyToken, chatController.getChatById);
 
-// Create chat
+// ✅ 4. Create chat
 router.post('/', verifyToken, chatController.createChat);
 
-// Update chat
+// ✅ 5. Update chat
 router.put('/:id', verifyToken, chatController.updateChat);
 
-// Delete chat
+// ✅ 6. Delete chat
 router.delete('/:id', verifyToken, chatController.deleteChat);
 
-// Messages inside a chat
+// ✅ 7. Nested message routes for a specific chat
 router.use('/:chatId/messages', messageRouter);
 
 module.exports = router;

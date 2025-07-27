@@ -1,289 +1,330 @@
-import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { Phone, Video } from "lucide-react";
-import socket from "../socket";
 import { Grid } from "@giphy/react-components";
 import { gf } from "@/giphy/config";
+import socket from "@/socket";
 import instance from "@/services/instance";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store/store";
 
 interface Message {
   _id: string;
-  from: "me" | "other";
-  text: string;
-  time: string;
-  isGif?: boolean;
-  conversationId?: string;
+  chat: string;
+  sender: string | { _id: string }; // account for object or string sender
+  content: string;
+  type: "text" | "gif";
+  createdAt: string;
 }
 
-const ChatPage = () => {
-  const { userId } = useParams<{ userId: string }>();
-  const [message, setMessage] = useState("");
+const ChatPage = ({
+  selectedId,
+  messages,
+  setMessages,
+}: {
+  selectedId: string;
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+}) => {
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [text, setText] = useState("");
   const [gifPickerOpen, setGifPickerOpen] = useState(false);
   const [gifSearchTerm, setGifSearchTerm] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const currentUserId = useSelector((state: RootState) => state.user.id) || "";
 
-  const currentUser = useSelector((state: RootState) => state.user);
-  const currentUserId = currentUser?.id || "";
-
-  // Map API or socket raw message to our UI Message type
-  const mapMessages = (apiMessages: any[]): Message[] =>
-    apiMessages.map((msg) => {
-      const senderId =
-        typeof msg.sender === "object" && msg.sender?._id
-          ? msg.sender._id
-          : msg.sender;
-
-      return {
-        _id: msg._id || msg.id || `msg_${Math.random()}`, // fallback ID just in case
-        from: String(senderId) === String(currentUserId) ? "me" : "other",
-        text: msg.content || msg.text || "",
-        time: msg.createdAt || msg.time || new Date().toISOString(),
-        isGif: msg.type === "gif",
-        conversationId: msg.chat || userId || "",
-      };
-    });
-
-  // Fetch messages from API when userId changes
+  // Join room on selectedId change
   useEffect(() => {
-    if (!userId) return;
+    if (!selectedId) return;
+    socket.emit("joinRoom", selectedId);
+    return () => {
+      socket.emit("leaveRoom", selectedId);
+    };
+  }, [selectedId]);
+
+  // Listen for new messages and avoid duplicates
+  useEffect(() => {
+    const handleReceiveMessage = (message: Message) => {
+      setMessages((prev) => {
+        if (prev.some((m) => m._id === message._id)) return prev;
+        return [...prev, message];
+      });
+    };
+
+    socket.on("receiveMessage", handleReceiveMessage);
+    return () => {
+      socket.off("receiveMessage", handleReceiveMessage);
+    };
+  }, [setMessages]);
+
+  // Fetch messages when chat changes (with deduplication)
+  useEffect(() => {
+    if (!selectedId) return;
+
     const fetchMessages = async () => {
       try {
-        const res = await instance.get(`/chats/${userId}/messages`);
-        setMessages(mapMessages(res.data));
+        const res = await instance.get(`/messages/chat/${selectedId}`);
+
+        // Deduplicate fetched messages by _id just in case
+        const uniqueMessagesMap = new Map<string, Message>();
+        res.data.forEach((msg: Message) => uniqueMessagesMap.set(msg._id, msg));
+
+        setMessages(Array.from(uniqueMessagesMap.values()));
       } catch (err) {
         console.error("Failed to fetch messages:", err);
       }
     };
     fetchMessages();
-  }, [userId]);
+  }, [selectedId, setMessages]);
 
-  // Scroll to bottom on messages change
+  // Scroll to bottom on message list update
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Join/leave room on userId change
-  useEffect(() => {
-    if (!userId) return;
+  // Extract sender id helper function
+  const getSenderId = (sender: string | { _id: string }) => {
+    if (!sender) return "unknown";
+    if (typeof sender === "object" && sender._id) return sender._id;
+    if (typeof sender === "string") return sender;
+    return "unknown";
+  };
 
-    // Clear messages when switching chat
-    setMessages([]);
+  // Send a text message
+  const sendMessage = async () => {
+    if (!text.trim() || !selectedId) return;
 
-    socket.emit("joinRoom", userId);
-
-    return () => {
-      socket.emit("leaveRoom", userId);
+    const messageData = {
+      chat: selectedId,
+      sender: currentUserId,
+      content: text.trim(),
+      type: "text",
     };
-  }, [userId]);
-
-  // Handle incoming socket messages
-  useEffect(() => {
-    const handleReceiveMessage = (msg: any) => {
-      // Map raw incoming message to UI Message
-      const mappedMsg = mapMessages([msg])[0];
-
-      setMessages((prev) => {
-        // Prevent duplicate messages by _id
-        if (prev.some((m) => m._id === mappedMsg._id)) return prev;
-        return [...prev, mappedMsg];
-      });
-    };
-
-    socket.on("receiveMessage", handleReceiveMessage);
-
-    return () => {
-      socket.off("receiveMessage", handleReceiveMessage);
-    };
-  }, [userId]);
-
-  // Send a message
-  const sendMessage = async (text: string, isGif = false) => {
-    if (!text.trim() || !userId) return;
-
-    const tempId = `temp-${Date.now()}`;
-
-    const tempMessage: Message = {
-      _id: tempId,
-      from: "me",
-      text,
-      time: new Date().toISOString(),
-      isGif,
-      conversationId: userId,
-    };
-
-    setMessages((prev) => [...prev, tempMessage]);
-    setMessage("");
-    setGifPickerOpen(false);
-    setGifSearchTerm("");
 
     try {
-      // Save message to backend
-      const savedMessageRes = await instance.post(`/chats/${userId}/messages`, {
-        sender: currentUserId,
-        content: text,
-        type: isGif ? "gif" : "text",
-        chat: userId,
-        createdAt: new Date().toISOString(),
-      });
-
-      const savedMessage = mapMessages([savedMessageRes.data])[0];
-
-      // Replace temp message with saved message (with real ID)
-      setMessages((prev) =>
-        prev.map((msg) => (msg._id === tempId ? savedMessage : msg))
-      );
-
-      // Notify others via socket
       socket.emit("sendMessage", {
-        chatId: userId,
+        chatId: selectedId,
         senderId: currentUserId,
-        content: text,
-        type: isGif ? "gif" : "text",
+        content: text.trim(),
+        type: "text",
       });
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      // Remove temp message if failed to send
-      setMessages((prev) => prev.filter((msg) => msg._id !== tempId));
+
+      await instance.post("/messages", messageData);
+
+      setText("");
+      setGifPickerOpen(false);
+      setGifSearchTerm("");
+    } catch (err) {
+      console.error("Failed to send message:", err);
     }
   };
 
+  // Send a GIF message immediately when clicked (no text input)
+  const sendGifMessage = async (gifUrl: string) => {
+    if (!gifUrl || !selectedId) return;
+
+    const messageData = {
+      chat: selectedId,
+      sender: currentUserId,
+      content: gifUrl,
+      type: "gif",
+    };
+
+    try {
+      socket.emit("sendMessage", {
+        chatId: selectedId,
+        senderId: currentUserId,
+        content: gifUrl,
+        type: "gif",
+      });
+
+      await instance.post("/messages", messageData);
+
+      setGifPickerOpen(false);
+      setGifSearchTerm("");
+    } catch (err) {
+      console.error("Failed to send GIF message:", err);
+    }
+  };
+
+  // Giphy fetch function
   const fetchGifs = (offset: number) =>
     gifSearchTerm.trim()
       ? gf.search(gifSearchTerm, { offset, limit: 20 })
       : gf.trending({ offset, limit: 20 });
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+
+    if (!selectedId) return;
+
+    socket.emit("typing", { chatId: selectedId, userId: currentUserId });
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit("stopTyping", { chatId: selectedId, userId: currentUserId });
+    }, 3000);
+  };
+  useEffect(() => {
+    if (!selectedId) return;
+
+    const handleTyping = ({ chatId, userId }: { chatId: string; userId: string }) => {
+      if (chatId === selectedId && userId !== currentUserId) {
+        setIsTyping(true);
+
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+        typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
+      }
+    };
+
+    const handleStopTyping = ({ chatId, userId }: { chatId: string; userId: string }) => {
+      if (chatId === selectedId && userId !== currentUserId) {
+        setIsTyping(false);
+      }
+    };
+
+    socket.on("typing", handleTyping);
+    socket.on("stopTyping", handleStopTyping);
+
+    return () => {
+      socket.off("typing", handleTyping);
+      socket.off("stopTyping", handleStopTyping);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    };
+  }, [selectedId, currentUserId]);
+
+
   return (
-    <div className="flex-1 flex flex-col h-screen bg-gray-50/80 dark:bg-zinc-900/80 relative">
+    <div className="flex flex-col h-screen max-h-screen w-full bg-gray-50 dark:bg-zinc-900">
       {/* Header */}
-      <div className="border-b p-4 flex items-center justify-between bg-white dark:bg-zinc-800">
-        <div>
-          <h2 className="text-lg font-semibold text-black dark:text-white">
-            {userId ? `Chat with #${userId}` : "Select a conversation"}
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Last seen recently</p>
+      <div className="p-4 py-6 border-b flex justify-between items-center bg-white dark:bg-zinc-800">
+        <div className="flex flex-col items-center">
+
+        <div className="font-semibold text-lg text-black dark:text-white">Chat </div>
+        {isTyping && (
+          <div className="italic text-sm text-gray-600 dark:text-gray-400 ml-2">
+            Typing...
+          </div>
+        )}
+
         </div>
+
         <div className="flex gap-4 text-black dark:text-white">
-          <button aria-label="Call">
-            <Phone />
-          </button>
-          <button aria-label="Video call">
-            <Video />
-          </button>
+          <Phone className="cursor-pointer" />
+          <Video className="cursor-pointer" />
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-2">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
         {messages.length === 0 && (
           <p className="text-center text-gray-500 dark:text-gray-400 mt-4">
             No messages yet.
           </p>
         )}
 
-        {messages.map((msg, index) => (
-          <div
-            key={msg._id}
-            className={`max-w-xs p-2 rounded-lg text-sm ${
-              msg.from === "me"
-                ? "bg-green-500 text-white self-end"
-                : "bg-gray-200 dark:bg-zinc-700 text-black dark:text-white self-start"
-            }`}
-          >
-            {msg.isGif ? (
-              <img
-                src={msg.text}
-                alt="gif"
-                className="rounded max-w-[200px] max-h-[200px] object-contain"
-              />
-            ) : (
-              <p>{msg.text}</p>
-            )}
+        {messages.map((m) => {
+          const senderId = getSenderId(m.sender);
+          const isSentByCurrentUser = senderId === currentUserId;
 
-            <span className="block text-xs mt-1 text-right opacity-70">
-              {(() => {
-                const date = new Date(msg.time);
-                return isNaN(date.getTime())
-                  ? "Invalid time"
-                  : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-              })()}
-            </span>
-          </div>
-        ))}
+          return (
+            <div
+              key={m._id}
+              className={`p-2 rounded-lg break-words break-all whitespace-pre-wrap overflow-wrap-anywhere max-w-[75%]
+${isSentByCurrentUser
+                  ? "ml-auto bg-amber-200 text-black dark:bg-yellow-800 dark:text-white"
+                  : "mr-auto bg-gray-200 dark:bg-zinc-700 text-black dark:text-white"
+                }`}
 
-        <div ref={messagesEndRef} />
+            >
+
+              {m.type === "gif" ? (
+                <img
+                  src={m.content}
+                  alt="GIF"
+                  className="rounded max-w-[200px] max-h-[200px] object-contain"
+                />
+              ) : (
+                <span>{m.content}</span>
+              )}
+            </div>
+          );
+        })}
+
+        <div ref={scrollRef} />
       </div>
 
-      {/* Input + GIF Picker */}
+      {/* Input + GIF picker */}
       <div className="p-4 border-t bg-white dark:bg-zinc-800 flex flex-col relative">
-        <div className="flex items-center gap-2">
+        <div className="flex gap-2">
           <input
             type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 border p-2 rounded bg-white dark:bg-zinc-900 text-black dark:text-white"
-            onKeyDown={(e) => e.key === "Enter" && sendMessage(message)}
-            disabled={!userId}
+            value={text}
+            onChange={handleInputChange}
+            placeholder="Type a message"
+            className="flex-1 border rounded p-2 bg-white dark:bg-zinc-900 text-black dark:text-white"
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            disabled={!selectedId}
           />
           <button
-            onClick={() => sendMessage(message)}
-            className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50"
-            disabled={!userId || message.trim() === ""}
+            onClick={sendMessage}
+            className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+            disabled={!text.trim() || !selectedId}
           >
             Send
           </button>
           <button
             onClick={() => setGifPickerOpen((prev) => !prev)}
             className="bg-yellow-400 text-black px-4 py-2 rounded"
-            disabled={!userId}
+            aria-label="Toggle GIF picker"
+            disabled={!selectedId}
           >
             GIF
           </button>
         </div>
 
+        {/* GIF Picker Overlay */}
         {gifPickerOpen && (
           <div
             style={{
-              width: 410,
-              height: 360,
               position: "absolute",
-              bottom: 70,
-              right: 20,
-              background: "white",
+              bottom: "70px",
+              right: 0,
               zIndex: 1000,
               borderRadius: 8,
               overflowY: "auto",
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               padding: 8,
-              display: "flex",
-              flexDirection: "column",
+              maxHeight: 380,
             }}
+            className="bg-white dark:bg-zinc-800 "
           >
             <input
               type="text"
               value={gifSearchTerm}
               onChange={(e) => setGifSearchTerm(e.target.value)}
               placeholder="Search GIFs"
-              className="mb-2 p-2 border rounded"
+              className="mb-2 p-2 border rounded w-full bg-white dark:bg-zinc-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               autoFocus
             />
+
             <Grid
-              width={384}
-              columns={3}
               fetchGifs={fetchGifs}
-              noLink
-              hideAttribution
+              width={368} // slightly less than 384 due to padding
+              columns={3}
+              gutter={6}
+              key={gifSearchTerm}
               onGifClick={(gif, e) => {
                 e.preventDefault();
-                sendMessage(gif.images.fixed_height.url, true);
+                sendGifMessage(gif.images.fixed_height.url);
               }}
-              key={gifSearchTerm}
             />
           </div>
         )}
+
       </div>
     </div>
   );

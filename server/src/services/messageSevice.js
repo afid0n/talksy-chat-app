@@ -16,10 +16,49 @@ const getMessagesForChat = async (chatId) => {
   return formatMongoData(messages);
 };
 
-const createMessage = async (messageData) => {
-  const message = await Message.create(messageData);
-  return formatMongoData(message);
+
+
+const createMessage = async (data) => {
+  if (!data) throw new Error("No data passed to createMessage");
+
+  const { chat, sender, content, type = "text", status = "sent" } = data;
+
+  if (!chat || !sender || !content) {
+    throw new Error("Missing required fields chat, sender or content");
+  }
+
+  // Define a timeframe to consider for duplicates, e.g., last 5 seconds
+  const DUPLICATE_WINDOW_SECONDS = 5;
+  const timeThreshold = new Date(Date.now() - DUPLICATE_WINDOW_SECONDS * 1000);
+
+  // Check for existing messages that match chat, sender, content, type and are recent
+  const duplicate = await Message.findOne({
+    chat,
+    sender,
+    content,
+    type,
+    createdAt: { $gte: timeThreshold },
+  });
+
+  if (duplicate) {
+    // Duplicate found within last 5 seconds, return existing message instead of creating new one
+    return duplicate;
+  }
+
+  // Otherwise create new message
+  const newMessage = await Message.create({
+    chat,
+    sender,
+    content,
+    type,
+    status,
+  });
+
+  return newMessage;
 };
+
+
+
 
 const updateMessage = async (id, updateData) => {
   const message = await Message.findByIdAndUpdate(id, updateData, { new: true });
