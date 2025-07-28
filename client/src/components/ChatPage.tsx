@@ -6,15 +6,8 @@ import socket from "@/socket";
 import instance from "@/services/instance";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store/store";
+import type { Message } from "@/types/MessagesTypes";
 
-interface Message {
-  _id: string;
-  chat: string;
-  sender: string | { _id: string }; // account for object or string sender
-  content: string;
-  type: "text" | "gif";
-  createdAt: string;
-}
 
 const ChatPage = ({
   selectedId,

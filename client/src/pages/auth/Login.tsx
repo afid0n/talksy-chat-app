@@ -16,6 +16,8 @@ export default function LoginForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:7070";
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -84,7 +86,7 @@ export default function LoginForm() {
       >
         <button
           type="button"
-          onClick={() => window.location.href = `http://localhost:7070/auth/google`}
+          onClick={() => window.location.href = `${SERVER_URL}/auth/google`}
           className="flex items-center justify-center w-full py-2 mb-4 border border-gray-300 dark:border-zinc-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
         >
           <FaGoogle className="mr-2" />

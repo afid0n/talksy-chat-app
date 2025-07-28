@@ -2,8 +2,8 @@ import { useFormik } from "formik";
 import { enqueueSnackbar } from "notistack";
 import { useSearchParams, Link } from "react-router-dom";
 import resetPasswordValidationSchema from "../../validations/resetPasswordValidation";
-import { post } from "../../services/commonRequest";
 import { t } from "i18next";
+import instance from "@/services/instance";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -20,7 +20,7 @@ const ResetPassword = () => {
         const res: {
           message: string;
           statusCode?: number;
-        } = await post(`http://localhost:7070/users/reset-password`, {
+        } = await instance.post(`/users/reset-password`, {
           token,
           newPassword: values.newPassword,
         });

@@ -25,6 +25,7 @@ const FriendRequestList = ({ requests, onRefresh }: FriendRequestListProps) => {
       enqueueSnackbar(res.message || "Request cancelled", { variant: "info" });
       onRefresh();
     } catch (err: any) {
+      
       enqueueSnackbar("Error cancelling request", { variant: "error" });
     }
   };

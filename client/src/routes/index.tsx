@@ -10,7 +10,6 @@ import Feed from "../pages/client/Feed";
 import Home from "../pages/client/Home";
 import Profile from "../pages/client/Profile";
 import NotFound from "../pages/Common/NotFound";
-import ChatPage from "@/components/ChatPage";
 import ChatWrapper from "../pages/client/Chat";
 
 const ROUTES = [
@@ -27,14 +26,6 @@ const ROUTES = [
         element: (
           <RequireAuth>
             <ChatWrapper />
-          </RequireAuth>
-        ),
-      },
-          {
-        path: "chat/:chatId",
-        element: (
-          <RequireAuth>
-            <ChatPage /> 
           </RequireAuth>
         ),
       },
