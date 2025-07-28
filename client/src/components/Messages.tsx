@@ -10,6 +10,7 @@ interface Conversation {
   isGroup?: boolean;
   avatar?: string;
   chatId: string ;
+  isOnline?: boolean;
   
 }
 

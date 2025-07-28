@@ -13,10 +13,12 @@ const ChatPage = ({
   selectedId,
   messages,
   setMessages,
+  isPartnerOnline
 }: {
   selectedId: string;
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  isPartnerOnline: boolean;
 }) => {
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -196,12 +198,20 @@ const ChatPage = ({
       <div className="p-4 py-6 border-b flex justify-between items-center bg-white dark:bg-zinc-800">
         <div className="flex flex-col items-center">
 
-        <div className="font-semibold text-lg text-black dark:text-white">Chat </div>
-        {isTyping && (
-          <div className="italic text-sm text-gray-600 dark:text-gray-400 ml-2">
-            Typing...
+          <div className="font-semibold text-lg text-black dark:text-white flex items-center gap-2">
+            Chat
+            {isPartnerOnline ? (
+              <span className="text-green-500 text-sm">● Online</span>
+            ) : (
+              <span className="text-gray-400 text-sm">● Offline</span>
+            )}
           </div>
-        )}
+
+          {isTyping && (
+            <div className="italic text-sm text-gray-600 dark:text-gray-400 ml-2">
+              Typing...
+            </div>
+          )}
 
         </div>
 
