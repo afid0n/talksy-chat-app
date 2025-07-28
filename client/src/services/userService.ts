@@ -99,11 +99,9 @@ export const removeFriend = async (friendId: string): Promise<void> => {
 };
 
 export const logout = async () => {
-  return await instance.get("/users/logout", { withCredentials: true });
+  return await instance.post("/users/logout");
 };
 
 export const deleteAccount = async () => {
-  return await instance.delete("/auth/delete-account", {
-    withCredentials: true,
-  });
+  return await instance.delete("/users/delete-account", );
 };
