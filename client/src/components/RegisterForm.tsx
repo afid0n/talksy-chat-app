@@ -163,7 +163,7 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:7070";
             <div className="mt-4 flex justify-center">
               <ReCAPTCHA
                 ref={recaptchaRef}
-                sitekey="6Ld0A4orAAAAAIguOQtslv-xTFOyrSDMgkRmLeax"
+                sitekey="6LcVAYorAAAAAKH1rLCmDIKS5H6hqwzg34_DcS2A"
                 onChange={handleCaptchaChange}
                 theme={isDark ? "dark" : "light"}
               />
