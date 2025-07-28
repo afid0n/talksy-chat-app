@@ -4,7 +4,6 @@ const { generateToken } = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/mailService');
 const { SERVER_URL, CLIENT_URL } = require('../config/config');
 const User = require('../models/userModel');
-const { get } = require('../schemas/userSchema');
 const { verifyAccessToken } = require('../utils/genetareJWT');
 
 
@@ -368,36 +367,24 @@ const acceptFriendRequest = async (req, res, next) => {
 };
 
 const cancelFriendRequest = async (req, res, next) => {
-  const senderId = req.user.id;
-  const targetId = req.params.targetId;
+  const receiverId = req.user.id;
+  const senderId = req.params.senderId;
 
-  if (senderId === targetId) {
-    return res.status(400).json({ message: "You cannot cancel a request to yourself." });
-  }
+  console.log( "Receiver ID:", receiverId);
+  console.log("Sender ID:", senderId);
 
-  try {
-    const targetUser = await User.findById(targetId);
+  const receiver = await User.findById(receiverId);
+  const index = receiver.friendRequests.indexOf(senderId);
 
-    if (!targetUser) {
-      return res.status(404).json({ message: "Target user not found." });
-    }
+  if (index === -1)
+    return res.status(400).json({ message: "No such request" });
 
-    // Check if a request exists
-    const index = targetUser.friendRequests.indexOf(senderId);
+  receiver.friendRequests.splice(index, 1);
+  await receiver.save();
 
-    if (index === -1) {
-      return res.status(400).json({ message: "No friend request to cancel." });
-    }
-
-    // Remove senderId from target's requests
-    targetUser.friendRequests.splice(index, 1);
-    await targetUser.save();
-
-    res.status(200).json({ message: "Friend request canceled successfully." });
-  } catch (err) {
-    next(err);
-  }
+  res.status(200).json({ message: "Request rejected." });
 };
+;
 
 
 const getFriends = async (req, res) => {

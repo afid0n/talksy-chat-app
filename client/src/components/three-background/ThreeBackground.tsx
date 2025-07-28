@@ -1,28 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 const ThreeBackground = () => {
   const mountRef = useRef<HTMLDivElement | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(
-    localStorage.getItem("vite-ui-theme") === "dark"
-  );
 
-  // Listen for theme changes in localStorage and custom event
-  useEffect(() => {
-    const updateTheme = () => {
-      setIsDarkMode(localStorage.getItem("vite-ui-theme") === "dark");
-    };
-    window.addEventListener("storage", updateTheme);
-    window.addEventListener("vite-ui-theme-change", updateTheme);
-    return () => {
-      window.removeEventListener("storage", updateTheme);
-      window.removeEventListener("vite-ui-theme-change", updateTheme);
-    };
-  }, []);
+  const getCurrentTheme = () =>
+    document.documentElement.classList.contains("dark");
 
   useEffect(() => {
+    let isDark = getCurrentTheme();
+
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(isDarkMode ? "#101014" : "#fefce8");
+    scene.background = new THREE.Color(isDark ? "#101014" : "#fefce8");
 
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -38,19 +27,20 @@ const ThreeBackground = () => {
 
     const mount = mountRef.current;
     if (mount) {
+      mount.innerHTML = ""; // clear old canvas
       mount.appendChild(renderer.domElement);
     }
-    const particleCount = 1000;
+
     const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount * 3; i++) {
+    const positions = new Float32Array(1000 * 3);
+    for (let i = 0; i < positions.length; i++) {
       positions[i] = (Math.random() - 0.5) * 20;
     }
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
     const material = new THREE.PointsMaterial({
       size: 0.06,
-      color: isDarkMode ? "#f59e10" : "#facc15", // orange for dark, yellow for light
+      color: isDark ? "#f59e10" : "#facc15",
     });
 
     const particles = new THREE.Points(geometry, material);
@@ -69,13 +59,29 @@ const ThreeBackground = () => {
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
+
+    const handleThemeChange = () => {
+      const nowDark = getCurrentTheme();
+      if (nowDark !== isDark) {
+        isDark = nowDark;
+        scene.background = new THREE.Color(isDark ? "#101014" : "#fefce8");
+        material.color.set(isDark ? "#f59e10" : "#facc15");
+      }
+    };
+
     window.addEventListener("resize", handleResize);
+    const observer = new MutationObserver(handleThemeChange);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      observer.disconnect();
       mount?.removeChild(renderer.domElement);
+      renderer.dispose();
+      geometry.dispose();
+      material.dispose();
     };
-  }, [isDarkMode]);
+  }, []);
 
   return (
     <div
