@@ -187,7 +187,7 @@ const ChatWrapper = () => {
       <Messages
         conversations={conversations.map((chat) => ({
           id: chat.friendId,
-          chatId: chat.chatId || "no_chatId",
+          chatId: chat.chatId || undefined,
           fullName: chat.fullName || "Unnamed Chat",
           avatar: chat.avatar?.url || "",
           lastMessage: chat.lastMessage?.content || "",

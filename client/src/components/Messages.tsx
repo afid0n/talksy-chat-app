@@ -9,7 +9,7 @@ interface Conversation {
   initials: string;
   isGroup?: boolean;
   avatar?: string;
-  chatId: string ;
+  chatId?: string ;
   isOnline?: boolean;
   
 }
@@ -17,7 +17,7 @@ interface Conversation {
 interface MessagesProps {
   conversations: Conversation[];
   selectedId: string | null;
-  onSelect: (friendId: string, chatId: string) => void;
+  onSelect: (friendId: string, chatId?: string) => void;
   searchQuery: string;
   onSearchChange: (val: string) => void;
 }
