@@ -42,6 +42,7 @@
   "enter_new_password": "Введите новый пароль",
   "confirm_your_new_password": "Подтвердите новый пароль",
   "update_password": "Обновить пароль",
+  "updating": "Обновление",
   "password_mismatch_warning": "Новый пароль и подтверждение не совпадают.",
   "password_update_success": "Пароль успешно обновлён!",
   "password_update_fail": "Не удалось обновить пароль",

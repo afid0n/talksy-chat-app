@@ -45,6 +45,7 @@
   "password_mismatch_warning": "Yeni şifre ile onayı eşleşmiyor.",
   "password_update_success": "Şifre başarıyla güncellendi!",
   "password_update_fail": "Şifre güncellenemedi",
+  "updating": "Güncelleniyor",
   "notifications": "Bildirimler",
   "message_notifications": "Mesaj Bildirimleri",
   "message_notifications_desc": "Yeni mesaj aldığınızda bildirim alın",

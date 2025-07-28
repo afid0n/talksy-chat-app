@@ -10,6 +10,7 @@ import type { User } from "@/types/User";
 const PersonalInformation: React.FC<{ userr: Partial<User> }> = ({ userr }) => {
 
   const [previewImage, setPreviewImage] = useState(userr?.avatar?.url || "");
+  const [loading, setLoading] = useState(false);
 
 
 
@@ -26,6 +27,7 @@ const PersonalInformation: React.FC<{ userr: Partial<User> }> = ({ userr }) => {
       profileImage: null,
     },
     onSubmit: async (values) => {
+      setLoading(true);
       try {
         const formData = new FormData();
         formData.append("fullName", values.fullName);
@@ -40,9 +42,7 @@ const PersonalInformation: React.FC<{ userr: Partial<User> }> = ({ userr }) => {
         const response = await instance.patch(
           `/users/${userr.id}`,
           formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
 
         enqueueSnackbar("Updated profile successfully", { variant: "success" });
@@ -50,8 +50,11 @@ const PersonalInformation: React.FC<{ userr: Partial<User> }> = ({ userr }) => {
       } catch (error) {
         enqueueSnackbar("Failed to update profile", { variant: "error" });
         console.error("Update failed:", error);
+      } finally {
+        setLoading(false);
       }
     },
+
   });
 
   return (
@@ -160,10 +163,12 @@ const PersonalInformation: React.FC<{ userr: Partial<User> }> = ({ userr }) => {
       <div className="flex justify-end">
         <button
           type="submit"
-          className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium px-6 py-2 rounded-lg"
+          disabled={loading}
+          className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {t("update_info")}
+          {loading ? t("updating") + "..." : t("update_info")}
         </button>
+
       </div>
     </form>
   );
