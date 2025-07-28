@@ -1,12 +1,13 @@
-import { Mail, User } from "lucide-react";
+import { Mail, User2, } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import { useFormik } from "formik";
-import axios from "axios";
 import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 import { t } from "i18next";
+import instance from "@/services/instance";
+import type { User } from "@/types/User";
 
-const PersonalInformation = ({ userr }) => {
+const PersonalInformation: React.FC<{ userr: Partial<User> }> = ({ userr }) => {
 
   const [previewImage, setPreviewImage] = useState(userr?.avatar?.url || "");
 
@@ -36,8 +37,8 @@ const PersonalInformation = ({ userr }) => {
           formData.append("profileImage", values.profileImage);
         }
 
-        const response = await axios.patch(
-          `http://localhost:7070/users/${userr.id}`,
+        const response = await instance.patch(
+          `/users/${userr.id}`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -91,7 +92,7 @@ const PersonalInformation = ({ userr }) => {
         {/* Full Name */}
         <div className="space-y-1">
           <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-300">
-            <User size={16} /> {t("full_name")}
+            <User2 size={16} /> {t("full_name")}
           </label>
           <input
             name="fullName"

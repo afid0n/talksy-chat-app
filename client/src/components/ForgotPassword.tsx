@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { post } from "@/services/commonRequest";
-import { endpoints } from "@/services/api";
 import { enqueueSnackbar } from "notistack";
 import { t } from "i18next";
+import instance from "@/services/instance";
 
 interface Props {
   onSubmit: (email: string) => void;
@@ -21,7 +20,7 @@ const ForgotPasswordCom: React.FC<Props> = ({ onSubmit }) => {
       const res: {
         message: string;
         statusCode?: number;
-      } = await post(`http://localhost:7070/users/forgot-password`, {
+      } = await instance.post(`/users/forgot-password`, {
         email,
       });
 

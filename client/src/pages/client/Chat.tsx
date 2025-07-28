@@ -3,12 +3,12 @@ import socket from "@/socket";
 import ChatPage from "@/components/ChatPage";
 import Messages from "@/components/Messages";
 
-import type { Message } from "@/services/messageService";
 import { fetchMessagesForChat } from "@/services/messageService";
 import { getChatPreviewsForUser } from "@/services/userService";
 import { getOrCreateChatWithUser } from "@/services/chatService";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store/store";
+import type { Message } from "@/types/MessagesTypes";
 
 type ChatPreview = {
   friendId: string;
@@ -132,7 +132,7 @@ const ChatWrapper = () => {
       <Messages
         conversations={conversations.map((chat) => ({
           id: chat.friendId,
-          chatId: chat.chatId || undefined,
+          chatId: chat.chatId || "no_chatId" ,
           fullName: chat.fullName || "Unnamed Chat",
           avatar: chat.avatar?.url || "",
           lastMessage: chat.lastMessage?.content || "",

@@ -39,6 +39,10 @@ export default function ChangePassword() {
       };
 
       try {
+        if (!userSate.id) {
+          console.error("User ID is missing");
+          return;
+        }
         const response = await changePassword(userSate.id, payload);
 
         enqueueSnackbar(response.message || t("password_update_success"), {
