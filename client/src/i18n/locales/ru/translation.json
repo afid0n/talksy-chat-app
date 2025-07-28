@@ -43,6 +43,7 @@
   "confirm_your_new_password": "Подтвердите новый пароль",
   "update_password": "Обновить пароль",
   "updating": "Обновление",
+"register_birthday_min_age_error": "Вы должны быть не моложе 16 лет, чтобы продолжить.",
   "password_mismatch_warning": "Новый пароль и подтверждение не совпадают.",
   "password_update_success": "Пароль успешно обновлён!",
   "password_update_fail": "Не удалось обновить пароль",

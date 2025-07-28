@@ -46,6 +46,7 @@
   "password_update_success": "Şifre başarıyla güncellendi!",
   "password_update_fail": "Şifre güncellenemedi",
   "updating": "Güncelleniyor",
+"register_birthday_min_age_error": "En az 16 yaşında olmalısınız.",
   "notifications": "Bildirimler",
   "message_notifications": "Mesaj Bildirimleri",
   "message_notifications_desc": "Yeni mesaj aldığınızda bildirim alın",

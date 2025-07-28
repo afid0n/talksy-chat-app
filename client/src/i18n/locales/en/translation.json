@@ -173,6 +173,7 @@
   "register_birthday_click": "Click to select birthday",
   "register_birthday_is": "Your birthday is",
   "register_birthday_age": "You are",
+"register_birthday_min_age_error": "You must be at least 16 years old to continue.",
   "register_back": "← Back",
   "register_continue": "Continue →",
    "register_google_button": "Continue with Google",
