@@ -150,7 +150,6 @@ const updateUser = async (req, res) => {
     });
   }
 };
-
 const login = async (req, res, next) => {
   try {
     const credentials = {
@@ -161,23 +160,27 @@ const login = async (req, res, next) => {
 
     console.log("RESPONSE ON SERVER: ", response);
 
+    const accessToken = response.accessToken;  // extract token here!
+
     res.cookie("token", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     res.status(200).json({
       message: response.message,
     });
 
   } catch (error) {
-    res.json({
+    res.status(401).json({
       message: error.message || "internal server error",
-      statusCode: 401, //unauthorized
+      statusCode: 401,
     });
   }
 };
+
 
 const changePassword = async (req, res) => {
   try {
