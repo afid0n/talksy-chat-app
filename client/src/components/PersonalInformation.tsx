@@ -1,14 +1,16 @@
-import { Mail, User } from "lucide-react";
+import { Mail, User2, } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
 import { useFormik } from "formik";
-import axios from "axios";
 import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 import { t } from "i18next";
+import instance from "@/services/instance";
+import type { User } from "@/types/User";
 
-const PersonalInformation = ({ userr }) => {
+const PersonalInformation: React.FC<{ userr: Partial<User> }> = ({ userr }) => {
 
   const [previewImage, setPreviewImage] = useState(userr?.avatar?.url || "");
+  const [loading, setLoading] = useState(false);
 
 
 
@@ -25,6 +27,7 @@ const PersonalInformation = ({ userr }) => {
       profileImage: null,
     },
     onSubmit: async (values) => {
+      setLoading(true);
       try {
         const formData = new FormData();
         formData.append("fullName", values.fullName);
@@ -36,12 +39,10 @@ const PersonalInformation = ({ userr }) => {
           formData.append("profileImage", values.profileImage);
         }
 
-        const response = await axios.patch(
-          `http://localhost:7070/users/${userr.id}`,
+        const response = await instance.patch(
+          `/users/${userr.id}`,
           formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
 
         enqueueSnackbar("Updated profile successfully", { variant: "success" });
@@ -49,8 +50,11 @@ const PersonalInformation = ({ userr }) => {
       } catch (error) {
         enqueueSnackbar("Failed to update profile", { variant: "error" });
         console.error("Update failed:", error);
+      } finally {
+        setLoading(false);
       }
     },
+
   });
 
   return (
@@ -91,7 +95,7 @@ const PersonalInformation = ({ userr }) => {
         {/* Full Name */}
         <div className="space-y-1">
           <label className="text-sm font-medium flex items-center gap-1 text-gray-700 dark:text-gray-300">
-            <User size={16} /> {t("full_name")}
+            <User2 size={16} /> {t("full_name")}
           </label>
           <input
             name="fullName"
@@ -159,10 +163,12 @@ const PersonalInformation = ({ userr }) => {
       <div className="flex justify-end">
         <button
           type="submit"
-          className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium px-6 py-2 rounded-lg"
+          disabled={loading}
+          className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {t("update_info")}
+          {loading ? t("updating") + "..." : t("update_info")}
         </button>
+
       </div>
     </form>
   );

@@ -11,14 +11,15 @@ interface ChooseLangProps {
 
 
 const ChooseLang: React.FC<ChooseLangProps> = ({ onNext }) => {
-  const [language, setLanguage] = useState<string>(i18n.language || "en");
+  const [, setLanguage] = useState<string>(i18n.language || "en");
 
-  const languages = [
-    { code: "en", label: "US", name: t("english") },
-    { code: "az", label: "AZ", name: t("azerbaijani") },
-    { code: "ru", label: "RU", name: t("russian") },
-    { code: "tr", label: "TR", name: t("turkish") },
-  ];
+const languages = [
+  { code: "en", label: "US", name: "english" },
+  { code: "az", label: "AZ", name: "azerbaijani" },
+  { code: "ru", label: "RU", name: "russian" },
+  { code: "tr", label: "TR", name: "turkish" },
+];
+
 
   const changeLanguage = (langCode: string) => {
     setLanguage(langCode);

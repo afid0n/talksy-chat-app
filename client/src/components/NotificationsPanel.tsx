@@ -49,7 +49,7 @@ const NotificationsPanel = () => {
 
       <NotificationToggle
         title={t("message_notifications")}
-        description={t("message_notifications_description")}
+        description={t("message_notifications_desc")}
         checked={messageNotif}
         onChange={() => setMessageNotif(!messageNotif)}
       />
@@ -61,7 +61,7 @@ const NotificationsPanel = () => {
       />
       <NotificationToggle
         title={t("app_updates")}
-        description={t("app_updates_description")}
+        description={t("app_updates_desc")}
         checked={appUpdatesNotif}
         onChange={() => setAppUpdatesNotif(!appUpdatesNotif)}
       />

@@ -24,7 +24,7 @@ router.get('/chat-previews', verifyToken, getMessagePreviews);
 
 router.post('/send-request/:targetId', verifyAccessToken, userController.sendFriendRequest);
 router.post('/accept-request/:requesterId', verifyAccessToken, userController.acceptFriendRequest);
-router.post('/cancel-request/:targetId', verifyAccessToken, userController.cancelFriendRequest);
+router.post('/cancel-request/:senderId', verifyAccessToken, userController.cancelFriendRequest);
 
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);

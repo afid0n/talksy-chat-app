@@ -8,8 +8,10 @@ interface Conversation {
   unreadCount: number;
   initials: string;
   isGroup?: boolean;
-  chatId: string;
   avatar?: string;
+  chatId: string ;
+  isOnline?: boolean;
+  
 }
 
 interface MessagesProps {

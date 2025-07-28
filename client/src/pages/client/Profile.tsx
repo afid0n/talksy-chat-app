@@ -29,10 +29,8 @@ import ChangePassword from "@/components/ChangePassword";
 import moment from "moment";
 import { useAppSelector } from "@/redux/store/hooks";
 import type { UserState } from "@/types/User";
-import axios from "axios";
 import { enqueueSnackbar } from "notistack";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "@/redux/store/store";
+import { useDispatch } from "react-redux";
 import { acceptFriendRequest, cancelFriendRequest } from "@/services/userService";
 import { t } from "i18next";
 import i18n from "@/i18n/config";
@@ -50,7 +48,7 @@ const Profile = () => {
    const [messageCount, setMessageCount] = useState(0);
 
   // State for likedUsers count (Favorites)
-  const [favoritesCount, setFavoritesCount] = useState(() => {
+  const [favoritesCount,] = useState(() => {
     try {
       const liked = JSON.parse(localStorage.getItem("likedUsers") || "[]");
       return Array.isArray(liked) ? liked.length : 0;
@@ -248,7 +246,7 @@ const handleAccept = async (requesterId: string) => {
                 color: "blue",
               },
               {
-                count: favoritesCount, // <-- from localStorage
+                count: favoritesCount,
                 label: t("favorites"),
                 icon: Heart,
                 color: "purple",

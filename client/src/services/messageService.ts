@@ -1,23 +1,7 @@
 import type { AxiosError } from "axios";
 import instance from "./instance";
+import type { Message } from "@/types/MessagesTypes";
 
-export interface Message {
-  _id: string;
-  chat: string;
-  sender: {
-    _id: string;
-    fullName: string;
-    // add more sender fields if needed
-  };
-  type: "text" | "image" | "video" | "gif";
-  content: string;
-  status: "sent" | "delivered" | "read";
-  replyTo?: string | null;
-  deleted: boolean;
-  edited: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
 
 // Get all messages for a chat
 export const fetchMessagesForChat = async (chatId: string) => {

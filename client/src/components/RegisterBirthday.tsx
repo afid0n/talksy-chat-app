@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import  { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
@@ -9,7 +9,7 @@ interface RegisterBirthdayProps {
   onNext: () => void;
   onBack: () => void;
   setBirthday: (date: Date) => void;
-  birthday?: Date | null; // optional initial date from parent
+  birthday?: Date | null;
 }
 
 const RegisterBirthday = ({
@@ -18,10 +18,10 @@ const RegisterBirthday = ({
   setBirthday,
   birthday = null,
 }: RegisterBirthdayProps) => {
-  const [date, setDate] = React.useState<Date | undefined>(birthday || undefined);
-  const [showCalendar, setShowCalendar] = React.useState(false);
+  const [date, setDate] = useState<Date | undefined>(birthday || undefined);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [isTooYoung, setIsTooYoung] = useState(false); // 🔸 new state
 
-  // Sync local date with parent on mount or when birthday changes
   useEffect(() => {
     if (birthday) {
       setDate(birthday);
@@ -29,9 +29,10 @@ const RegisterBirthday = ({
     }
   }, [birthday]);
 
-  // Update parent whenever date changes
   useEffect(() => {
     if (date) {
+      const age = calculateAge(date);
+      setIsTooYoung(age < 16); 
       setBirthday(date);
     }
   }, [date, setBirthday]);
@@ -53,7 +54,9 @@ const RegisterBirthday = ({
       exit={{ opacity: 0, x: -50 }}
       className="text-gray-800 dark:text-gray-100"
     >
-      <h2 className="text-2xl font-bold mb-4 text-center"> {t("register_birthday_title")}</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        {t("register_birthday_title")}
+      </h2>
 
       {!showCalendar && (
         <button
@@ -81,13 +84,16 @@ const RegisterBirthday = ({
       {date && (
         <div className="mt-2 mb-4 text-center text-gray-700 dark:text-gray-300">
           <p>
-             🎂 {t("register_birthday_is")}{" "}
+            🎂 {t("register_birthday_is")}{" "}
             <strong>{format(date, "MMMM d, yyyy")}</strong>
           </p>
           <p>
-           🎉 {t("register_birthday_age")}{" "}
-            <strong>{calculateAge(date)}</strong> years old
+            🎉 {t("register_birthday_age")}{" "}
+            <strong>{calculateAge(date)}</strong> 
           </p>
+          {isTooYoung && (
+            <p className="text-red-500 mt-2">{t("register_birthday_min_age_error")}</p>
+          )}
         </div>
       )}
 
@@ -101,7 +107,7 @@ const RegisterBirthday = ({
         </button>
         <button
           onClick={onNext}
-          disabled={!date}
+          disabled={!date || isTooYoung}
           className="bg-yellow-500 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-yellow-600 dark:hover:bg-yellow-600"
           type="button"
         >

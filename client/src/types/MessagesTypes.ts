@@ -3,7 +3,7 @@ export interface Message {
   chat: string;
   sender: {
     _id: string;
-    username: string;
+    fullName: string;
   };
   type: 'text' | 'gif' | 'emoji';
   content: string;

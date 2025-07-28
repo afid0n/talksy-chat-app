@@ -25,6 +25,9 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
 
   // Ref for resetting captcha
   const recaptchaRef = useRef<ReCAPTCHA>(null);
+  // config.ts
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:7070";
+
 
   useEffect(() => {
     const theme = localStorage.getItem("vite-ui-theme");
@@ -93,7 +96,7 @@ const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
     <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-md rounded-lg py-3 px-8 w-full max-w-md mx-auto transition">
       <button
         type="button"
-        onClick={() => window.location.href = `http://localhost:7070/auth/google?${params.toString()}`}
+        onClick={() => window.location.href = `${SERVER_URL}/auth/google?${params.toString()}`}
         className="flex items-center justify-center w-full py-2 mb-4 border border-gray-300 dark:border-zinc-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
       >
         <FaGoogle className="mr-2" />{t("register_google_button")}

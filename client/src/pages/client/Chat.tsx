@@ -3,12 +3,12 @@ import socket from "@/socket";
 import ChatPage from "@/components/ChatPage";
 import Messages from "@/components/Messages";
 
-import type { Message } from "@/services/messageService";
 import { fetchMessagesForChat } from "@/services/messageService";
 import { getChatPreviewsForUser } from "@/services/userService";
 import { getOrCreateChatWithUser } from "@/services/chatService";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store/store";
+import type { Message } from "@/types/MessagesTypes";
 
 type ChatPreview = {
   friendId: string;
@@ -29,8 +29,17 @@ const ChatWrapper = () => {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<ChatPreview[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   const currentUser = useSelector((state: RootState) => state.user);
+
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      socket.emit("userConnected", currentUser.id);
+    }
+  }, [currentUser?.id]);
+
 
   // Debug log currentUser
   useEffect(() => {
@@ -53,6 +62,7 @@ const ChatWrapper = () => {
   useEffect(() => {
     console.log("Updated conversations state:", conversations);
   }, [conversations]);
+  ;
 
   // Handle socket join and message fetch on selectedChatId change
   useEffect(() => {
@@ -99,13 +109,13 @@ const ChatWrapper = () => {
         prev.map((chat) =>
           chat.friendId === selectedFriendId
             ? {
-                ...chat,
-                lastMessage: {
-                  content: message.content,
-                  createdAt: new Date().toISOString(),
-                },
-                updatedAt: new Date().toISOString(),
-              }
+              ...chat,
+              lastMessage: {
+                content: message.content,
+                createdAt: new Date().toISOString(),
+              },
+              updatedAt: new Date().toISOString(),
+            }
             : chat
         )
       );
@@ -113,18 +123,63 @@ const ChatWrapper = () => {
 
     socket.on("receiveMessage", handleIncomingMessage);
 
+    
     return () => {
       console.log(`Leaving socket room: ${selectedChatId}`);
       socket.emit("leaveRoom", selectedChatId);
       socket.off("receiveMessage", handleIncomingMessage);
     };
   }, [selectedChatId, currentUser.id, selectedFriendId]);
+  
+  useEffect(() => {
+    const handleOnlineUsers = (users: string[]) => {
+      setOnlineUsers(users);
+    };
 
+    const handleUserOnline = (userId: string) => {
+      setOnlineUsers((prev) => [...new Set([...prev, userId])]);
+    };
+
+    const handleUserOffline = (userId: string) => {
+      setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+    };
+
+    socket.on("onlineUsers", handleOnlineUsers);
+    socket.on("userOnline", handleUserOnline);
+    socket.on("userOffline", handleUserOffline);
+
+    return () => {
+      socket.off("onlineUsers", handleOnlineUsers);
+      socket.off("userOnline", handleUserOnline);
+      socket.off("userOffline", handleUserOffline);
+    };
+  }, []);
   // Debug selectedFriendId and selectedChatId changes
   useEffect(() => {
     console.log("Selected friend ID:", selectedFriendId);
     console.log("Selected chat ID:", selectedChatId);
   }, [selectedFriendId, selectedChatId]);
+
+     // Extract chatPartnerId from messages or fallback to selectedFriendId
+    const getChatPartnerId = (): string | null => {
+      if (!messages.length || !currentUser?.id) return selectedFriendId;
+
+      // Find first message sender who is NOT current user
+      const firstMsg = messages.find((m) => {
+        const senderId = typeof m.sender === "string" ? m.sender : m.sender?._id;
+        return senderId !== currentUser.id;
+      });
+
+      if (firstMsg) {
+        const senderId = typeof firstMsg.sender === "string" ? firstMsg.sender : firstMsg.sender?._id;
+        return senderId || selectedFriendId;
+      }
+
+      return selectedFriendId;
+    };
+
+    const chatPartnerId = getChatPartnerId();
+    const isPartnerOnline = chatPartnerId ? onlineUsers.includes(chatPartnerId) : false;
 
   return (
     <div className="flex min-h-screen w-full h-full">
@@ -132,7 +187,7 @@ const ChatWrapper = () => {
       <Messages
         conversations={conversations.map((chat) => ({
           id: chat.friendId,
-          chatId: chat.chatId || undefined,
+          chatId: chat.chatId || "no_chatId",
           fullName: chat.fullName || "Unnamed Chat",
           avatar: chat.avatar?.url || "",
           lastMessage: chat.lastMessage?.content || "",
@@ -142,12 +197,13 @@ const ChatWrapper = () => {
           unreadCount: 0,
           initials: chat.fullName
             ? chat.fullName
-                .split(" ")
-                .map((w) => w[0])
-                .join("")
-                .toUpperCase()
+              .split(" ")
+              .map((w) => w[0])
+              .join("")
+              .toUpperCase()
             : "C",
           isGroup: chat.isGroup,
+          isOnline: onlineUsers.includes(chat.friendId),
         }))}
         selectedId={selectedFriendId}
         onSelect={async (friendId, chatId) => {
@@ -180,7 +236,7 @@ const ChatWrapper = () => {
           }
         }}
         searchQuery=""
-        onSearchChange={() => {}}
+        onSearchChange={() => { }}
       />
 
       {/* ChatPage or placeholder */}
@@ -189,6 +245,7 @@ const ChatWrapper = () => {
           <ChatPage
             selectedId={selectedChatId}
             messages={messages}
+            isPartnerOnline={isPartnerOnline}
             setMessages={setMessages}
           />
         ) : (
