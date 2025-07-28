@@ -51,6 +51,7 @@
   "message_notifications_desc": "Yeni mesajlar barədə bildirişlər alın",
   "connection_requests": "Əlaqə istəkləri",
   "connection_requests_desc": "Kimsə sizinlə əlaqə qurmaq istədikdə bildiriş alın",
+"register_birthday_min_age_error": "Davam etmək üçün ən azı 16 yaşında olmalısınız.",
   "connection_notifications": "Əlaqə bildirişləri",
   "app_updates": "Tətbiq yeniləmələri",
   "updating": "Yenilənir",
