@@ -28,6 +28,7 @@ router.post('/cancel-request/:senderId', verifyAccessToken, userController.cance
 
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
+router.post("/logout", userController.logoutUser);
 
 // Update user with profile image upload
 router.patch('/:id', upload.single("profileImage"), userController.updateUser);

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { enqueueSnackbar } from 'notistack';
 import { logoutUser } from '@/redux/userSlice';
+import { logout } from '@/services/userService';
 
 const Sidebar = ({
   isOpen,
@@ -31,11 +32,17 @@ const Sidebar = ({
     { label: t('sidebar.profile'), icon: User, path: '/profile' },
   ];
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
-    enqueueSnackbar(t('sidebar.logout_success'), { variant: 'success' });
-    navigate('/auth/login');
-  };
+ const handleLogout = async () => {
+  try {
+    await logout(); 
+    dispatch(logoutUser()); 
+    enqueueSnackbar(t("sidebar.logout_success"), { variant: "success" });
+    navigate("/auth/login");
+  } catch (error) {
+    enqueueSnackbar(t("sidebar.logout_failed"), { variant: "error" });
+    console.error("Logout failed", error);
+  }
+};
 
   return (
     <aside

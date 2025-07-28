@@ -31,7 +31,7 @@ import { useAppSelector } from "@/redux/store/hooks";
 import type { UserState } from "@/types/User";
 import { enqueueSnackbar } from "notistack";
 import { useDispatch } from "react-redux";
-import { acceptFriendRequest, cancelFriendRequest } from "@/services/userService";
+import { acceptFriendRequest, cancelFriendRequest, deleteAccount, logout } from "@/services/userService";
 import { t } from "i18next";
 import i18n from "@/i18n/config";
 import { useNavigate } from "react-router-dom";
@@ -65,11 +65,33 @@ const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
-    enqueueSnackbar("Logged out successfully", { variant: "info" });
+const handleLogout = async () => {
+  try {
+    await logout();
+    dispatch(logoutUser()); 
+    enqueueSnackbar(t("sidebar.logout_success"), { variant: "success" });
     navigate("/auth/login");
-  };
+  } catch (error) {
+    enqueueSnackbar(t("sidebar.logout_failed"), { variant: "error" });
+    console.error("Logout failed", error);
+  }
+};
+
+const handleDeleteAccount = async () => {
+  if (!window.confirm("Are you sure you want to permanently delete your account? This cannot be undone.")) {
+    return;
+  }
+
+  try {
+    await deleteAccount();
+    dispatch(logoutUser()); 
+    navigate("/auth/register"); 
+    enqueueSnackbar("Your account has been deleted.", { variant: "success" });
+  } catch (error) {
+    enqueueSnackbar("Failed to delete account. Try again.", { variant: "error" });
+    console.error("Delete account error:", error);
+  }
+};
 
   const changeLanguage = (langCode: string) => {
     setLanguage(langCode);
@@ -395,7 +417,7 @@ const handleAccept = async (requesterId: string) => {
                 <LogOut size={18} />
                 {t("sign_out")}
               </button>
-              <button className="flex items-center justify-center w-full gap-2 text-red-700 dark:text-red-200 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 border border-red-300 dark:border-red-400 font-semibold py-2 px-4 rounded-md transition">
+              <button onClick={handleDeleteAccount} className="flex items-center justify-center w-full gap-2 text-red-700 dark:text-red-200 bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 border border-red-300 dark:border-red-400 font-semibold py-2 px-4 rounded-md transition">
                 <X size={18} />
                 {t("delete_account")}
               </button>

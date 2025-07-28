@@ -97,3 +97,13 @@ export const getChatPreviewsForUser = async () => {
 export const removeFriend = async (friendId: string): Promise<void> => {
   await instance.delete(`/users/friends/${friendId}`);
 };
+
+export const logout = async () => {
+  return await instance.get("/users/logout", { withCredentials: true });
+};
+
+export const deleteAccount = async () => {
+  return await instance.delete("/auth/delete-account", {
+    withCredentials: true,
+  });
+};

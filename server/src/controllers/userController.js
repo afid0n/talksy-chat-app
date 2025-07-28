@@ -151,16 +151,6 @@ const updateUser = async (req, res) => {
   }
 };
 
-const deleteUser = async (req, res, next) => {
-  try {
-    const user = await userService.deleteUser(req.params.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json({ message: 'User deleted', user });
-  } catch (err) {
-    next(err);
-  }
-};
-
 const login = async (req, res, next) => {
   try {
     const credentials = {
@@ -450,7 +440,36 @@ const removeFriend = async (req, res, next) => {
 };
 
 
+const logoutUser = async (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  });
 
+  res.status(200).json({ message: "Logged out" });
+};
+
+const User = require("../models/userModel");
+
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.user.id; // Provided by authenticate middleware
+
+    await User.findByIdAndDelete(userId);
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    });
+
+    return res.status(200).json({ message: "Account deleted successfully." });
+  } catch (err) {
+    console.error("Error deleting account:", err);
+    return res.status(500).json({ message: "Something went wrong." });
+  }
+};
 
 module.exports = {
   getUserById,
@@ -472,4 +491,5 @@ module.exports = {
   cancelFriendRequest,
   getFriends
   , removeFriend
+  , logoutUser
 };

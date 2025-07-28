@@ -220,10 +220,6 @@ const updateUser = async (userId, updates) => {
   };
 };
 
-const deleteUser = async (id) => {
-  const user = await User.findByIdAndDelete(id);
-  return user ? formatMongoData(user) : null;
-};
 
 const getAllUsers = async () => {
   // Fetch all users
@@ -297,7 +293,6 @@ module.exports = {
   verifyEmailToken,
   login,
   updateUser,
-  deleteUser,
   getAllUsers,
   changePassword,
   resetPass,
