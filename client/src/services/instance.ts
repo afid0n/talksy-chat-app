@@ -14,7 +14,7 @@ instance.interceptors.request.use(
   function (config) {
     const token = getAccessToken(); 
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      // config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
