@@ -450,8 +450,6 @@ const logoutUser = async (req, res) => {
   res.status(200).json({ message: "Logged out" });
 };
 
-const User = require("../models/userModel");
-
 const deleteUser = async (req, res) => {
   try {
     const userId = req.user.id; // Provided by authenticate middleware
