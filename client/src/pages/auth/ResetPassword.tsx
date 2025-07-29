@@ -8,7 +8,6 @@ import instance from "@/services/instance";
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
-  console.log("token: ", token);
   const formik = useFormik({
     initialValues: {
       newPassword: "",

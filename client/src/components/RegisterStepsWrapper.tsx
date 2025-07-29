@@ -82,7 +82,6 @@ export default function RegisterStepsWrapper() {
       language: navigator.language || "en",
     };
 
-    console.log("📦 Sending register payload:", payload);
     await registerUser(payload);
 
     const userExtras = {

@@ -13,12 +13,14 @@ const ChatPage = ({
   selectedId,
   messages,
   setMessages,
-  isPartnerOnline
+  isPartnerOnline,
+   onBack,
 }: {
   selectedId: string;
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   isPartnerOnline: boolean;
+  onBack: () => void;
 }) => {
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -192,12 +194,21 @@ const ChatPage = ({
   }, [selectedId, currentUserId]);
 
 
-  return (
-    <div className="flex flex-col h-screen max-h-screen w-full bg-gray-50 dark:bg-zinc-900">
-      {/* Header */}
-      <div className="p-4 py-6 border-b flex justify-between items-center bg-white dark:bg-zinc-800">
-        <div className="flex flex-col items-center">
-
+ return (
+  <div className="flex flex-col h-screen w-full bg-gray-50 dark:bg-zinc-900">
+    {/* Header */}
+    <div className="p-4 py-6 border-b flex items-center justify-between bg-white dark:bg-zinc-800">
+      <div className="flex items-center gap-4">
+        {/* Back Button (mobile only) */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="md:hidden text-yellow-600 dark:text-yellow-400 text-m font-medium"
+          >
+            ←
+          </button>
+        )}
+        <div className="flex flex-col">
           <div className="font-semibold text-lg text-black dark:text-white flex items-center gap-2">
             Chat
             {isPartnerOnline ? (
@@ -206,72 +217,69 @@ const ChatPage = ({
               <span className="text-gray-400 text-sm">● Offline</span>
             )}
           </div>
-
           {isTyping && (
-            <div className="italic text-sm text-gray-600 dark:text-gray-400 ml-2">
+            <div className="italic text-sm text-gray-600 dark:text-gray-400 ml-1">
               Typing...
             </div>
           )}
-
-        </div>
-
-        <div className="flex gap-4 text-black dark:text-white">
-          <Phone className="cursor-pointer" />
-          <Video className="cursor-pointer" />
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
-        {messages.length === 0 && (
-          <p className="text-center text-gray-500 dark:text-gray-400 mt-4">
-            No messages yet.
-          </p>
-        )}
-
-        {messages.map((m) => {
-          const senderId = getSenderId(m.sender);
-          const isSentByCurrentUser = senderId === currentUserId;
-
-          return (
-            <div
-              key={m._id}
-              className={`p-2 rounded-lg break-words break-all whitespace-pre-wrap overflow-wrap-anywhere max-w-[75%]
-${isSentByCurrentUser
-                  ? "ml-auto bg-amber-200 text-black dark:bg-yellow-800 dark:text-white"
-                  : "mr-auto bg-gray-200 dark:bg-zinc-700 text-black dark:text-white"
-                }`}
-
-            >
-
-              {m.type === "gif" ? (
-                <img
-                  src={m.content}
-                  alt="GIF"
-                  className="rounded max-w-[200px] max-h-[200px] object-contain"
-                />
-              ) : (
-                <span>{m.content}</span>
-              )}
-            </div>
-          );
-        })}
-
-        <div ref={scrollRef} />
+      <div className="flex gap-4 text-black dark:text-white">
+        <Phone className="cursor-pointer" />
+        <Video className="cursor-pointer" />
       </div>
+    </div>
 
-      {/* Input + GIF picker */}
-      <div className="p-4 border-t bg-white dark:bg-zinc-800 flex flex-col relative">
+    {/* Messages */}
+    <div className="flex-1 overflow-y-auto p-2 sm:p-4 flex flex-col gap-2">
+      {messages.length === 0 && (
+        <p className="text-center text-gray-500 dark:text-gray-400 mt-4">
+          No messages yet.
+        </p>
+      )}
+
+      {messages.map((m) => {
+        const senderId = getSenderId(m.sender);
+        const isSentByCurrentUser = senderId === currentUserId;
+
+        return (
+          <div
+            key={m._id}
+            className={`p-2 rounded-lg break-words whitespace-pre-wrap max-w-[85%] sm:max-w-[75%]
+            ${isSentByCurrentUser
+                ? "ml-auto bg-amber-200 text-black dark:bg-yellow-800 dark:text-white"
+                : "mr-auto bg-gray-200 dark:bg-zinc-700 text-black dark:text-white"
+              }`}
+          >
+            {m.type === "gif" ? (
+              <img
+                src={m.content}
+                alt="GIF"
+                className="rounded max-w-[180px] sm:max-w-[220px] max-h-[200px] object-contain"
+              />
+            ) : (
+              <span>{m.content}</span>
+            )}
+          </div>
+        );
+      })}
+      <div ref={scrollRef} />
+    </div>
+
+    {/* Input + GIF picker */}
+    <div className="p-2 sm:p-4 border-t bg-white dark:bg-zinc-800 flex flex-col relative gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
+        <input
+          type="text"
+          value={text}
+          onChange={handleInputChange}
+          placeholder="Type a message"
+          className="flex-1 border rounded p-2 bg-white dark:bg-zinc-900 text-black dark:text-white"
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          disabled={!selectedId}
+        />
         <div className="flex gap-2">
-          <input
-            type="text"
-            value={text}
-            onChange={handleInputChange}
-            placeholder="Type a message"
-            className="flex-1 border rounded p-2 bg-white dark:bg-zinc-900 text-black dark:text-white"
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            disabled={!selectedId}
-          />
           <button
             onClick={sendMessage}
             className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
@@ -288,49 +296,38 @@ ${isSentByCurrentUser
             GIF
           </button>
         </div>
-
-        {/* GIF Picker Overlay */}
-        {gifPickerOpen && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: "70px",
-              right: 0,
-              zIndex: 1000,
-              borderRadius: 8,
-              overflowY: "auto",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              padding: 8,
-              maxHeight: 380,
-            }}
-            className="bg-white dark:bg-zinc-800 "
-          >
-            <input
-              type="text"
-              value={gifSearchTerm}
-              onChange={(e) => setGifSearchTerm(e.target.value)}
-              placeholder="Search GIFs"
-              className="mb-2 p-2 border rounded w-full bg-white dark:bg-zinc-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-              autoFocus
-            />
-
-            <Grid
-              fetchGifs={fetchGifs}
-              width={368} // slightly less than 384 due to padding
-              columns={3}
-              gutter={6}
-              key={gifSearchTerm}
-              onGifClick={(gif, e) => {
-                e.preventDefault();
-                sendGifMessage(gif.images.fixed_height.url);
-              }}
-            />
-          </div>
-        )}
-
       </div>
+
+      {/* GIF Picker */}
+      {gifPickerOpen && (
+        <div
+          className="absolute bottom-[70px] right-2 z-50 rounded shadow-lg p-2 bg-white dark:bg-zinc-800 max-h-[350px] w-[calc(100vw-2rem)] sm:w-[368px] overflow-y-auto"
+        >
+          <input
+            type="text"
+            value={gifSearchTerm}
+            onChange={(e) => setGifSearchTerm(e.target.value)}
+            placeholder="Search GIFs"
+            className="mb-2 p-2 border rounded w-full bg-white dark:bg-zinc-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+            autoFocus
+          />
+          <Grid
+            fetchGifs={fetchGifs}
+            width={340}
+            columns={3}
+            gutter={6}
+            key={gifSearchTerm}
+            onGifClick={(gif, e) => {
+              e.preventDefault();
+              sendGifMessage(gif.images.fixed_height.url);
+            }}
+          />
+        </div>
+      )}
     </div>
-  );
+  </div>
+);
+
 };
 
 export default ChatPage;

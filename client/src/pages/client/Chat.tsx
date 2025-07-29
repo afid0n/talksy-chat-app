@@ -29,9 +29,20 @@ const ChatWrapper = () => {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<ChatPreview[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   const currentUser = useSelector((state: RootState) => state.user);
+useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth < 768);
+  };
+
+  handleResize(); // Initial check
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
 
 
   useEffect(() => {
@@ -43,14 +54,12 @@ const ChatWrapper = () => {
 
   // Debug log currentUser
   useEffect(() => {
-    console.log("Current user from Redux:", currentUser);
   }, [currentUser]);
 
   // Load all conversations for sidebar
   useEffect(() => {
     getChatPreviewsForUser()
       .then((data) => {
-        console.log("Fetched chat previews:", data);
         setConversations(data);
       })
       .catch((err) => {
@@ -60,23 +69,19 @@ const ChatWrapper = () => {
 
   // Debug conversations update
   useEffect(() => {
-    console.log("Updated conversations state:", conversations);
   }, [conversations]);
   ;
 
   // Handle socket join and message fetch on selectedChatId change
   useEffect(() => {
     if (!selectedChatId) {
-      console.log("No selectedChatId yet, skipping socket join and fetch");
       return;
     }
 
-    console.log(`Joining socket room: ${selectedChatId}`);
     socket.emit("joinRoom", selectedChatId);
 
     fetchMessagesForChat(selectedChatId)
       .then((msgs) => {
-        console.log(`Fetched messages for chat ${selectedChatId}:`, msgs);
         setMessages(msgs);
       })
       .catch((err) => {
@@ -84,7 +89,6 @@ const ChatWrapper = () => {
       });
 
     const handleIncomingMessage = (message: Message & { chat: string }) => {
-      console.log("Received socket message:", message);
 
       if (message.chat === selectedChatId) {
         if (!message.sender) {
@@ -125,7 +129,6 @@ const ChatWrapper = () => {
 
     
     return () => {
-      console.log(`Leaving socket room: ${selectedChatId}`);
       socket.emit("leaveRoom", selectedChatId);
       socket.off("receiveMessage", handleIncomingMessage);
     };
@@ -156,8 +159,6 @@ const ChatWrapper = () => {
   }, []);
   // Debug selectedFriendId and selectedChatId changes
   useEffect(() => {
-    console.log("Selected friend ID:", selectedFriendId);
-    console.log("Selected chat ID:", selectedChatId);
   }, [selectedFriendId, selectedChatId]);
 
      // Extract chatPartnerId from messages or fallback to selectedFriendId
@@ -181,65 +182,62 @@ const ChatWrapper = () => {
     const chatPartnerId = getChatPartnerId();
     const isPartnerOnline = chatPartnerId ? onlineUsers.includes(chatPartnerId) : false;
 
-  return (
-    <div className="flex min-h-screen w-full h-full">
-      {/* Sidebar Messages */}
-      <Messages
-        conversations={conversations.map((chat) => ({
-          id: chat.friendId,
-          chatId: chat.chatId || undefined,
-          fullName: chat.fullName || "Unnamed Chat",
-          avatar: chat.avatar?.url || "",
-          lastMessage: chat.lastMessage?.content || "",
-          lastMessageTime: chat.lastMessage?.createdAt
-            ? new Date(chat.lastMessage.createdAt).toLocaleTimeString()
-            : "",
-          unreadCount: 0,
-          initials: chat.fullName
-            ? chat.fullName
-              .split(" ")
-              .map((w) => w[0])
-              .join("")
-              .toUpperCase()
-            : "C",
-          isGroup: chat.isGroup,
-          isOnline: onlineUsers.includes(chat.friendId),
-        }))}
-        selectedId={selectedFriendId}
-        onSelect={async (friendId, chatId) => {
-          console.log("Messages onSelect called with:", { friendId, chatId });
 
-          setSelectedFriendId(friendId);
+   return (
+  <div className="flex min-h-screen w-full h-full">
+    {/* Sidebar: show on desktop, or mobile when no chat is selected */}
+    {(!isMobile || !selectedChatId) && (
+      <div className="w-full md:w-80 border-r  overflow-y-auto bg-white/70 dark:bg-zinc-700/70 dark:border-gray-700">
+        <Messages
+          conversations={conversations.map((chat) => ({
+            id: chat.friendId,
+            chatId: chat.chatId || undefined,
+            fullName: chat.fullName || "Unnamed Chat",
+            avatar: chat.avatar?.url || "",
+            lastMessage: chat.lastMessage?.content || "",
+            lastMessageTime: chat.lastMessage?.createdAt
+              ? new Date(chat.lastMessage.createdAt).toLocaleTimeString()
+              : "",
+            unreadCount: 0,
+            initials: chat.fullName
+              ? chat.fullName.split(" ").map((w) => w[0]).join("").toUpperCase()
+              : "C",
+            isGroup: chat.isGroup,
+            isOnline: onlineUsers.includes(chat.friendId),
+          }))}
+          selectedId={selectedFriendId}
+          onSelect={async (friendId, chatId) => {
+            setSelectedFriendId(friendId);
 
-          try {
-            let chat;
+            try {
+              let chat;
 
-            if (chatId) {
-              console.log("Using existing chatId:", chatId);
-              chat = { _id: chatId };
-            } else {
-              console.log("No chatId, calling getOrCreateChatWithUser for friendId:", friendId);
-              chat = await getOrCreateChatWithUser(friendId);
-              console.log("getOrCreateChatWithUser returned chat:", chat);
-            }
+              if (chatId) {
+                chat = { _id: chatId };
+              } else {
+                chat = await getOrCreateChatWithUser(friendId);
+              }
 
-            if (!chat || !chat._id) {
-              console.error("Invalid chat returned:", chat);
+              if (!chat || !chat._id) {
+                console.error("Invalid chat returned:", chat);
+                setSelectedChatId(null);
+                return;
+              }
+
+              setSelectedChatId(chat._id);
+            } catch (error) {
+              console.error("Failed to get or create chat:", error);
               setSelectedChatId(null);
-              return;
             }
+          }}
+          searchQuery=""
+          onSearchChange={() => {}}
+        />
+      </div>
+    )}
 
-            setSelectedChatId(chat._id);
-          } catch (error) {
-            console.error("Failed to get or create chat:", error);
-            setSelectedChatId(null);
-          }
-        }}
-        searchQuery=""
-        onSearchChange={() => { }}
-      />
-
-      {/* ChatPage or placeholder */}
+    {/* ChatPage: full width on mobile */}
+    {(!isMobile || selectedChatId) && (
       <div className="flex-1 border-l dark:border-zinc-700">
         {selectedChatId ? (
           <ChatPage
@@ -247,6 +245,12 @@ const ChatWrapper = () => {
             messages={messages}
             isPartnerOnline={isPartnerOnline}
             setMessages={setMessages}
+            onBack={() => {
+              if (isMobile) {
+                setSelectedChatId(null);
+                setSelectedFriendId(null);
+              }
+            }}
           />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500 dark:text-zinc-400">
@@ -254,8 +258,9 @@ const ChatWrapper = () => {
           </div>
         )}
       </div>
-    </div>
-  );
+    )}
+  </div>
+);
 };
 
 export default ChatWrapper;

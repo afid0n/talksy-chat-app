@@ -104,7 +104,6 @@ const handleDeleteAccount = async () => {
       try {
         const res = await instance.get(`/users/${user.id}`);
         setUserr(res.data);
-        console.log("User:", res.data);
       } catch (err) {
         console.error("Error loading user:", err);
       }
@@ -118,9 +117,7 @@ useEffect(() => {
     try {
       if (!user.id) return;
       const res = await instance.get(`/messages`);
-      console.log(res.data, "Messages for user:", user.id);
       const userMessages = res.data.filter((msg: any) => msg.sender === user.id);
-      console.log(userMessages)
       setMessageCount(userMessages.length);
     } catch (error) {
       console.error("Failed to fetch messages:", error);
@@ -333,32 +330,40 @@ const handleAccept = async (requesterId: string) => {
 
         {/* Settings */}
         <TabsContent className="flex flex-col gap-5" value="settings">
-          <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-              {t("language_region")}
-            </h3>
-            <div className="flex justify-between items-center">
-              {[
-                { code: "en", label: "English", region: "US" },
-                { code: "az", label: "Azərbaycan", region: "AZ" },
-                { code: "ru", label: "Русский", region: "RU" },
-                { code: "tr", label: "Türkçe", region: "TR" },
-              ].map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => changeLanguage(lang.code)}
-                  className={`flex items-center justify-center gap-2 border px-8 sm:px-12 py-3 sm:py-5 rounded-lg transition ${
-                    language === lang.code
-                      ? "bg-yellow-50 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200 border-yellow-500"
-                      : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800"
-                  }`}
-                >
-                  <span className="text-xs font-medium">{lang.region}</span>
-                  <span className="text-sm">{lang.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+         <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-sm">
+  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+    {t("language_region")}
+  </h3>
+  <div className="flex flex-wrap gap-4 justify-between items-center">
+    {[
+      { code: "en", label: "English", region: "US" },
+      { code: "az", label: "Azərbaycan", region: "AZ" },
+      { code: "ru", label: "Русский", region: "RU" },
+      { code: "tr", label: "Türkçe", region: "TR" },
+    ].map((lang) => (
+      <button
+        key={lang.code}
+        onClick={() => changeLanguage(lang.code)}
+        className={`
+          flex items-center justify-center gap-2 border rounded-lg transition
+          px-4 py-3
+          sm:px-8 sm:py-5
+          w-full
+          sm:w-auto
+          ${
+            language === lang.code
+              ? "bg-yellow-50 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200 border-yellow-500"
+              : "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 border-transparent"
+          }
+        `}
+      >
+        <span className="text-xs font-medium">{lang.region}</span>
+        <span className="text-sm">{lang.label}</span>
+      </button>
+    ))}
+  </div>
+</div>
+
 
           {/* Appearance Theme Toggle */}
           <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-sm">

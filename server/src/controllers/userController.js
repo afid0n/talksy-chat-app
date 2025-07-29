@@ -136,9 +136,9 @@ const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
     const updates = req.body;
-// Əgər Cloudinary-ə yeni şəkil yüklənibsə
-   if (req.file && req.file.path) {
-      updates.profileImage = req.file.path;         
+    // Əgər Cloudinary-ə yeni şəkil yüklənibsə
+    if (req.file && req.file.path) {
+      updates.profileImage = req.file.path;
       updates.public_id = req.file.filename;
     }
     const result = await userService.updateUser(userId, updates);
@@ -164,10 +164,11 @@ const login = async (req, res, next) => {
 
     res.cookie("token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+
 
     res.status(200).json({
       message: response.message,
@@ -362,7 +363,7 @@ const cancelFriendRequest = async (req, res, next) => {
   const receiverId = req.user.id;
   const senderId = req.params.senderId;
 
-  console.log( "Receiver ID:", receiverId);
+  console.log("Receiver ID:", receiverId);
   console.log("Sender ID:", senderId);
 
   const receiver = await User.findById(receiverId);
@@ -460,8 +461,9 @@ const deleteUser = async (req, res) => {
 
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(200).json({ message: "Account deleted successfully." });

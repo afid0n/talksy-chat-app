@@ -7,6 +7,9 @@ router.get('/chat/:chatId', verifyToken, messageController.getMessagesByChatId);
 
 router.get('/', messageController.getMessages);
 
+router.delete('/delete-all', messageController.deleteAllMessages);
+
+
 // Get message by ID
 router.get('/:id', messageController.getMessageById);
 

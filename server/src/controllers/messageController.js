@@ -88,6 +88,18 @@ const getMessagesByChatId = async (req, res, next) => {
   }
 };
 
+
+
+const deleteAllMessages = async (req, res, next) => {
+  try {
+    const result = await Message.deleteMany({});;
+    res.json({ message: `All messages deleted. Count: ${result.deletedCount}` });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 module.exports = {
   getMessageById,
   getMessagesForChat,
@@ -96,4 +108,5 @@ module.exports = {
   deleteMessage,
   getMessages,
   getMessagesByChatId
+  , deleteAllMessages
 };
