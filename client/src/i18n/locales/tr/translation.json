@@ -223,6 +223,7 @@
     }
   },
   "cards": {
+    "connectToChatTooltip": "Bu kullanıcıyla sohbet başlatmak için bağlanmanız gerekiyor",
     "like": "Beğen",
     "liked": "Beğenildi",
     "connect": "Bağlan",

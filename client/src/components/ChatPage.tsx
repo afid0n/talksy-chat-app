@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Phone, Video } from "lucide-react";
+import { Phone, SendHorizontal, Video } from "lucide-react";
 import { Grid } from "@giphy/react-components";
 import { gf } from "@/giphy/config";
 import socket from "@/socket";
@@ -267,64 +267,66 @@ const ChatPage = ({
       <div ref={scrollRef} />
     </div>
 
-    {/* Input + GIF picker */}
-    <div className="p-2 sm:p-4 border-t bg-white dark:bg-zinc-800 flex flex-col relative gap-2">
-      <div className="flex flex-col sm:flex-row gap-2">
-        <input
-          type="text"
-          value={text}
-          onChange={handleInputChange}
-          placeholder="Type a message"
-          className="flex-1 border rounded p-2 bg-white dark:bg-zinc-900 text-black dark:text-white"
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          disabled={!selectedId}
-        />
-        <div className="flex gap-2">
-          <button
-            onClick={sendMessage}
-            className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
-            disabled={!text.trim() || !selectedId}
-          >
-            Send
-          </button>
-          <button
-            onClick={() => setGifPickerOpen((prev) => !prev)}
-            className="bg-yellow-400 text-black px-4 py-2 rounded"
-            aria-label="Toggle GIF picker"
-            disabled={!selectedId}
-          >
-            GIF
-          </button>
-        </div>
-      </div>
-
-      {/* GIF Picker */}
-      {gifPickerOpen && (
-        <div
-          className="absolute bottom-[70px] right-2 z-50 rounded shadow-lg p-2 bg-white dark:bg-zinc-800 max-h-[350px] w-[calc(100vw-2rem)] sm:w-[368px] overflow-y-auto"
-        >
-          <input
-            type="text"
-            value={gifSearchTerm}
-            onChange={(e) => setGifSearchTerm(e.target.value)}
-            placeholder="Search GIFs"
-            className="mb-2 p-2 border rounded w-full bg-white dark:bg-zinc-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-            autoFocus
-          />
-          <Grid
-            fetchGifs={fetchGifs}
-            width={340}
-            columns={3}
-            gutter={6}
-            key={gifSearchTerm}
-            onGifClick={(gif, e) => {
-              e.preventDefault();
-              sendGifMessage(gif.images.fixed_height.url);
-            }}
-          />
-        </div>
-      )}
+  <div className="p-2 sm:p-4 border-t bg-white dark:bg-zinc-800 flex flex-col relative gap-2">
+  <div className="flex flex-row gap-2 items-center">
+    <input
+      type="text"
+      value={text}
+      onChange={handleInputChange}
+      placeholder="Type a message"
+      className="flex-1 min-w-0 border rounded p-2 bg-white dark:bg-zinc-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+      disabled={!selectedId}
+    />
+    <div className="flex gap-1">
+      <button
+        onClick={sendMessage}
+        className="bg-blue-500 text-white flex items-center justify-center px-2 sm:px-3 py-2 rounded disabled:opacity-50 shrink-0"
+        disabled={!text.trim() || !selectedId}
+        aria-label="Send message"
+      >
+        <SendHorizontal size={16} />
+      </button>
+      <button
+        onClick={() => setGifPickerOpen((prev) => !prev)}
+        className="bg-yellow-400 text-black px-2 sm:px-3 py-2 rounded whitespace-nowrap shrink-0"
+        aria-label="Toggle GIF picker"
+        disabled={!selectedId}
+      >
+        GIF
+      </button>
     </div>
+  </div>
+
+  {/* GIF Picker */}
+  {gifPickerOpen && (
+    <div
+      className="absolute bottom-[70px] right-0 left-0 sm:right-2 sm:left-auto mx-2 sm:mx-0 z-50 rounded shadow-lg p-2 bg-white dark:bg-zinc-800 max-h-[350px] sm:w-[368px] overflow-y-auto"
+      style={{ maxWidth: 'calc(100vw - 1rem)' }}
+    >
+      <input
+        type="text"
+        value={gifSearchTerm}
+        onChange={(e) => setGifSearchTerm(e.target.value)}
+        placeholder="Search GIFs"
+        className="mb-2 p-2 border rounded w-full bg-white dark:bg-zinc-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+        autoFocus
+      />
+      <Grid
+        fetchGifs={fetchGifs}
+        width={340}
+        columns={3}
+        gutter={6}
+        key={gifSearchTerm}
+        onGifClick={(gif, e) => {
+          e.preventDefault();
+          sendGifMessage(gif.images.fixed_height.url);
+        }}
+      />
+    </div>
+  )}
+</div>
+
   </div>
 );
 

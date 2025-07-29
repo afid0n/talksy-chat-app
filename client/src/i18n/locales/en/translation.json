@@ -224,6 +224,7 @@
 
   },
    "cards": {
+    "connectToChatTooltip": "You need to connect to this user before starting a chat",
     "like": "Like",
     "liked": "Liked",
     "connect": "Connect",

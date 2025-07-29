@@ -223,61 +223,72 @@ const Cards = ({
               </div>
 
               {!isCurrentUser && (
-              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mt-4 items-center">
-  <button
-    className={`w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md transition ${
-      liked
-        ? "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700"
-        : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800"
-    }`}
-    onClick={() => handleLike(user.id)}
-  >
-    <UserRoundPlus size={13} />
-    {liked ? t("cards.liked") : t("cards.like")}
-  </button>
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mt-4 items-center">
 
-  {isFriend ? (
-    <button
-      onClick={() => confirmRemoveFriend(user.id)}
-      disabled={isLoading}
-      className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700 cursor-pointer"
-      title={t("cards.unconnectTooltip")}
-    >
-      <UserRoundPlus size={13} />
-      {t("cards.connected")}
-    </button>
-  ) : isRequested ? (
-    <span className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed">
-      <UserRoundPlus size={13} />
-      {t("cards.requested")}
-    </span>
-  ) : hasReceivedRequest ? (
-    <span className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 cursor-default">
-      <UserRoundPlus size={13} />
-      {t("cards.requestReceived")}
-    </span>
-  ) : (
-    <button
-      className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 cursor-pointer"
-      onClick={() => handleSendRequest(user.id)}
-      disabled={isLoading}
-    >
-      <UserRoundPlus size={13} />
-      {t("cards.connect")}
-    </button>
-  )}
+                  <button
+                    className={`w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md transition ${
+                      liked
+                        ? "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700"
+                        : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800"
+                    }`}
+                    onClick={() => handleLike(user.id)}
+                  >
+                    <UserRoundPlus size={13} />
+                    {liked ? t("cards.liked") : t("cards.like")}
+                  </button>
 
-  {isFriend && (
-    <button
-      className="w-full sm:w-auto bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 px-3 py-1 rounded-md flex items-center justify-center gap-1"
-      onClick={handleStartChat}
-    >
-      <MessageCircle size={14} />
-      {t("cards.message")}
-    </button>
-  )}
-</div>
+                  {isFriend ? (
+                    <button
+                      onClick={() => confirmRemoveFriend(user.id)}
+                      disabled={isLoading}
+                      className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700 cursor-pointer"
+                      title={t("cards.unconnectTooltip")}
+                    >
+                      <UserRoundPlus size={13} />
+                      {t("cards.connected")}
+                    </button>
+                  ) : isRequested ? (
+                    <span className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed">
+                      <UserRoundPlus size={13} />
+                      {t("cards.requested")}
+                    </span>
+                  ) : hasReceivedRequest ? (
+                    <span className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 cursor-default">
+                      <UserRoundPlus size={13} />
+                      {t("cards.requestReceived")}
+                    </span>
+                  ) : (
+                    <button
+                      className="w-full sm:w-auto text-sm flex items-center justify-center gap-1 px-4 py-1.5 rounded-md bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 cursor-pointer"
+                      onClick={() => handleSendRequest(user.id)}
+                      disabled={isLoading}
+                    >
+                      <UserRoundPlus size={13} />
+                      {t("cards.connect")}
+                    </button>
+                  )}
 
+                  {/* ALWAYS show message button */}
+                  <button
+                    className={`w-full sm:w-auto px-3 py-1 rounded-md flex items-center justify-center gap-1
+                      ${
+                        isFriend
+                          ? "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-800 cursor-pointer"
+                          : "bg-gray-200 dark:bg-zinc-700 text-gray-500 cursor-not-allowed"
+                      }
+                    `}
+                    onClick={handleStartChat}
+                    disabled={!isFriend}
+                    title={
+                      !isFriend
+                        ? t("cards.connectToChatTooltip")
+                        : undefined
+                    }
+                  >
+                    <MessageCircle size={14} />
+                    {t("cards.message")}
+                  </button>
+                </div>
               )}
             </div>
           );

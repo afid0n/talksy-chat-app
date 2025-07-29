@@ -224,6 +224,7 @@
       }
     },
     "cards": {
+      "connectToChatTooltip": "Bu istifadəçi ilə söhbətə başlamaq üçün əlaqə qurmalısınız",
       "like": "Bəyən",
       "liked": "Bəyənildi",
       "connect": "Əlaqə qur",

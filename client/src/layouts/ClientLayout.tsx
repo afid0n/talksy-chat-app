@@ -20,7 +20,7 @@ const AppLayout = () => {
   }, [isOpen]);
 
   return (
-    <div className=" ">
+    <div >
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
       <main
         className={`transition-all duration-300 ${
