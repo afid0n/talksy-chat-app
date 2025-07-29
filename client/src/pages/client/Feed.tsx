@@ -21,6 +21,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import instance from "@/services/instance";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 
 const Feed = () => {
   const { t } = useTranslation();
@@ -34,10 +35,23 @@ const Feed = () => {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+
+    if (token) {
+      localStorage.setItem("token", token);
+      // Optionally remove token from URL for cleanliness
+      window.history.replaceState({}, document.title, location.pathname);
+    }
+  }, [location]);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await instance.get("/users/me", { withCredentials: true });
+        const { data } = await instance.get("/users/me");
         dispatch(loginSuccess(data));
       } catch (error) {
         console.log("Not logged in", error);

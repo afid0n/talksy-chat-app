@@ -160,19 +160,17 @@ const login = async (req, res, next) => {
 
     console.log("RESPONSE ON SERVER: ", response);
 
-    const accessToken = response.accessToken;  // extract token here!
+    const accessToken = response.token;  // extract token here!
 
-    res.cookie("token", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // Remove setting cookie — no cookie for token anymore
+    // res.cookie("token", accessToken, { ... });
 
-
+    // Send token in JSON response instead
     res.status(200).json({
       message: response.message,
+      token: accessToken, // exactly this name, and this variable holds the JWT token string
     });
+
 
   } catch (error) {
     res.status(401).json({
@@ -181,6 +179,7 @@ const login = async (req, res, next) => {
     });
   }
 };
+
 
 
 const changePassword = async (req, res) => {

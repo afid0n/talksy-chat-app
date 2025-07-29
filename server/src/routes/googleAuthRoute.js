@@ -26,7 +26,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `${CLIENT_URL}/auth/login`, // fallback in case of error
+    failureRedirect: `${CLIENT_URL}/auth/login`,
     session: false,
   }),
   (req, res) => {
@@ -44,17 +44,11 @@ router.get(
       { expiresIn: "7d" }
     );
 
-res.cookie("token", accessToken, {
-  httpOnly: true,
-  secure: true,       
-  sameSite: "None",    
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
-
-
-
-    res.redirect(`${CLIENT_URL}/feed`);
+    // Redirect with token as URL param
+    const redirectUrl = `${CLIENT_URL}/feed?token=${accessToken}`;
+    res.redirect(redirectUrl);
   }
 );
+
 
 module.exports = router;

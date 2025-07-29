@@ -20,22 +20,13 @@ module.exports = (req, res, next) => {
 
 
 const verifyToken = (req, res, next) => {
-  // Try to get token from Authorization header first
-  let token = null;
-
   const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    token = authHeader.split(" ")[1];
-  }
 
-  // Fallback to cookie-based token
-  if (!token && req.cookies?.token) {
-    token = req.cookies.token;
-  }
-
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "No token provided!" });
   }
+
+  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET_KEY);
@@ -45,5 +36,6 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token!" });
   }
 };
+
 
 module.exports = verifyToken;

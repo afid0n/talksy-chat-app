@@ -1,8 +1,8 @@
 import { FaGoogle } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { enqueueSnackbar } from "notistack";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loginUser } from '@/services/userService';
 import { loginValidationSchema } from '@/validations/authValidation';
 import { useDispatch } from 'react-redux';
@@ -16,6 +16,40 @@ export default function LoginForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const urlToken = params.get("token");
+
+  if (urlToken) {
+    localStorage.setItem("token", urlToken);
+    instance.defaults.headers.common["Authorization"] = `Bearer ${urlToken}`;
+    window.history.replaceState({}, "", location.pathname);
+    fetchUser();
+  } else {
+    const savedToken = localStorage.getItem("token");
+    if (savedToken && savedToken !== "undefined") {
+      instance.defaults.headers.common["Authorization"] = `Bearer ${savedToken}`;
+      fetchUser();
+    } else {
+      navigate("/auth/login");
+    }
+  }
+
+  async function fetchUser() {
+    try {
+      const res = await instance.get<UserState>("/users/me");
+      dispatch(loginSuccess({ ...res.data, isAuthenticated: true }));
+    } catch {
+      localStorage.removeItem("token");
+      delete instance.defaults.headers.common["Authorization"];
+      navigate("/auth/login");
+    }
+  }
+}, [location.search, dispatch, navigate]);
+
+
   const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:7070";
 
   const formik = useFormik({
@@ -24,48 +58,55 @@ export default function LoginForm() {
       password: '',
     },
     validationSchema: loginValidationSchema,
-    onSubmit: async (values) => {
-      setLoading(true);
-      try {
-        // Step 1: login to get token (cookies are set)
-        const response = await loginUser(values);
-
-        if (response?.message !== "login successful") {
-          enqueueSnackbar(response?.message || t("login_failed"), { variant: "error" });
-          return;
-        }
+  onSubmit: async (values) => {
+  setLoading(true);
+  try {
+    // Step 1: login to get token
+    const response = await loginUser(values);
 
 
-        // Step 2: Get user info
-        const userRes = await instance.get<UserState>("/users/me", {
-          withCredentials: true,
-        });
 
-        const user = userRes.data;
-
-        const fullUser: UserState = {
-          ...user,
-          isAuthenticated: true,
-        };
-
-        // Step 3: dispatch to Redux
-        dispatch(loginSuccess(fullUser));
-
-        // Step 4: navigate
-        enqueueSnackbar(t("login_success"), { variant: "success" });
-        navigate("/feed");
-
-      } catch (error: any) {
-        const message = error.response?.data?.message || t("login_failed");
-        enqueueSnackbar(message, {
-          autoHideDuration: 2000,
-          anchorOrigin: { vertical: "bottom", horizontal: "right" },
-          variant: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
+    if (response?.message !== "login successful") {
+      enqueueSnackbar(response?.message || t("login_failed"), { variant: "error" });
+      setLoading(false);
+      return;
     }
+
+    // Save token to localStorage
+    localStorage.setItem("token", response.token);
+
+    // Set token as default Authorization header for future requests
+    instance.defaults.headers.common["Authorization"] = `Bearer ${response.token}`;
+
+    // Step 2: Get user info using the token set above
+    const userRes = await instance.get<UserState>("/users/me");
+
+    const user = userRes.data;
+
+    const fullUser: UserState = {
+      ...user,
+      isAuthenticated: true,
+    };
+
+    // Step 3: dispatch to Redux
+    dispatch(loginSuccess(fullUser));
+
+    // Step 4: navigate
+    enqueueSnackbar(t("login_success"), { variant: "success" });
+    navigate("/feed");
+
+  } catch (error: any) {
+    const message = error.response?.data?.message || t("login_failed");
+    enqueueSnackbar(message, {
+      autoHideDuration: 2000,
+      anchorOrigin: { vertical: "bottom", horizontal: "right" },
+      variant: "error",
+    });
+  } finally {
+    setLoading(false);
+  }
+}
+
   });
 
   return (

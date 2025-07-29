@@ -170,7 +170,7 @@ const login = async (credentials) => {
 
   return {
     message: "login successful",
-    accessToken: accessToken,
+    token: accessToken,
     refreshToken: refreshToken,
   };
 };

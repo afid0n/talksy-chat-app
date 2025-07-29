@@ -12,7 +12,6 @@ export const registerUser = async (
   payload: RegisterPayload
 ): Promise<RegisterResponse> => {
   try {
-    console.log("📦 Sending register payload:", payload);
     const response = await instance.post<RegisterResponse>("/users/register", payload);
     return response.data;
   } catch (error: unknown) {
@@ -24,15 +23,16 @@ export const registerUser = async (
 // Login user
 export const loginUser = async (
   credentials: LoginPayload
-): Promise<{ message: string }> => {
+): Promise<{ message: string , token:string}> => {
   try {
-    const response = await instance.post<{ message: string }>(
-      "/users/login",
-      credentials,
-      { withCredentials: true }
-    );
+    const response = await instance.post<{
+      message: string;
+      token: string;
+    }>("/users/login", credentials);
 
-    return response.data;
+    // Store token in localStorage for future requests
+    localStorage.setItem("token", response.data.token);
+    return { message: response.data.message, token: response.data.token };
   } catch (error: unknown) {
     const err = error as AxiosError<{ message?: string }>;
     throw new Error(err.response?.data?.message || err.message || "Failed to login.");
@@ -52,15 +52,23 @@ export const resendVerificationEmail = async (email: string): Promise<{ success:
 };
 
 export const getCurrentUser = async (): Promise<User> => {
+  const token = localStorage.getItem("token");
+
+  if (!token) throw new Error("No token found");
+
   try {
     const res = await instance.get<User>("/users/me", {
-      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     return res.data;
   } catch (error: any) {
     throw new Error(error?.response?.data?.message || "Failed to fetch current user");
   }
 };
+
+
 
 export const sendFriendRequest = async (targetId: string) => {
   const res = await instance.post(`/users/send-request/${targetId}`, {});

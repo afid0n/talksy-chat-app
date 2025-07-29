@@ -1,27 +1,25 @@
-import axios from "axios";
 import { API_BASE_URL } from "./api";
 
+import axios from "axios";
+
 const instance = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10_000,
-  withCredentials: true, 
-  headers: { "api-key": "code_academy" },
+  baseURL: API_BASE_URL|| "http://localhost:7070",
 });
 
-const getAccessToken = () => localStorage.getItem("token");
+const token = localStorage.getItem("token");
+if (token) {
+  instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
 
-instance.interceptors.request.use(
-  function (config) {
-    const token = getAccessToken(); 
-    if (token) {
-      // config.headers.Authorization = `Bearer ${token}`;
-    }
 
-    return config;
-  },
-  function (error) {
-    return Promise.reject(error);
+instance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
+
+
 
 export default instance;
