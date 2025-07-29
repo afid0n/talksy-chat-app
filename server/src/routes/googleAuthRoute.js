@@ -45,7 +45,7 @@ router.get(
     );
 
     // Redirect with token as URL param
-    const redirectUrl = `${CLIENT_URL}/feed?token=${accessToken}`;
+    const redirectUrl = `${CLIENT_URL}/auth/login?token=${accessToken}`;
     res.redirect(redirectUrl);
   }
 );
