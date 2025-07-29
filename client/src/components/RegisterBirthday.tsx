@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
@@ -20,7 +20,7 @@ const RegisterBirthday = ({
 }: RegisterBirthdayProps) => {
   const [date, setDate] = useState<Date | undefined>(birthday || undefined);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [isTooYoung, setIsTooYoung] = useState(false); // 🔸 new state
+  const [isTooYoung, setIsTooYoung] = useState(false);
 
   useEffect(() => {
     if (birthday) {
@@ -32,7 +32,7 @@ const RegisterBirthday = ({
   useEffect(() => {
     if (date) {
       const age = calculateAge(date);
-      setIsTooYoung(age < 16); 
+      setIsTooYoung(age < 16);
       setBirthday(date);
     }
   }, [date, setBirthday]);
@@ -52,20 +52,20 @@ const RegisterBirthday = ({
       initial={{ opacity: 0, x: 50 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -50 }}
-      className="text-gray-800 dark:text-gray-100"
+      className="text-gray-800 dark:text-gray-100 px-4 sm:px-6 md:px-10 py-6 max-w-md w-full mx-auto"
     >
-      <h2 className="text-2xl font-bold mb-4 text-center">
+      <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">
         {t("register_birthday_title")}
       </h2>
 
       {!showCalendar && (
         <button
           onClick={() => setShowCalendar(true)}
-          className="bg-yellow-400 dark:bg-yellow-500 flex items-center gap-2 w-full justify-center text-lg text-white px-6 py-2 rounded mb-4 hover:bg-yellow-500 dark:hover:bg-yellow-600 transition-all"
+          className="bg-yellow-400 dark:bg-yellow-500 flex items-center gap-2 w-full justify-center text-base sm:text-lg text-white px-6 py-2 rounded mb-4 hover:bg-yellow-500 dark:hover:bg-yellow-600 transition-all"
           type="button"
         >
           <p>{t("register_birthday_click")}</p>
-          <Cake />
+          <Cake size={20} />
         </button>
       )}
 
@@ -75,24 +75,26 @@ const RegisterBirthday = ({
             mode="single"
             selected={date}
             onSelect={setDate}
-            className="rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 shadow-sm"
+            className="rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 shadow-sm w-full sm:w-auto"
             captionLayout="dropdown"
           />
         </div>
       )}
 
       {date && (
-        <div className="mt-2 mb-4 text-center text-gray-700 dark:text-gray-300">
+        <div className="mt-2 mb-4 text-center text-sm sm:text-base text-gray-700 dark:text-gray-300 space-y-1">
           <p>
             🎂 {t("register_birthday_is")}{" "}
             <strong>{format(date, "MMMM d, yyyy")}</strong>
           </p>
           <p>
             🎉 {t("register_birthday_age")}{" "}
-            <strong>{calculateAge(date)}</strong> 
+            <strong>{calculateAge(date)}</strong>
           </p>
           {isTooYoung && (
-            <p className="text-red-500 mt-2">{t("register_birthday_min_age_error")}</p>
+            <p className="text-red-500 mt-2 text-sm sm:text-base">
+              {t("register_birthday_min_age_error")}
+            </p>
           )}
         </div>
       )}
@@ -108,7 +110,7 @@ const RegisterBirthday = ({
         <button
           onClick={onNext}
           disabled={!date || isTooYoung}
-          className="bg-yellow-500 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-yellow-600 dark:hover:bg-yellow-600"
+          className="bg-yellow-500 text-white px-4 py-2 rounded text-sm sm:text-base disabled:opacity-50 hover:bg-yellow-600 dark:hover:bg-yellow-600 transition-all"
           type="button"
         >
           {t("register_continue")}
