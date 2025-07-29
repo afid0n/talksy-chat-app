@@ -19,27 +19,26 @@ interface RegisterFormProps {
   loading?: boolean;
 }
 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:7070";
+
+const initialValues = {
+  username: "",
+  fullName: "",
+  email: "",
+  password: "",
+};
+
 const RegisterForm = ({ onBack, onSubmit, loading }: RegisterFormProps) => {
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [isDark, setIsDark] = useState(false);
-
-  // Ref for resetting captcha
   const recaptchaRef = useRef<ReCAPTCHA>(null);
-  // config.ts
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:7070";
 
-
+  // Sync theme on mount
   useEffect(() => {
-    const theme = localStorage.getItem("vite-ui-theme");
-    setIsDark(theme === "dark");
+    const checkTheme = () =>
+      document.documentElement.classList.contains("dark");
+    setIsDark(checkTheme());
   }, []);
-
-  const initialValues = {
-    username: "",
-    fullName: "",
-    email: "",
-    password: "",
-  };
 
   const validationSchema = Yup.object({
     username: Yup.string()
@@ -48,7 +47,9 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:7070";
     fullName: Yup.string()
       .min(3, t("register_fullname_min"))
       .required(t("register_fullname_required")),
-    email: Yup.string().email(t("register_email_invalid")).required(t("register_email_required")),
+    email: Yup.string()
+      .email(t("register_email_invalid"))
+      .required(t("register_email_required")),
     password: Yup.string()
       .min(6, t("register_password_min"))
       .required(t("register_password_required")),
@@ -68,39 +69,42 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:7070";
 
     try {
       await onSubmit(values);
-
     } catch (error: any) {
       setCaptchaVerified(false);
       if (recaptchaRef.current) {
         recaptchaRef.current.reset();
       }
 
-      enqueueSnackbar(
-        error?.message || t("register_failed"),
-        { variant: "error" }
-      );
+      enqueueSnackbar(error?.message || t("register_failed"), {
+        variant: "error",
+      });
     }
   };
-  const birthday = localStorage.getItem("register_birthday") || undefined;;
-  const location = localStorage.getItem("register_location") || undefined;;
-  const interests = localStorage.getItem("register_interests") || undefined;;
+
+  // Params from localStorage
+  const birthday = localStorage.getItem("register_birthday") || undefined;
+  const location = localStorage.getItem("register_location") || undefined;
+  const interests = localStorage.getItem("register_interests") || undefined;
 
   const params = new URLSearchParams();
-
   if (birthday) params.append("birthday", birthday);
   if (location) params.append("location", location);
   if (interests) params.append("interests", interests);
 
-
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-md rounded-lg py-3 px-8 w-full max-w-md mx-auto transition">
+    <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-md rounded-lg py-6 px-4 sm:px-8 w-full max-w-md mx-auto transition">
+      {/* Google Auth Button */}
       <button
         type="button"
-        onClick={() => window.location.href = `${SERVER_URL}/auth/google?${params.toString()}`}
+        onClick={() =>
+          (window.location.href = `${SERVER_URL}/auth/google?${params.toString()}`)
+        }
         className="flex items-center justify-center w-full py-2 mb-4 border border-gray-300 dark:border-zinc-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
       >
-        <FaGoogle className="mr-2" />{t("register_google_button")}
+        <FaGoogle className="mr-2" />
+        {t("register_google_button")}
       </button>
+
       <h2 className="text-xl font-semibold text-center text-gray-800 dark:text-white mb-4">
         {t("register_title")}
       </h2>
@@ -169,20 +173,23 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:7070";
               />
             </div>
 
-            <div className="flex justify-between space-x-4 pt-4">
+            <div className="flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
               <button
                 type="button"
                 onClick={onBack}
-                className="w-1/2 bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-200 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 transition"
+                className="w-full sm:w-1/2 bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-200 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 transition"
               >
-                <ChevronLeft className="inline-block mr-1" /> {t("register_back_button")}
+                <ChevronLeft className="inline-block mr-1" />
+                {t("register_back_button")}
               </button>
               <button
                 type="submit"
                 disabled={loading || isSubmitting || !captchaVerified}
-                className="w-1/2 bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-1/2 bg-yellow-600 text-white py-2 rounded-md hover:bg-yellow-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? t("register_submit_loading") : t("register_submit_button")}
+                {loading
+                  ? t("register_submit_loading")
+                  : t("register_submit_button")}
               </button>
             </div>
 

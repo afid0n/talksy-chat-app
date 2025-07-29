@@ -51,53 +51,58 @@ const RegisterCountry = ({ onNext, setLocation }: { onNext: () => void; setLocat
     onNext();
   };
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      className="max-w-md mx-auto"
-    >
-      <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+return (
+  <motion.div
+    initial={{ opacity: 0, x: 50 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -50 }}
+    className="w-full px-4 sm:px-6 md:px-8 lg:px-10 max-w-md md:max-w-lg lg:max-w-xl mx-auto"
+  >
+    <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">
       {t("register_country_title")}
-      </h2>
-      <p className="mb-4 text-gray-500 dark:text-gray-400">
-       {t("register_country_subtitle")}
+    </h2>
+    <p className="mb-4 text-sm sm:text-base text-gray-500 dark:text-gray-400">
+      {t("register_country_subtitle")}
+    </p>
+
+    <input
+      className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm sm:text-base text-gray-900 dark:text-gray-100 p-3 rounded outline-none focus:ring-2 focus:ring-yellow-400"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      placeholder={t("register_country_placeholder")}
+      autoComplete="off"
+    />
+
+    {loading && (
+      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        {t("register_country_loading")}
       </p>
+    )}
 
-      <input
-        className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-3 rounded outline-none focus:ring-2 focus:ring-yellow-400"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder={t("register_country_placeholder")}
-        autoComplete="off"
-      />
+    {!loading && query && (
+      <ul className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow mt-2 rounded max-h-60 overflow-y-auto">
+        {filtered.length > 0 ? (
+          filtered.map((item) => (
+            <li
+              key={item}
+              className={`p-2 sm:p-3 text-sm sm:text-base cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-600/20 dark:text-gray-100 ${
+                selected === item ? "bg-yellow-200 dark:bg-yellow-700" : ""
+              }`}
+              onClick={() => handleSelect(item)}
+            >
+              {item}
+            </li>
+          ))
+        ) : (
+          <li className="p-2 text-sm text-gray-500 dark:text-gray-400">
+            {t("register_country_no_matches")}
+          </li>
+        )}
+      </ul>
+    )}
+  </motion.div>
+);
 
-      {loading && (
-        <p className="mt-2 text-gray-500 dark:text-gray-400">{t("register_country_loading")}</p>
-      )}
-
-      {!loading && query && (
-        <ul className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow mt-2 rounded max-h-60 overflow-y-auto">
-          {filtered.length > 0 ? (
-            filtered.map((item) => (
-              <li
-                key={item}
-                className={`p-2 cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-600/20 dark:text-gray-100 ${
-                  selected === item ? "bg-yellow-200 dark:bg-yellow-700" : ""
-                }`}
-                onClick={() => handleSelect(item)}
-              >
-                {item}
-              </li>
-            ))
-          ) : (
-            <li className="p-2 text-gray-500 dark:text-gray-400">{t("register_country_no_matches")}</li>
-          )}
-        </ul>
-      )}
-    </motion.div>
-  );
 };
 
 export default RegisterCountry;

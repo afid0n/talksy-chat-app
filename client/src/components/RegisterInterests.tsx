@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { t } from "i18next";
 
 const allInterests = [
- "travel", "reading", "fitness", "coding", "music", "dogs", "cats", "gaming", "netflix",
+  "travel", "reading", "fitness", "coding", "music", "dogs", "cats", "gaming", "netflix",
   "photography", "art", "fashion", "cooking", "dancing", "movies", "hiking",
   "writing", "tech", "sports", "basketball", "football", "cycling", "skateboarding",
   "swimming", "diy", "makeup", "foodie", "gardening", "astrology",
@@ -15,7 +15,7 @@ interface RegisterInterestsProps {
   onNext: () => void;
   onBack: () => void;
   setInterests: (interests: string[]) => void;
-  initialInterests?: string[]; // optional to prefill selections
+  initialInterests?: string[];
 }
 
 const RegisterInterests = ({
@@ -24,10 +24,8 @@ const RegisterInterests = ({
   setInterests,
   initialInterests = [],
 }: RegisterInterestsProps) => {
-  // Initialize with parent's interests if any
   const [selected, setSelected] = useState<string[]>(initialInterests);
 
-  // Sync selected interests back to parent on changes
   useEffect(() => {
     setInterests(selected);
   }, [selected, setInterests]);
@@ -45,13 +43,16 @@ const RegisterInterests = ({
       initial={{ opacity: 0, x: 50 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -50 }}
+      className="w-full max-w-4xl px-4 sm:px-6 md:px-10 mx-auto"
     >
-      <h2 className="text-2xl font-bold mb-2 dark:text-white">{t("register_interests_title")}</h2>
-      <p className="mb-4 text-gray-500 dark:text-gray-400">
+      <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 dark:text-white text-center sm:text-left">
+        {t("register_interests_title")}
+      </h2>
+      <p className="mb-4 text-sm sm:text-base text-gray-500 dark:text-gray-400 text-center sm:text-left">
         {t("register_interests_subtitle")}
       </p>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {allInterests.map((interest) => {
           const isSelected = selected.includes(interest);
           const isDisabled = selected.length >= 5 && !isSelected;
@@ -62,7 +63,7 @@ const RegisterInterests = ({
               onClick={() => toggleInterest(interest)}
               disabled={isDisabled}
               className={`
-                p-2 rounded border text-sm transition
+                p-2 rounded border text-xs sm:text-sm transition text-center
                 ${isSelected
                   ? "bg-yellow-400 text-white"
                   : isDisabled
@@ -78,7 +79,7 @@ const RegisterInterests = ({
         })}
       </div>
 
-      <div className="flex justify-between mt-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mt-6 gap-3 sm:gap-0">
         <button
           onClick={onBack}
           className="text-sm underline text-gray-600 dark:text-gray-300"
@@ -89,7 +90,7 @@ const RegisterInterests = ({
         <button
           onClick={onNext}
           disabled={selected.length < 3}
-          className="bg-yellow-500 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-yellow-500 text-white text-sm px-5 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
           type="button"
         >
           {t("register_interests_continue")}
