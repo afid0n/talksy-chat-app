@@ -4,7 +4,7 @@ const mockCountries: Country[] = [
   {
     code: "AZ",
     name: { en: "Azerbaijan", az: "Azərbaycan", tr: "Azerbaycan", ru: "Азербайджан" },
-    cities: ["Baku", "Ganja", "Sumqayit", "Shaki","Nakhchivan"],
+    cities: ["Baku", "Ganja", "Sumqayit", "Shaki","Nakhchivan" , "Zaqatala", "Lankaran", "Mingachevir"],
   },
   {
     code: "TR",
