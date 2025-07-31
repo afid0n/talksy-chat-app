@@ -11,6 +11,7 @@ import Home from "../pages/client/Home";
 import Profile from "../pages/client/Profile";
 import NotFound from "../pages/Common/NotFound";
 import ChatWrapper from "../pages/client/Chat";
+import RedirectIfAuth from "@/components/RedirectIfAuth";
 
 const ROUTES = [
   {
@@ -47,32 +48,44 @@ const ROUTES = [
       },
     ],
   },
-  {
-    path: "/auth/",
-    element: <AuthLayout />,
-    children: [
-      {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "register",
-        element: <Register />,
-      },
-      {
-        path: "forgot-password",
-        element: <ForgotPassword />,
-      },
-      {
-        path: "reset-password", 
-        element: <ResetPassword />,
-      },
-      {
-        path: "email-verified",
-        element: <VerifyEmail />,
-      },
-    ],
-  },
+{
+  path: "/auth/",
+  element: <AuthLayout />,
+  children: [
+    {
+      path: "login",
+      element: (
+        <RedirectIfAuth>
+          <Login />
+        </RedirectIfAuth>
+      ),
+    },
+    {
+      path: "register",
+      element: (
+        <RedirectIfAuth>
+          <Register />
+        </RedirectIfAuth>
+      ),
+    },
+    {
+      path: "forgot-password",
+      element: (
+        <RedirectIfAuth>
+          <ForgotPassword />
+        </RedirectIfAuth>
+      ),
+    },
+    {
+      path: "reset-password",
+      element: <ResetPassword />, // allow access always (optional)
+    },
+    {
+      path: "email-verified",
+      element: <VerifyEmail />, // allow access always
+    },
+  ],
+},
   {
     path: "*",
     element: <NotFound />,
